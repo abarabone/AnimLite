@@ -13,6 +13,9 @@
 /Assets/UniGLTF/
 /Assets/VRM10/
 /Assets/VRMShaders/
+/Assets/UniGLTF.meta
+/Assets/VRM10.meta
+/Assets/VRMShaders.meta
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

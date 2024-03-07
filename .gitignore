@@ -17,6 +17,8 @@
 /Assets/VRM10.meta
 /Assets/VRMShaders.meta
 
+/Assets/AnimLite/**.meta
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /[Mm]emoryCaptures/

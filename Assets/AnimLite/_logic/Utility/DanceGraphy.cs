@@ -15,53 +15,6 @@ namespace AnimLite.DancePlayable
     using AnimLite.Vrm;
 
 
-    [System.Serializable]
-    public class DanceSet
-    {
-        public AudioDefine Audio;
-
-        public DanceMotionDefine[] Motions;
-    }
-
-    [System.Serializable]
-    public class AudioDefine
-    {
-        public AudioSource AudioSource;
-        public AudioClip AudioClip;
-
-        public float DelayTime;
-    }
-
-    [System.Serializable]
-    public class DanceMotionDefine
-    {
-        [FilePath]
-        public string VmdFilePath;
-        [FilePath]
-        public string FaceMappingFilePath;
-
-        public Animator ModelAnimator;
-        public SkinnedMeshRenderer FaceRenderer;
-
-        public float DelayTime;
-
-        [HideInInspector] public bool OverWritePositionAndRotation;
-        [HideInInspector] public Vector3 Position;
-        [HideInInspector] public Quaternion Rotation;
-    }
-
-
-    public static class DanceGraphyExtension
-    {
-
-        public static Task<DanceGraphy> CreateDanceGraphyAsync(this DanceSet dance, CancellationToken ct)
-        {
-            return DanceGraphy.CreateDanceGraphyAsync(dance, ct);
-        }
-
-    }
-
-
     public class DanceGraphy : IDisposable
     {
 
@@ -121,8 +74,12 @@ namespace AnimLite.DancePlayable
 
             static void createAudioPlayable_(PlayableGraph graph, AudioDefine audio)
             {
+                if (audio.AudioSource.IsUnityNull()) return;
+
                 graph.CreateAudio(audio.AudioSource, audio.AudioClip, audio.DelayTime);
             }
+
+
 
             static async Task<MotionResouce[]> buildMotionResourcesAsync_(DanceMotionDefine[] motions, CancellationToken ct)
             {
@@ -147,6 +104,7 @@ namespace AnimLite.DancePlayable
                     };
                 }
             }
+
 
 
             static void createMotionPlayables_(PlayableGraph graph, DanceMotionDefine[] motions, MotionResouce[] resources)
@@ -174,7 +132,7 @@ namespace AnimLite.DancePlayable
                     var rkf = res.vmddata.RotationStreams
                         .ToKeyFinderWith<Key4CatmulRot, Clamp>();
 
-                    var job = motion.ModelAnimator.create(res.bone, pkf, rkf, timer);
+                    var job = motion.ModelAnimator.create(res.bone, pkf, rkf, timer, motion.FootIkMode, motion.BodyScale);
 
                     graph.CreateVmdAnimationJobWithSyncScript(motion.ModelAnimator, job, motion.DelayTime);
                 }

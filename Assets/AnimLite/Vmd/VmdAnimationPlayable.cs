@@ -152,8 +152,9 @@ namespace AnimLite.Vmd
     public static class VmdJobExtension
     {
 
+
         public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
-            this Animator anim, TransformHandleMappings bone, TPFinder pkf, TRFinder rkf, StreamingTimer timer, VmdFootIkMode footIkMode = VmdFootIkMode.auto)
+            this Animator anim, TransformHandleMappings bone, TPFinder pkf, TRFinder rkf, StreamingTimer timer, VmdFootIkMode footIkMode = VmdFootIkMode.auto, float bodyScale = 0)
                 where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
                 where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
         {
@@ -178,9 +179,9 @@ namespace AnimLite.Vmd
                 useLegPositionIk = useIk.pos,
                 useFootRotationIk = useIk.rot,
 
-                body = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bone),
+                body = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bone, bodyScale),
 
-                foot = anim.ToFootIkOperator<TransformHandleMappings, TfHandle>(bone),
+                foot = anim.ToFootIkOperator<TransformHandleMappings, TfHandle>(bone, bodyScale),
             };
 
 

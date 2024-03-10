@@ -22,7 +22,7 @@ namespace AnimLite.DancePlayable
         /// </summary>
         public static void CreateVmdAnimationJobWithSyncScript<TJob>(
             this PlayableGraph graph,
-            Animator anim, TJob job, float delay = 0)
+            Animator anim, TJob job, float delay = 0, VmdFootIkMode footIkMode = VmdFootIkMode.auto)
                 where TJob : struct, IAnimationJob, IVmdAnimationJob
             // 変数で渡された job は、ジェネリクスの場合 burst コンパイルに失敗するとか書いてあった気がしたけど、大丈夫だった
         {

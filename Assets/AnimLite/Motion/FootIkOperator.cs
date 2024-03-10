@@ -95,16 +95,21 @@ namespace AnimLite.IK
     {
 
         public static FootIkOperator<Tf> ToFootIkTransformOperator(
-            this Animator anim, TransformMappings bone)
+            this Animator anim, TransformMappings bone, float bodyScale = 0)
         =>
-            anim.ToFootIkOperator<TransformMappings, Tf>(bone);
+            anim.ToFootIkOperator<TransformMappings, Tf>(bone, bodyScale);
 
 
-        public static FootIkOperator<TTf> ToFootIkOperator<TBone, TTf>(this Animator anim, TBone bone)
+        public static FootIkOperator<TTf> ToFootIkOperator<TBone, TTf>(this Animator anim, TBone bone, float bodyScale = 0)
             where TBone : ITransformMappings<TTf>
             where TTf : ITransformProxy, new()
         {
-            var bodySizeRate = anim.humanScale * 0.8f;// 0.8 は、ミク → humaoid 補正
+            // mmd と humanoid のスケール比 80cm : 100cm くらい
+            // 158cm のミクの股位置がそのくらいと思われる
+            // humanoid の humanscale 1m は、hip の位置らしいとのこと
+            var bodyScale_ = bodyScale == 0
+                ? anim.humanScale * 0.8f// 0.8 は、ミク → humaoid 補正
+                : bodyScale * 0.8f;
 
             var tfanim = anim.transform;
 
@@ -115,11 +120,9 @@ namespace AnimLite.IK
             var footIkOffsetR = tfanim.InverseTransformVector(footRpos);
             // vmd には相対位置しか記録されないと推測されるので、初期ポーズでの足の位置はこちらで用意する必要がある。
 
-            anim.BindStreamTransform(anim.transform);// バインドしないと rootMotionPosition が取得できない様子
-
             return new FootIkOperator<TTf>
             {
-                bodyScale = bodySizeRate,
+                bodyScale = bodyScale_,
 
                 footIkOffsetL = footIkOffsetL,
                 footIkOffsetR = footIkOffsetR,

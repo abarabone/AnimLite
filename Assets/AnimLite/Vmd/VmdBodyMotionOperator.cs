@@ -35,35 +35,32 @@ namespace AnimLite.Vmd
 
 
         public static VmdBodyMotionOperator<TransformMappings, Tf> ToVmdBodyTransformMotionOperator(
-            this Animator anim, TransformMappings bone)
+            this Animator anim, TransformMappings bone, float bodyScale = 0)
         =>
-            anim.ToVmdBodyMotionOperator<TransformMappings, Tf>(bone);
+            anim.ToVmdBodyMotionOperator<TransformMappings, Tf>(bone, bodyScale);
 
 
 
-        // mmd と humanoid のスケール比 80cm : 100cm くらい
-        // 158cm のミクの股位置がそのくらいと思われる
-        // humanoid の humanscale 1m は、hip の位置らしいとのこと
-
-        public static VmdBodyMotionOperator<TBone, TTf> ToVmdBodyMotionOperator<TBone, TTf>(
-            this Animator anim, TBone bone)
-                where TBone : ITransformMappings<TTf>
-                where TTf : ITransformProxy
+        public static VmdBodyMotionOperator<TBone, TTf> ToVmdBodyMotionOperator<TBone, TTf>(this Animator anim, TBone bone, float bodyScale = 0)
+            where TBone : ITransformMappings<TTf>
+            where TTf : ITransformProxy
         {
-            //anim.ResetPose();
-
-            var bodySizeRate = anim.humanScale * 0.8f;// 0.8 は、ミク → humaoid 補正
 
             // humanoid の初期ポーズの中心が root に来るようで、そのｙ位置はたぶん 1m * humanScale 
             // なので仕方なく hip の位置を humanScale で元に戻すために、ここで設定する。
             //var bodyInitialOffset = Vector3.up.As_float3() * anim.humanScale;
-            // ↑上記のように考えていたが、どうも hip の高さと考えてよいらしい。
+            // ↑上記のように考えていたが、どうも hip の高さと考えてよいらしい。なので、下記のようにする。
 
-            //anim.BindStreamTransform(anim.transform);// バインドしないと rootMotionPosition が取得できない様子
+            // mmd と humanoid のスケール比 80cm : 100cm くらい
+            // 158cm のミクの股位置がそのくらいと思われる
+            // humanoid の humanscale 1m は、hip の位置らしいとのこと
+            var bodyScale_ = bodyScale == 0
+                ? anim.humanScale * 0.8f// 0.8 は、ミク → humaoid 補正
+                : bodyScale * 0.8f;
 
             return new VmdBodyMotionOperator<TBone, TTf>
             {
-                bodyScale = bodySizeRate,
+                bodyScale = bodyScale_,
 
                 bone = bone,
 

@@ -54,7 +54,7 @@ namespace AnimLite.Samples
 
 
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             if (this.disposabes == null) return;
 

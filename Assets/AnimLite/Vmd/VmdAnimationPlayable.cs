@@ -51,6 +51,7 @@ namespace AnimLite.Vmd
         }
 
 
+
         //[BurstCompile(FloatPrecision.Medium, FloatMode.Fast)]
         public void ProcessRootMotion(AnimationStream stream)
         {

@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Animations;
 using Unity.VisualScripting;
 
 namespace AnimLite.DancePlayable
@@ -17,7 +18,7 @@ namespace AnimLite.DancePlayable
 
         private async Awaitable OnEnable()
         {
-
+            
             addChildrenMotionsToDanceSet_();
 
             getFaceRendererIfNothing_();
@@ -65,6 +66,10 @@ namespace AnimLite.DancePlayable
         {
             this.graphy?.Dispose();
             this.graphy = null;
+
+            this.dance.Motions
+                .Where(motion => !motion.ModelAnimator.IsUnityNull())
+                .ForEach(motion => motion.ModelAnimator.UnbindAllStreamHandles());
         }
 
     }

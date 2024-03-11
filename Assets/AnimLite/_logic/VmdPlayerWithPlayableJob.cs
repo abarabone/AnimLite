@@ -26,7 +26,7 @@ namespace AnimLite.Samples
 
         async Awaitable Start()
         {
-
+            
             //this.anim.ResetPose();//
 
 

@@ -97,7 +97,7 @@ namespace AnimLite.Vmd
                 var root = new HumanBoneReference<TTf>
                 {
                     TransformHandle = anim.CreateTransformProxy<TTf>(anim.GetBoneTransform(HumanBodyBones.Hips).parent),
-                    //TransformHandle = anim.BindStreamTransform(anim.avatarRoot),
+                    //TransformHandle = anim.CreateTransformProxy<TTf>(anim.avatarRoot),
                     HumanBoneId = HumanBodyBones.LastBone,
                     StreamId = (int)MmdBodyBones.ëSÇƒÇÃêe,
                 };
@@ -115,7 +115,8 @@ namespace AnimLite.Vmd
                 var q =
                     from x in refs
                     let tf = x.HumanBoneId == HumanBodyBones.LastBone
-                        ? anim.GetBoneTransform(HumanBodyBones.Hips).parent//anim.avatarRoot
+                        ? anim.GetBoneTransform(HumanBodyBones.Hips).parent
+                        //? anim.avatarRoot
                         : anim.GetBoneTransform(x.HumanBoneId)
 
                     let rot = VmdBone.HumanBodyToAdjustRotation.TryGetOrDefault(x.HumanBoneId, default_rotation)

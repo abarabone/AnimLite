@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace AnimLite.Samples
 {
@@ -59,6 +60,9 @@ namespace AnimLite.Samples
             if (this.disposabes == null) return;
 
             this.disposabes.Dispose();
+
+            this.anim.UnbindAllStreamHandles();
+            this.anim.ResetPose();
         }
 
 

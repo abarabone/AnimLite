@@ -49,6 +49,36 @@ namespace AnimLite.Utility
         public static implicit operator T(DisposableWrap<T> src) => src.Valule;
     }
 
+    public class ProgressState : IDisposable
+    {
+        TaskCompletionSource<bool> tcs;
+
+        public bool IsInProgress => !this.tcs?.Task.IsCompleted ?? false;
+
+
+        public ProgressState Start()
+        {
+            //Debug.Log("start");
+            this.tcs = new TaskCompletionSource<bool>();
+
+            return this;
+        }
+
+        public async Awaitable WaitForCompleteAsync()
+        {
+            //Debug.Log("wait on");
+            await this.tcs?.Task;
+            Debug.Log("wait off");
+        }
+
+        public void Dispose()
+        {
+            //Debug.Log("end");
+            this.tcs.SetResult(true);
+        }
+    }
+
+
 
     public static class MathUtilityExtenstion
     {

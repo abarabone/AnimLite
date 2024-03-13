@@ -13,20 +13,23 @@ namespace AnimLite.DancePlayable
         [SerializeField]
         public DanceSet dance;
 
+        public ProgressState LoadingState { get; private set; } = new ProgressState();
+
 
         DanceGraphy graphy;
 
         private async Awaitable OnEnable()
         {
-            
-            addChildrenMotionsToDanceSet_();
+            using (this.LoadingState.Start())
+            {
+                moveChildrenMotionsToDanceSet_();
 
-            getFaceRendererIfNothing_();
+                getFaceRendererIfNothing_();
 
-            this.graphy = await this.dance.CreateDanceGraphyAsync(this.destroyCancellationToken);
+                this.graphy = await this.dance.CreateDanceGraphyAsync(this.destroyCancellationToken);
 
-            this.graphy.graph.Play();
-
+                this.graphy.graph.Play();
+            }
             return;
 
 
@@ -37,7 +40,7 @@ namespace AnimLite.DancePlayable
                     .ForEach(motion => motion.FaceRenderer = motion.ModelAnimator.FindFaceRenderer());
             }
 
-            void addChildrenMotionsToDanceSet_()
+            void moveChildrenMotionsToDanceSet_()
             {
                 var q =
                     from x in this.GetComponentsInChildren<DanceHumanDefine>()
@@ -48,6 +51,8 @@ namespace AnimLite.DancePlayable
                     ;
 
                 this.dance.Motions = this.dance.Motions.Concat(q).ToArray();
+
+                this.transform.DetachChildren();
 
                 return;
 
@@ -62,14 +67,21 @@ namespace AnimLite.DancePlayable
             }
         }
 
-        void OnDisable()
+        async Awaitable OnDisable()
         {
+            await this.LoadingState.WaitForCompleteAsync();
+
+            Debug.Log("disable start");
             this.graphy?.Dispose();
             this.graphy = null;
 
             this.dance.Motions
                 .Where(motion => !motion.ModelAnimator.IsUnityNull())
-                .ForEach(motion => motion.ModelAnimator.UnbindAllStreamHandles());
+                .ForEach(motion =>
+                {
+                    motion.ModelAnimator.UnbindAllStreamHandles();
+                    motion.ModelAnimator.ResetPose();
+                });
         }
 
     }

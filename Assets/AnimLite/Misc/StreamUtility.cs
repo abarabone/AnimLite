@@ -25,7 +25,6 @@ namespace AnimLite.Utility
                 var tf = bonedict.TryGetOrDefault(s.name);
                 if (tf == null) continue;
 
-                Debug.Log(tf.name);
                 tf.SetLocalPositionAndRotation(s.position, s.rotation);// çƒåvéZÇ∆Ç©ëñÇÈÇÒÇæÇÎÇ§Ç©Åc
             }
         }

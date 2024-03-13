@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,12 +58,18 @@ namespace AnimLite.DancePlayable
         {
             var graph = PlayableGraph.Create();
             using var registed = ct.Register(() => graph.Destroy());
-            
+
+            var motions = dance.Motions
+                .Where(motion => motion.FaceMappingFilePath != null && File.Exists(motion.FaceMappingFilePath))
+                .Where(motion => motion.VmdFilePath != null && File.Exists(motion.VmdFilePath))
+                .ToArray();
+
+
             createAudioPlayable_(graph, dance.Audio);
 
-            var resources = await buildMotionResourcesAsync_(dance.Motions, ct);
+            var resources = await buildMotionResourcesAsync_(motions, ct);
 
-            createMotionPlayables_(graph, dance.Motions, resources);
+            createMotionPlayables_(graph, motions, resources);
 
             return new DanceGraphy
             {
@@ -117,7 +124,7 @@ namespace AnimLite.DancePlayable
 
                     createBodyMotion_(motion, res, timer);
 
-                    createFaceMotion_(motion, res,timer);
+                    createFaceMotion_(motion, res, timer);
 
                     overwritePosition(motion);
                 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -49,34 +50,56 @@ namespace AnimLite.Utility
         public static implicit operator T(DisposableWrap<T> src) => src.Valule;
     }
 
-    public class ProgressState : IDisposable
+    public struct DisposableSemapho : IDisposable
     {
-        TaskCompletionSource<bool> tcs;
+        SemaphoreSlim semapho;
 
-        public bool IsInProgress => !this.tcs?.Task.IsCompleted ?? false;
+        public DisposableSemapho(SemaphoreSlim semapho) => this.semapho = semapho;
 
+        public Task WaitAsync() => this.semapho.WaitAsync();
 
-        public ProgressState Start()
+        public void Dispose() => this.semapho.Release();
+    }
+    public static class SemaphoExtension
+    {
+        public static async Task<DisposableSemapho> WaitAsyncDisposable(this SemaphoreSlim ss)
         {
-            //Debug.Log("start");
-            this.tcs = new TaskCompletionSource<bool>();
+            var ds = new DisposableSemapho(ss);
 
-            return this;
-        }
-
-        public async Awaitable WaitForCompleteAsync()
-        {
-            //Debug.Log("wait on");
-            await this.tcs?.Task;
-            Debug.Log("wait off");
-        }
-
-        public void Dispose()
-        {
-            //Debug.Log("end");
-            this.tcs.SetResult(true);
+            await ds.WaitAsync();
+            
+            return ds;
         }
     }
+
+    //public class ProgressState : IDisposable
+    //{
+    //    TaskCompletionSource<bool> tcs;
+
+    //    public bool IsInProgress => !this.tcs?.Task.IsCompleted ?? false;
+
+
+    //    public ProgressState Start()
+    //    {
+    //        //Debug.Log("start");
+    //        this.tcs = new TaskCompletionSource<bool>();
+
+    //        return this;
+    //    }
+
+    //    public async Awaitable WaitForCompleteAsync()
+    //    {
+    //        //Debug.Log("wait on");
+    //        await this.tcs?.Task;
+    //        Debug.Log("wait off");
+    //    }
+
+    //    public void Dispose()
+    //    {
+    //        //Debug.Log("end");
+    //        this.tcs.SetResult(true);
+    //    }
+    //}
 
 
 
@@ -262,6 +285,18 @@ namespace AnimLite.Utility.Linq
             e.Select((x, i) => { f(x, i); return x; })
             ;
 
+
+        public static async Awaitable<T[]> AwaitAllAsync<T>(this IEnumerable<Awaitable<T>> src, Func<T, bool> criteria = default)
+        {
+            var dst = new List<T>();
+            foreach (var e in src)
+            {
+                var t = await e;
+                if (!criteria?.Invoke(t) ?? false) continue;
+                dst.Add(t);
+            }
+            return dst.ToArray();
+        }
 
         public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) => Task.WhenAll(src);
         //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) => Task.WhenAll(src);

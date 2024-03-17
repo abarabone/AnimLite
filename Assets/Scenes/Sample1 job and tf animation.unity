@@ -2068,7 +2068,7 @@ GameObject:
   - component: {fileID: 1941398668}
   - component: {fileID: 1941398667}
   m_Layer: 0
-  m_Name: job_playable_animation
+  m_Name: job_playable_animation -> (0)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

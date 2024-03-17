@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
@@ -13,23 +14,24 @@ namespace AnimLite.DancePlayable
         [SerializeField]
         public DanceSet dance;
 
-        public ProgressState LoadingState { get; private set; } = new ProgressState();
+        //public ProgressState LoadingState { get; private set; } = new ProgressState();
+        public SemaphoreSlim DanceSemapho { get; } = new SemaphoreSlim(1, 1);
 
 
         DanceGraphy graphy;
 
         private async Awaitable OnEnable()
         {
-            using (this.LoadingState.Start())
-            {
-                moveChildrenMotionsToDanceSet_();
+            using var d = await this.DanceSemapho.WaitAsyncDisposable();
 
-                getFaceRendererIfNothing_();
+            moveChildrenMotionsToDanceSet_();
 
-                this.graphy = await this.dance.CreateDanceGraphyAsync(this.destroyCancellationToken);
+            getFaceRendererIfNothing_();
 
-                this.graphy.graph.Play();
-            }
+            this.graphy = await this.dance.CreateDanceGraphyAsync(this.destroyCancellationToken);
+
+            this.graphy.graph.Play();
+
             return;
 
 
@@ -69,7 +71,7 @@ namespace AnimLite.DancePlayable
 
         async Awaitable OnDisable()
         {
-            await this.LoadingState.WaitForCompleteAsync();
+            using var d = await this.DanceSemapho.WaitAsyncDisposable();
 
             Debug.Log("disable start");
             this.graphy?.Dispose();

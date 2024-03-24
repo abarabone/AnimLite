@@ -3,14 +3,15 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
+using UnityEngine.Playables;
 
 namespace AnimLite.DancePlayable
 {
     using AnimLite.Utility;
+    using AnimLite.Vrm;
 
     public class DanceSetHolder : MonoBehaviour
     {
-
         [SerializeField]
         public DanceSet dance;
 
@@ -19,6 +20,10 @@ namespace AnimLite.DancePlayable
 
 
         DanceGraphy graphy;
+
+        public PlayableGraph Graph => this.graphy.graph;
+
+
 
         private async Awaitable OnEnable()
         {
@@ -67,6 +72,15 @@ namespace AnimLite.DancePlayable
                     return m;
                 }
             }
+
+            //void toFullpath_()
+            //{
+            //    foreach (var motion in this.dance.Motions)
+            //    {
+            //        motion.FaceMappingFilePath = (FullPath)motion.FaceMappingFilePath;
+            //        motion.VmdFilePath = (FullPath)motion.VmdFilePath;
+            //    }
+            //}
         }
 
         async Awaitable OnDisable()
@@ -86,5 +100,15 @@ namespace AnimLite.DancePlayable
                 });
         }
 
+        //private void Awake()
+        //{
+        //    //Debug.Log((string)("abc.txt"));
+        //    Debug.Log(PathUnit.ParentPath);
+        //    Debug.Log(Application.consoleLogPath);
+        //    Debug.Log(Application.dataPath);
+        //    Debug.Log(Application.persistentDataPath);
+        //    Debug.Log(Application.streamingAssetsPath);
+        //    Debug.Log(Application.temporaryCachePath);
+        //}
     }
 }

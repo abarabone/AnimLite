@@ -36,9 +36,9 @@ namespace AnimLite.DancePlayable
     public class DanceMotionDefine
     {
         [FilePath]
-        public string VmdFilePath;
+        public PathUnit VmdFilePath;
         [FilePath]
-        public string FaceMappingFilePath;
+        public PathUnit FaceMappingFilePath;
 
         public Animator ModelAnimator;
         public SkinnedMeshRenderer FaceRenderer;

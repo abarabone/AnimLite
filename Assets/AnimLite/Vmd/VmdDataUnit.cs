@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AnimLite.Vmd
 {
     using AnimLite.Vrm;
+    using AnimLite.Utility;
 
 
     /// <summary>
@@ -33,19 +35,22 @@ namespace AnimLite.Vmd
     {
 
         public static Task<(VmdStreamData data, VmdFaceMapping facemap)> BuildVmdStreamDataAsync(
-            string vmdFilePath, string faceMapFilePath, CancellationToken ct) =>
+            PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct) =>
+                BuildVmdStreamDataAsync(vmdFilePath, faceMapFilePath, default, ct);
+
+        public static Task<(VmdStreamData data, VmdFaceMapping facemap)> BuildVmdStreamDataAsync(
+            PathUnit vmdFilePath, PathUnit faceMapFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct) =>
                 Task.Run(() =>
                 {
                     var vmddata = VmdParser.LoadVmd(vmdFilePath);
                     if (ct.IsCancellationRequested) return default;
 
-                    var facemap = VrmParser.ParseFaceMap(faceMapFilePath);
+                    var facemap = defaultmap.VmdToVrmMaps ?? VrmParser.ParseFaceMap(faceMapFilePath);
                     if (ct.IsCancellationRequested) return default;
 
                     var streamdata = vmddata.BuildVmdStreamData(facemap);
                     return (streamdata, facemap);
                 }, ct);
-
 
         public static Task<VmdStreamData> BuildVmdStreamDataAsync(
             this VmdMotionData vmdData, VmdFaceMapping facemap, CancellationToken ct) =>

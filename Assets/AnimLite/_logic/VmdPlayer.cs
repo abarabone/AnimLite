@@ -1,6 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
+using Unity.VisualScripting;
 
 namespace AnimLite.Samples
 {
@@ -16,10 +17,10 @@ namespace AnimLite.Samples
     {
 
         [FilePath]
-        public string VmdFilePath;
+        public PathUnit VmdFilePath;
 
         [FilePath]
-        public string FaceMappingFilePath;
+        public PathUnit FaceMappingFilePath;
 
         public Animator anim;
 
@@ -57,11 +58,10 @@ namespace AnimLite.Samples
 
         private void OnDisable()
         {
-            if (this.disposabes == null) return;
+            this.disposabes?.Dispose();
+            this.disposabes = null;
 
-            this.disposabes.Dispose();
-
-            this.anim.UnbindAllStreamHandles();
+            if (this.anim.IsUnityNull()) return;
             this.anim.ResetPose();
         }
 
@@ -72,8 +72,8 @@ namespace AnimLite.Samples
             //this.anim.ResetPose();//
 
             // ファイルからデータを読み下す
-            var vmdStreamData = await VmdParser.ParseVmdAsync(this.VmdFilePath, this.destroyCancellationToken);
-            var faceMapping = await VrmParser.ParseFaceMapAsync(this.FaceMappingFilePath, this.destroyCancellationToken);
+            var vmdStreamData = await VmdParser.ParseVmdAsync(this.VmdFilePath.ToFullPath(), this.destroyCancellationToken);
+            var faceMapping = await VrmParser.ParseFaceMapAsync(this.FaceMappingFilePath.ToFullPath(), this.destroyCancellationToken);
 
             // データを利用できる形式に変換する
             this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -114,7 +114,8 @@ namespace AnimLite.Samples
 
         void Update()
         {
-            if (!this.rot_data.KeyStreams.Values.IsCreated) return;
+            //if (!this.rot_data.KeyStreams.Values.IsCreated) return;
+            if (this.disposabes == null) return;
 
 
             // タイマーを進める

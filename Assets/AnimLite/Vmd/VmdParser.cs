@@ -17,14 +17,14 @@ namespace AnimLite.Vmd
     public static class VmdParser
     {
 
-        public static Task<VmdMotionData> ParseVmdAsync(string filepath, CancellationToken ct) =>
+        public static Task<VmdMotionData> ParseVmdAsync(PathUnit filepath, CancellationToken ct) =>
             Task.Run(() => LoadVmd(filepath), ct);
 
         public static Task<VmdMotionData> LoadVmdAsync(this TextAsset vmdFileAsset, CancellationToken ct) =>
             Task.Run(() => LoadVmd(vmdFileAsset), ct);
 
 
-        public static VmdMotionData LoadVmd(string filepath)
+        public static VmdMotionData LoadVmd(PathUnit filepath)
         {
             using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 

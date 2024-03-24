@@ -662,11 +662,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-    FaceMappingFilePath: Assets/face_map.txt
+    VmdFilePath:
+      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+    FaceMappingFilePath:
+      Value: 
     ModelAnimator: {fileID: 802923685}
     FaceRenderer: {fileID: 0}
     DelayTime: 1.2
+    FootIkMode: 0
+    BodyScale: 0
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -715,11 +719,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-    FaceMappingFilePath: Assets/face_map.txt
+    VmdFilePath:
+      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+    FaceMappingFilePath:
+      Value: 
     ModelAnimator: {fileID: 901753835}
     FaceRenderer: {fileID: 0}
     DelayTime: 1
+    FootIkMode: 0
+    BodyScale: 0
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -773,11 +781,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-    FaceMappingFilePath: Assets/face_map.txt
+    VmdFilePath:
+      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+    FaceMappingFilePath:
+      Value: 
     ModelAnimator: {fileID: 2086145749}
     FaceRenderer: {fileID: 0}
     DelayTime: 1.4
+    FootIkMode: 0
+    BodyScale: 0
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -2479,6 +2491,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1720885307}
+  - component: {fileID: 1720885309}
   - component: {fileID: 1720885306}
   - component: {fileID: 1720885308}
   m_Layer: 0
@@ -2506,35 +2519,51 @@ MonoBehaviour:
       AudioClip: {fileID: 0}
       DelayTime: 0
     Motions:
-    - VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-      FaceMappingFilePath: Assets/face_map.txt
+    - VmdFilePath:
+        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      FaceMappingFilePath:
+        Value: 
       ModelAnimator: {fileID: 1693636018}
       FaceRenderer: {fileID: 1693636017}
       DelayTime: 0
+      FootIkMode: 0
+      BodyScale: 0
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-      FaceMappingFilePath: Assets/face_map.txt
+    - VmdFilePath:
+        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      FaceMappingFilePath:
+        Value: 
       ModelAnimator: {fileID: 910147283}
       FaceRenderer: {fileID: 910147282}
       DelayTime: 0.2
+      FootIkMode: 0
+      BodyScale: 0
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-      FaceMappingFilePath: Assets/face_map.txt
+    - VmdFilePath:
+        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      FaceMappingFilePath:
+        Value: 
       ModelAnimator: {fileID: 1886257856}
       FaceRenderer: {fileID: 1886257855}
       DelayTime: 0.4
+      FootIkMode: 0
+      BodyScale: 0
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-      FaceMappingFilePath: Assets/face_map.txt
+    - VmdFilePath:
+        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      FaceMappingFilePath:
+        Value: 
       ModelAnimator: {fileID: 311476657}
       FaceRenderer: {fileID: 311476656}
       DelayTime: 0.6
+      FootIkMode: 0
+      BodyScale: 0
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
@@ -2653,6 +2682,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1720885309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1720885305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceaf69211b2e9414789adae3360fcd96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Holder: {fileID: 1720885306}
 --- !u!1001 &1879075435
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3887,11 +3929,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-    FaceMappingFilePath: Assets/face_map.txt
+    VmdFilePath:
+      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+    FaceMappingFilePath:
+      Value: 
     ModelAnimator: {fileID: 2088713431}
     FaceRenderer: {fileID: 0}
     DelayTime: 0.8
+    FootIkMode: 0
+    BodyScale: 0
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}

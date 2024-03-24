@@ -15,7 +15,10 @@ namespace AnimLite.Utility
 
         public static void ResetPose(this Animator anim)
         {
-            var bonedict = anim.GetComponentInChildren<SkinnedMeshRenderer>().bones
+            var bonedict = anim.GetComponentsInChildren<SkinnedMeshRenderer>()
+                .SelectMany(x => x.bones)
+                .Distinct(x => x.name)
+                .Do(x => Debug.Log(x.name))
                 .ToDictionary(x => x.name, x => x);
 
             var avatar = anim.avatar;
@@ -27,6 +30,9 @@ namespace AnimLite.Utility
 
                 tf.SetLocalPositionAndRotation(s.position, s.rotation);// 再計算とか走るんだろうか…
             }
+
+            anim.GetBoneTransform(HumanBodyBones.Hips).parent
+                .SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);// 超暫定、ルートはゼロと仮定…
         }
 
         //public static void ResetPose(this Animator anim)

@@ -15,10 +15,10 @@ namespace AnimLite.Samples
     {
 
         [FilePath]
-        public string VmdFilePath;
+        public PathUnit VmdFilePath;
 
         [FilePath]
-        public string FaceMappingFilePath;
+        public PathUnit FaceMappingFilePath;
 
         public Animator anim;
         public SkinnedMeshRenderer faceRenderer;
@@ -28,7 +28,7 @@ namespace AnimLite.Samples
         async Awaitable Start()
         {
             // 
-            var vmd = await VmdData.BuildVmdStreamDataAsync(this.VmdFilePath, this.FaceMappingFilePath, this.destroyCancellationToken);
+            var vmd = await VmdData.BuildVmdStreamDataAsync(this.VmdFilePath.ToFullPath(), this.FaceMappingFilePath.ToFullPath(), this.destroyCancellationToken);
             using var vmddata = vmd.data;
 
             // ‚u‚l‚c‚ğÄ¶‚Ì‚½‚ß‚Ìî•ñ‚ğ\’z‚·‚é

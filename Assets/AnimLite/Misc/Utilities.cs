@@ -9,6 +9,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.VisualScripting;
+using System.IO;
 
 
 namespace AnimLite.Utility
@@ -16,6 +17,99 @@ namespace AnimLite.Utility
 
     using AnimLite.Utility.Linq;
 
+
+    public enum FullPathMode
+    {
+        ForceDirectPath,
+        DataPath,
+        PersistentDataPath,
+    }
+
+    [Serializable]
+    public struct PathUnit
+    {
+
+        public string Value;
+
+
+        public PathUnit(string path) => this.Value = path;
+
+        public static implicit operator string(PathUnit path) => path.Value;
+        public static implicit operator PathUnit(string path) => new PathUnit(path);
+
+        static public string ParentPath { get; private set; } = Application.dataPath;
+        static public FullPathMode mode
+        {
+            set
+            {
+                PathUnit.ParentPath = value switch
+                {
+                    FullPathMode.PersistentDataPath => Application.persistentDataPath,
+                    FullPathMode.DataPath => Application.dataPath,
+                    _ => "",
+                };
+            }
+        }
+    }
+
+
+    public static class PathUtilityExtension
+    {
+
+        public static PathUnit ToFullPath(this PathUnit path, string parentpath) =>
+            path.Value == default || path.Value == "" || path.Value[1..3].Contains(':') || path.Value[0] == '/'
+                ? (path.Value ?? "")
+                : $"{parentpath}/{path.Value}"
+            ;
+
+        public static PathUnit ToFullPath(this PathUnit path) =>
+            path.ToFullPath(PathUnit.ParentPath).show_(path);
+
+
+        public static PathUnit ToPath(this string path) =>
+            new PathUnit(path);
+
+        static PathUnit show_(this PathUnit fullpath, PathUnit path)
+        {
+            //Debug.Log($"{path.Value} => {fullpath.Value}");
+
+            return fullpath;
+        }
+    }
+
+
+
+    //public struct FullPath
+    //{
+    //    public string fullpath;
+
+    //    static public FullPathMode mode = FullPathMode.DataPath;
+
+    //    public FullPath(string path) =>
+    //        this.fullpath = mode switch
+    //        {
+    //            FullPathMode.PersistentDataPath => path == default || path[1..3].Contains(':') || path[0] == '/'
+    //                ? path
+    //                : Application.persistentDataPath + "/" + path,
+
+    //            FullPathMode.DataPath => path == default || path[1..3].Contains(':') || path[0] == '/'
+    //                ? path
+    //                : Application.dataPath + "/../" + path,
+
+    //            _ => path,
+    //        };
+
+    //    public static implicit operator string(FullPath path) => path.fullpath;
+
+    //    public static implicit operator FullPath(string path) => show_(path, new FullPath(path));
+
+    //    static FullPath show_(string path, FullPath fullpath)
+    //    {
+    //        Debug.Log($"{path} => {fullpath.fullpath}");
+
+    //        return fullpath;
+    //    }
+    //}
 
 
     public class DisposableBag : IDisposable, IEnumerable<IDisposable>
@@ -168,6 +262,7 @@ namespace AnimLite.Utility
 
     public static class UtilityExtension
     {
+
 
         public static DisposableWrap<T> AsDisposable<T>(this T src, Action<T> action) => new DisposableWrap<T>(src, action);
 

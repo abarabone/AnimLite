@@ -35,7 +35,7 @@ namespace AnimLite.Utility
             var audioSouce = this.Holder.dance.Audio.AudioSource;
 
             var desktoppath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            await this.Holder.ReadJsonAsync(desktoppath + "/dance_set.json", this.destroyCancellationToken);
+            await this.Holder.ReadJsonAsync(desktoppath + "/dance_set.json", CancellationToken.None);// this.destroyCancellationToken);
 
             this.Holder.dance.Audio.AudioSource = audioSouce;
         }
@@ -45,30 +45,16 @@ namespace AnimLite.Utility
     public static class DanceSetJsonConverter
     {
 
-        public static async Task WriteJsonAsync(this DanceSetHolder holder, string path, CancellationToken ct)
+        public static async Task WriteJsonAsync(this DanceSetHolder holder, PathUnit path, CancellationToken ct)
         {
-            var danceset = new DanceSetJson
-            {
-                AudioPath = "",
-                motions = Enumerable
-                    .Concat(
-                        holder.dance.Motions
-                            .Select(x =>// x.ModelAnimator != null
-                                //? x.ToDanceMotionDefineJson(x.ModelAnimator.transform)
-                                //: x.ToDanceMotionDefineJson()),
-                                x.ToDanceMotionDefineJson()),
-                        holder.GetComponentsInChildren<DanceHumanDefine>()
-                            .Select(x =>
-                                x.Motion.ToDanceMotionDefineJson(x.transform)))
-                    .ToArray(),
-            };
+            var danceset = holder.dance.ToDanceSetJson(holder.transform);
 
             var jsontext = JsonUtility.ToJson(danceset, prettyPrint: true);
 
             await System.IO.File.WriteAllTextAsync(path, jsontext);
         }
 
-        public static async Awaitable<DanceSet> ReadJsonAsync(string path, CancellationToken ct)
+        public static async Awaitable<DanceSet> ReadJsonAsync(PathUnit path, CancellationToken ct)
         {
             if (Path.GetExtension(path) != ".json" || !File.Exists(path)) return default;
 
@@ -77,7 +63,7 @@ namespace AnimLite.Utility
             return await json.ToDanceSetAsync(ct);
 
 
-            async Task<DanceSetJson> json_(string path, CancellationToken ct)
+            async Task<DanceSetJson> json_(PathUnit path, CancellationToken ct)
             {
                 var json = await File.ReadAllTextAsync(path, ct);
 
@@ -85,7 +71,7 @@ namespace AnimLite.Utility
             }
         }
 
-        public static async Awaitable ReadJsonAsync(this DanceSetHolder holder, string path, CancellationToken ct)
+        public static async Awaitable ReadJsonAsync(this DanceSetHolder holder, PathUnit path, CancellationToken ct)
         {
             var ds = await ReadJsonAsync(path, ct);
             if (ds == default) return;
@@ -110,7 +96,7 @@ namespace AnimLite.Utility
             holder.dance = ds;
         }
 
-        public static async Awaitable<AudioClip> ReadAudioAsync(string path, CancellationToken ct)
+        public static async Awaitable<AudioClip> ReadAudioAsync(PathUnit path, CancellationToken ct)
         {
             var atype = Path.GetExtension(path) switch
             {
@@ -126,7 +112,7 @@ namespace AnimLite.Utility
             return await audio_(path, atype);
 
 
-            async Awaitable<AudioClip> audio_(string path, AudioType audioType)
+            async Awaitable<AudioClip> audio_(PathUnit path, AudioType audioType)
             {
                 using var req = UnityWebRequestMultimedia.GetAudioClip(path, audioType);
                 ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;
@@ -139,7 +125,27 @@ namespace AnimLite.Utility
             }
         }
 
-        public static async Awaitable<Animator> ReadModelAnimatorVrmAsync(string path, CancellationToken ct)
+        public static async Awaitable<Animator> LoadAnimatorResourceAsync(string path)
+        {
+            var name = path.ToLower().Split("as ")[0].Trim();
+
+            var req = Resources.LoadAsync<GameObject>(name);
+            await req;
+
+            var go = req.asset as GameObject;
+            return GameObject.Instantiate(go.GetComponent<Animator>());
+        }
+        public static async Awaitable<AudioClip> LoadAudioClipResourceAsync(string path)
+        {
+            var name = path.ToLower().Split("as ")[0].Trim();
+
+            var req = Resources.LoadAsync<AudioClip>(name);
+            await req;
+
+            return req.asset as AudioClip;
+        }
+
+        public static async Awaitable<Animator> ReadModelAnimatorVrmAsync(PathUnit path, CancellationToken ct)
         {
             if (Path.GetExtension(path) != ".vrm" || !File.Exists(path)) return default;
 
@@ -154,16 +160,31 @@ namespace AnimLite.Utility
         public static DanceSetJson ToDanceSetJson(this DanceSet src) =>
             new DanceSetJson
             {
-                AudioPath = "",
+                AudioPath = default,
                 DelayTime = src.Audio.DelayTime,
                 motions = src.Motions.Select(x => x.ToDanceMotionDefineJson()).ToArray(),
+            };
+        public static DanceSetJson ToDanceSetJson(this DanceSet src, Transform tf) =>
+            new DanceSetJson
+            {
+                AudioPath = default,
+                DelayTime = src.Audio.DelayTime,
+                motions =
+                    Enumerable.Concat(
+                        src.Motions
+                            .Select(x => x.ToDanceMotionDefineJson()),
+                        tf.GetComponentsInChildren<DanceHumanDefine>()
+                            .Select(x => x.Motion.ToDanceMotionDefineJson(x.transform)))
+                    .ToArray(),
             };
         public static async Awaitable<DanceSet> ToDanceSetAsync(this DanceSetJson src, CancellationToken ct) =>
             new DanceSet
             {
                 Audio = new AudioDefine
                 {
-                    AudioClip = await ReadAudioAsync(src.AudioPath, ct),
+                    AudioClip = src.AudioPath.EndsWith("as audioclip", StringComparison.OrdinalIgnoreCase)
+                        ? await LoadAudioClipResourceAsync(src.AudioPath)
+                        : await ReadAudioAsync(src.AudioPath.ToPath().ToFullPath(), ct),
                     DelayTime = src.DelayTime,
                 },
                 Motions = await src.motions.Select(x => x.ToDanceMotionDefineAsync(ct)).AwaitAllAsync(),
@@ -172,7 +193,7 @@ namespace AnimLite.Utility
         public static DanceMotionDefineJson ToDanceMotionDefineJson(this DanceMotionDefine src) =>
             new DanceMotionDefineJson
             {
-                VrmFilePath = "",
+                VrmFilePath = default,
                 FaceMappingFilePath = src.FaceMappingFilePath,
                 VmdFilePath = src.VmdFilePath,
 
@@ -187,7 +208,7 @@ namespace AnimLite.Utility
         public static DanceMotionDefineJson ToDanceMotionDefineJson(this DanceMotionDefine src, Transform tf) =>
             new DanceMotionDefineJson
             {
-                VrmFilePath = "",
+                VrmFilePath = default,
                 FaceMappingFilePath = src.FaceMappingFilePath,
                 VmdFilePath = src.VmdFilePath,
 
@@ -202,9 +223,11 @@ namespace AnimLite.Utility
         public static async Awaitable<DanceMotionDefine> ToDanceMotionDefineAsync(this DanceMotionDefineJson src, CancellationToken ct) =>
             new DanceMotionDefine
             {
-                ModelAnimator = await ReadModelAnimatorVrmAsync(src.VrmFilePath, ct),
-                FaceMappingFilePath = src.FaceMappingFilePath,
-                VmdFilePath = src.VmdFilePath,
+                ModelAnimator = src.VrmFilePath.EndsWith("as animator", StringComparison.OrdinalIgnoreCase)
+                    ? await LoadAnimatorResourceAsync(src.VrmFilePath)
+                    : await ReadModelAnimatorVrmAsync(src.VrmFilePath.ToPath().ToFullPath(), ct),
+                FaceMappingFilePath = src.FaceMappingFilePath.ToPath().ToFullPath(),
+                VmdFilePath = src.VmdFilePath.ToPath().ToFullPath(),
                 FaceRenderer = null,
 
                 DelayTime = src.DelayTime,

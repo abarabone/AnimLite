@@ -22,23 +22,53 @@ public class FilePathAttributeDrawer : PropertyDrawer
     //GUIを更新する
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        //string以外に設定されている場合はスルー
-        if (property.propertyType != SerializedPropertyType.String)
-        {
-            return;
-        }
-
         //D&D出来るGUIを作成、 ドロップされたオブジェクトのリストを取得
         List<Object> dropObjectList = CreateDragAndDropGUI(position);
 
-        //オブジェクトがドロップされたらパスを設定
-        if (dropObjectList.Count > 0)
-        {
-            property.stringValue = AssetDatabase.GetAssetPath(dropObjectList[0]);
-        }
+        var prop = showStringPath_() ?? showPathUitPath_();
+        if (prop == default) return;
 
         //現在設定されているパスを表示
-        GUI.Label(position, property.displayName + " : " + property.stringValue);
+        //GUI.Label(position, property.displayName + " : " + pathtext);
+        var poslabel = position;
+        poslabel.width = position.width * 0.3f;
+        GUI.Label(poslabel, property.displayName);
+        var postext = position;
+        postext.x += position.width * 0.3f;
+        postext.width = position.width - poslabel.width - 2;
+        prop.stringValue = GUI.TextField(postext, prop.stringValue);
+        return;
+
+
+        SerializedProperty showStringPath_()
+        {
+            if (property.propertyType != SerializedPropertyType.String) return default;
+
+            //オブジェクトがドロップされたらパスを設定
+            if (dropObjectList.Count > 0)
+            {
+                property.stringValue =
+                    AssetDatabase.GetAssetPath(dropObjectList[0]).Replace("Assets/", "");
+            }
+
+            return property;
+        }
+
+        SerializedProperty showPathUitPath_()
+        {
+            if (property.type != "PathUnit") return default;
+
+            var prop = property.FindPropertyRelative("Value");
+
+            //オブジェクトがドロップされたらパスを設定
+            if (dropObjectList.Count > 0)
+            {
+                prop.stringValue =
+                    AssetDatabase.GetAssetPath(dropObjectList[0]).Replace("Assets/", "");
+            }
+
+            return prop;
+        }
     }
 
     //D&DのGUIを作成

@@ -60,10 +60,10 @@ namespace AnimLite.DancePlayable
             using var registed = ct.Register(() => graph.Destroy());
 
             var motions = dance.Motions
-                .Where(motion => motion.FaceMappingFilePath != null && File.Exists(motion.FaceMappingFilePath))
-                .Where(motion => motion.VmdFilePath != null && File.Exists(motion.VmdFilePath))
-                .ToArray();
-
+                //.Where(motion => motion.FaceMappingFilePath != null && File.Exists(motion.FaceMappingFilePath))
+                //.Where(motion => motion.VmdFilePath != null && File.Exists(motion.VmdFilePath))
+                //.ToArray()
+                ;
 
             createAudioPlayable_(graph, dance.Audio);
 
@@ -92,6 +92,10 @@ namespace AnimLite.DancePlayable
             static async Task<MotionResouce[]> buildMotionResourcesAsync_(DanceMotionDefine[] motions, CancellationToken ct)
             {
 
+                var defaultFaceMap = motions.Any(x => (x.FaceMappingFilePath.Value ?? "") == "")
+                    ? await VrmParser.ParseFaceMapAsync(await loadDefaultFaceMapAsync_("face_map_default"), ct)
+                    : default;
+
                 var resources = await motions
                     .Select(motion => buildAsync_(motion))
                     .WhenAll();
@@ -101,7 +105,9 @@ namespace AnimLite.DancePlayable
 
                 async Task<MotionResouce> buildAsync_(DanceMotionDefine motion)
                 {
-                    var (vmddata, facemap) = await VmdData.BuildVmdStreamDataAsync(motion.VmdFilePath, motion.FaceMappingFilePath, ct);
+                    var vmdfullpath = motion.VmdFilePath.ToFullPath();
+                    var facefullpath = motion.FaceMappingFilePath.ToFullPath();
+                    var (vmddata, facemap) = await VmdData.BuildVmdStreamDataAsync(vmdfullpath, facefullpath, defaultFaceMap, ct);
 
                     return new MotionResouce
                     {
@@ -110,6 +116,13 @@ namespace AnimLite.DancePlayable
                         bone = motion.ModelAnimator.BuildVmdPlayableJobTransformMappings(),
                         face = motion.FaceRenderer?.sharedMesh?.BuildStreamingFace(facemap) ?? default,
                     };
+                }
+
+                static async Awaitable<string> loadDefaultFaceMapAsync_(string path)
+                {
+                    var req = Resources.LoadAsync<TextAsset>(path);
+                    await req;
+                    return (req.asset as TextAsset).text;
                 }
             }
 
@@ -147,7 +160,8 @@ namespace AnimLite.DancePlayable
 
                 void createFaceMotion_(DanceMotionDefine motion, MotionResouce res, StreamingTimer timer)
                 {
-                    if (motion.FaceRenderer.AsUnityNull() == null) return;
+                    if (res.face.Expressions == default) return;
+                    if (motion.FaceRenderer.AsUnityNull() == default) return;
 
                     var fkf = res.vmddata.FaceStreams
                         .ToKeyFinderWith<Key2NearestShift, Clamp>();

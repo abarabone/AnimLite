@@ -641,8 +641,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 352371449e6e25545823b32788339ee3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VmdFilePath: "Assets/model/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-  FaceMappingFilePath: Assets/face_map.txt
+  VmdFilePath:
+    Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+  FaceMappingFilePath:
+    Value: Resources/face_map_default.txt
   anim: {fileID: 1175109454}
   FaceMeshRenderer: {fileID: 1175109453}
 --- !u!4 &774669174
@@ -1602,8 +1604,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7bedccd95c945542ba18b4513e3f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VmdFilePath: "Assets/model/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-  FaceMappingFilePath: Assets/face_map.txt
+  VmdFilePath:
+    Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+  FaceMappingFilePath:
+    Value: Resources/face_map_default.txt
   anim: {fileID: 504929960}
   faceRenderer: {fileID: 0}
 --- !u!1001 &1273240305
@@ -2038,8 +2042,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82d8f7c83e5db4f4aa4a626576c223a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-  FaceMappingFilePath: Assets/face_map.txt
+  VmdFilePath:
+    Value: "motions/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+  FaceMappingFilePath:
+    Value: Resources/face_map_default.txt
   anim: {fileID: 1273240307}
   faceRenderer: {fileID: 1273240306}
 --- !u!4 &1939900938
@@ -2086,8 +2092,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82d8f7c83e5db4f4aa4a626576c223a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VmdFilePath: "Assets/model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
-  FaceMappingFilePath: Assets/face_map.txt
+  VmdFilePath:
+    Value: "motions/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+  FaceMappingFilePath:
+    Value: Resources/face_map_default.txt
   anim: {fileID: 1077456492}
   faceRenderer: {fileID: 1077456491}
 --- !u!4 &1941398668

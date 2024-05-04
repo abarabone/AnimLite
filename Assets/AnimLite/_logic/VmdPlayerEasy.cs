@@ -27,8 +27,10 @@ namespace AnimLite.Samples
 
         async Awaitable Start()
         {
-            // 
-            var vmd = await VmdData.BuildVmdStreamDataAsync(this.VmdFilePath.ToFullPath(), this.FaceMappingFilePath.ToFullPath(), this.destroyCancellationToken);
+            // ＶＭＤデータをファイルからパースし、ストリームデータをビルドする
+            var vmdpath = this.VmdFilePath.ToFullPath();
+            var facemap = this.FaceMappingFilePath.ToFullPath();
+            var vmd = await VmdData.LoadVmdStreamDataAsync(vmdpath, facemap, this.destroyCancellationToken);
             using var vmddata = vmd.data;
 
             // ＶＭＤを再生のための情報を構築する

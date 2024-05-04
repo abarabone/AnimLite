@@ -32,12 +32,8 @@ namespace AnimLite.Utility
         [ContextMenu("load 'dance_set.json' from desktop")]
         private async Awaitable Read()
         {
-            var audioSouce = this.Holder.dance.Audio.AudioSource;
-
             var desktoppath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            await this.Holder.ReadJsonAsync(desktoppath + "/dance_set.json", CancellationToken.None);// this.destroyCancellationToken);
-
-            this.Holder.dance.Audio.AudioSource = audioSouce;
+            await this.Holder.ReadJsonAsync(desktoppath + "/dance_set.json", this.destroyCancellationToken);
         }
     }
 
@@ -54,13 +50,13 @@ namespace AnimLite.Utility
             await System.IO.File.WriteAllTextAsync(path, jsontext);
         }
 
-        public static async Awaitable<DanceSet> ReadJsonAsync(PathUnit path, CancellationToken ct)
+        public static async Awaitable<DanceSet> ReadJsonAsync(PathUnit path, AudioSource audiosrc, CancellationToken ct)
         {
             if (Path.GetExtension(path) != ".json" || !File.Exists(path)) return default;
 
             var json = await json_(path, ct);
 
-            return await json.ToDanceSetAsync(ct);
+            return await json.ToDanceSetAsync(audiosrc, ct);
 
 
             async Task<DanceSetJson> json_(PathUnit path, CancellationToken ct)
@@ -73,7 +69,7 @@ namespace AnimLite.Utility
 
         public static async Awaitable ReadJsonAsync(this DanceSetHolder holder, PathUnit path, CancellationToken ct)
         {
-            var ds = await ReadJsonAsync(path, ct);
+            var ds = await ReadJsonAsync(path, holder.dance.Audio.AudioSource, ct);
             if (ds == default) return;
 
             var qMotionWithPos = ds.Motions.Where(motion => motion.OverWritePositionAndRotation);
@@ -105,7 +101,7 @@ namespace AnimLite.Utility
                 ".acc" => AudioType.ACC,
                 ".wav" => AudioType.WAV,
                 _ => AudioType.UNKNOWN,
-            };
+            };Debug.Log($"{atype} {path.Value} {File.Exists(path)}");
 
             if (atype == AudioType.UNKNOWN || !File.Exists(path)) return default;
 
@@ -162,14 +158,18 @@ namespace AnimLite.Utility
             {
                 AudioPath = default,
                 DelayTime = src.Audio.DelayTime,
-                motions = src.Motions.Select(x => x.ToDanceMotionDefineJson()).ToArray(),
+                Volume = src.Audio.AudioSource.volume,
+
+                Motions = src.Motions.Select(x => x.ToDanceMotionDefineJson()).ToArray(),
             };
         public static DanceSetJson ToDanceSetJson(this DanceSet src, Transform tf) =>
             new DanceSetJson
             {
                 AudioPath = default,
                 DelayTime = src.Audio.DelayTime,
-                motions =
+                Volume = src.Audio.AudioSource.volume,
+
+                Motions =
                     Enumerable.Concat(
                         src.Motions
                             .Select(x => x.ToDanceMotionDefineJson()),
@@ -177,7 +177,7 @@ namespace AnimLite.Utility
                             .Select(x => x.Motion.ToDanceMotionDefineJson(x.transform)))
                     .ToArray(),
             };
-        public static async Awaitable<DanceSet> ToDanceSetAsync(this DanceSetJson src, CancellationToken ct) =>
+        public static async Awaitable<DanceSet> ToDanceSetAsync(this DanceSetJson src, AudioSource audiosrc, CancellationToken ct) =>
             new DanceSet
             {
                 Audio = new AudioDefine
@@ -186,9 +186,16 @@ namespace AnimLite.Utility
                         ? await LoadAudioClipResourceAsync(src.AudioPath)
                         : await ReadAudioAsync(src.AudioPath.ToPath().ToFullPath(), ct),
                     DelayTime = src.DelayTime,
+                    AudioSource = setvolume_(audiosrc, src.Volume),
                 },
-                Motions = await src.motions.Select(x => x.ToDanceMotionDefineAsync(ct)).AwaitAllAsync(),
+
+                Motions = await src.Motions.Select(x => x.ToDanceMotionDefineAsync(ct)).AwaitAllAsync(),
             };
+        static AudioSource setvolume_(AudioSource src, float volume)
+        {
+            src.volume = volume;
+            return src;
+        }
 
         public static DanceMotionDefineJson ToDanceMotionDefineJson(this DanceMotionDefine src) =>
             new DanceMotionDefineJson
@@ -247,7 +254,9 @@ namespace AnimLite.Utility
     {
         public string AudioPath;
         public float DelayTime;
-        public DanceMotionDefineJson[] motions;
+        public float Volume;
+
+        public DanceMotionDefineJson[] Motions;
     }
     [System.Serializable]
     public class DanceMotionDefineJson

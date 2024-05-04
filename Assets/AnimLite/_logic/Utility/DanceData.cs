@@ -48,9 +48,9 @@ namespace AnimLite.DancePlayable
         public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
         public float BodyScale = 0;
 
-        [HideInInspector] public bool OverWritePositionAndRotation;
-        [HideInInspector] public Vector3 Position;
-        [HideInInspector] public Quaternion Rotation;
+        /*[HideInInspector]*/ public bool OverWritePositionAndRotation;
+        /*[HideInInspector]*/ public Vector3 Position;
+        /*[HideInInspector]*/ public Quaternion Rotation;
     }
 
 
@@ -63,5 +63,6 @@ namespace AnimLite.DancePlayable
         }
 
     }
+
 
 }

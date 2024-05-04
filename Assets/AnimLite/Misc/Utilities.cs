@@ -71,8 +71,9 @@ namespace AnimLite.Utility
 
         static PathUnit show_(this PathUnit fullpath, PathUnit path)
         {
-            //Debug.Log($"{path.Value} => {fullpath.Value}");
-
+            //#if UNITY_EDITOR
+            //    Debug.Log($"{path.Value} => {fullpath.Value}");
+            //#endif
             return fullpath;
         }
     }
@@ -118,16 +119,29 @@ namespace AnimLite.Utility
         List<IDisposable> disposables = new List<IDisposable>();
 
 
-        public IDisposable this[int i] => this.disposables[i];
+        public IDisposable this[int i] =>
+            this.disposables[i];
 
-        public void Add(IDisposable item) => this.disposables.Add(item);
+        public void Add(IDisposable item) =>
+            this.disposables.Add(item);
 
-        public void Dispose() => this.disposables.ForEach(x => x.Dispose());
+        public void Dispose() =>
+            this.disposables.ForEach(x => x.Dispose());
 
 
-        public IEnumerator<IDisposable> GetEnumerator() => this.disposables.GetEnumerator();
+        public IEnumerator<IDisposable> GetEnumerator() =>
+            this.disposables.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.disposables.GetEnumerator();
+    }
+    public static class DisposableExtension
+    {
+        public static T AddTo<T>(this T disposable, DisposableBag disposables)
+            where T : IDisposable
+        {
+            disposables.Add(disposable);
+            return disposable;
+        }
     }
 
     public struct DisposableWrap<T> : IDisposable
@@ -144,23 +158,43 @@ namespace AnimLite.Utility
         public static implicit operator T(DisposableWrap<T> src) => src.Valule;
     }
 
+
+    /// <summary>
+    /// セマフォの解放を using で行う
+    /// ・セマフォの破棄は別に行う
+    /// </summary>
     public struct DisposableSemapho : IDisposable
     {
         SemaphoreSlim semapho;
 
-        public DisposableSemapho(SemaphoreSlim semapho) => this.semapho = semapho;
+        public DisposableSemapho(SemaphoreSlim semapho) =>
+            this.semapho = semapho;
 
-        public Task WaitAsync() => this.semapho.WaitAsync();
+        public async Task WaitAsync(CancellationToken ct)
+        {
+            "semapho on".ShowDebugLog();
+            await this.semapho.WaitAsync(ct);
+        }
 
-        public void Dispose() => this.semapho.Release();
+        public void Dispose()
+        {
+            this.semapho.Release();
+            "semapho off".ShowDebugLog();
+        }
+
+        //public async Task WaitAsync() =>
+        //    await this.semapho.WaitAsync();
+
+        //public void Dispose() =>
+        //    this.semapho.Release();
     }
     public static class SemaphoExtension
     {
-        public static async Task<DisposableSemapho> WaitAsyncDisposable(this SemaphoreSlim ss)
+        public static async Task<DisposableSemapho> WaitAsyncDisposable(this SemaphoreSlim ss, CancellationToken ct)
         {
             var ds = new DisposableSemapho(ss);
 
-            await ds.WaitAsync();
+            await ds.WaitAsync(ct);
             
             return ds;
         }
@@ -250,11 +284,12 @@ namespace AnimLite.Utility
         /// 最適化で消えることを期待するがダメかも
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ShowDebugLog(this string text)
+        public static string ShowDebugLog(this string text)
         {
-#if UNITY_EDITOR
-            Debug.Log(text);
-#endif
+            #if UNITY_EDITOR
+                Debug.Log(text);
+            #endif
+            return text;
         }
 
     }
@@ -381,7 +416,8 @@ namespace AnimLite.Utility.Linq
             ;
 
 
-        public static async Awaitable<T[]> AwaitAllAsync<T>(this IEnumerable<Awaitable<T>> src, Func<T, bool> criteria = default)
+        public static async Awaitable<T[]> AwaitAllAsync<T>(
+            this IEnumerable<Awaitable<T>> src, Func<T, bool> criteria = default)
         {
             var dst = new List<T>();
             foreach (var e in src)
@@ -393,10 +429,13 @@ namespace AnimLite.Utility.Linq
             return dst.ToArray();
         }
 
-        public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) => Task.WhenAll(src);
-        //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) => Task.WhenAll(src);
+        public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) =>
+            Task.WhenAll(src);
+        //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) =>
+        //    Task.WhenAll(src);
 
-        public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) => await t;
+        public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) =>
+            await t;
 
 
         public static IEnumerable<T> Zip<T1, T2, T>(this (IEnumerable<T1> src1, IEnumerable<T2> src2) x, Func<T1, T2, T> f) =>

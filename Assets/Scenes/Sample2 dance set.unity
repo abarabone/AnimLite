@@ -663,7 +663,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Motion:
     VmdFilePath:
-      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
     ModelAnimator: {fileID: 802923685}
@@ -720,7 +720,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Motion:
     VmdFilePath:
-      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
     ModelAnimator: {fileID: 901753835}
@@ -782,7 +782,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Motion:
     VmdFilePath:
-      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
     ModelAnimator: {fileID: 2086145749}
@@ -2513,6 +2513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d406d040f7f0ab4083a4158b7bdfd42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LookAtTarget: {fileID: 1399767122}
   dance:
     Audio:
       AudioSource: {fileID: 1720885308}
@@ -2520,7 +2521,7 @@ MonoBehaviour:
       DelayTime: 0
     Motions:
     - VmdFilePath:
-        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+        Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
       ModelAnimator: {fileID: 1693636018}
@@ -2532,7 +2533,7 @@ MonoBehaviour:
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
     - VmdFilePath:
-        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+        Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
       ModelAnimator: {fileID: 910147283}
@@ -2544,7 +2545,7 @@ MonoBehaviour:
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
     - VmdFilePath:
-        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+        Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
       ModelAnimator: {fileID: 1886257856}
@@ -2556,7 +2557,7 @@ MonoBehaviour:
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
     - VmdFilePath:
-        Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+        Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
       ModelAnimator: {fileID: 311476657}
@@ -3930,7 +3931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Motion:
     VmdFilePath:
-      Value: "model/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
+      Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
     ModelAnimator: {fileID: 2088713431}

@@ -49,6 +49,8 @@ namespace AnimLite.DancePlayable
             this.graph.Destroy();
 
             this.resources.ForEach(x => x.Dispose());
+
+            "resources disposed".ShowDebugLog();
         }
 
 
@@ -56,8 +58,6 @@ namespace AnimLite.DancePlayable
 
         public static async Task<DanceGraphy> CreateDanceGraphyAsync(DanceSet dance, CancellationToken ct)
         {
-            var graph = PlayableGraph.Create();
-            using var registed = ct.Register(() => graph.Destroy());
 
             var motions = dance.Motions
                 //.Where(motion => motion.FaceMappingFilePath != null && File.Exists(motion.FaceMappingFilePath))
@@ -65,11 +65,21 @@ namespace AnimLite.DancePlayable
                 //.ToArray()
                 ;
 
-            createAudioPlayable_(graph, dance.Audio);
-
             var resources = await buildMotionResourcesAsync_(motions, ct);
 
+
+            var graph = PlayableGraph.Create();
+            using var registed = ct.Register(() =>
+            {
+                resources.ForEach(x => x.Dispose());
+                graph.Destroy();
+
+                "create canceled".ShowDebugLog();
+            });
+
             createMotionPlayables_(graph, motions, resources);
+
+            createAudioPlayable_(graph, dance.Audio);
 
             return new DanceGraphy
             {
@@ -107,7 +117,9 @@ namespace AnimLite.DancePlayable
                 {
                     var vmdfullpath = motion.VmdFilePath.ToFullPath();
                     var facefullpath = motion.FaceMappingFilePath.ToFullPath();
-                    var (vmddata, facemap) = await VmdData.BuildVmdStreamDataAsync(vmdfullpath, facefullpath, defaultFaceMap, ct);
+                    var (vmddata, facemap) = defaultFaceMap.VmdToVrmMaps == default
+                        ? (await VmdData.LoadVmdStreamDataAsync(vmdfullpath, facefullpath, ct))
+                        : (await VmdData.LoadVmdStreamDataAsync(vmdfullpath, defaultFaceMap, ct), defaultFaceMap);
 
                     return new MotionResouce
                     {

@@ -1609,7 +1609,7 @@ MonoBehaviour:
   FaceMappingFilePath:
     Value: Resources/face_map_default.txt
   anim: {fileID: 504929960}
-  faceRenderer: {fileID: 0}
+  faceRenderer: {fileID: 1617998271}
 --- !u!1001 &1273240305
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2012,6 +2012,11 @@ SkinnedMeshRenderer:
 Animator:
   m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
   m_PrefabInstance: {fileID: 1273240305}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1617998271 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5292355953843914932, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 504929958}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1939900936
 GameObject:

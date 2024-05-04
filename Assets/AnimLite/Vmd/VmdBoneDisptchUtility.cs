@@ -91,6 +91,7 @@ namespace AnimLite.Vmd
                     //math.rotate(kf.r.get((int)MmdBodyBones.センター), kf.p.get((int)MmdBodyBones.センター).As3()) * 0.1f +
                     //math.rotate(mul(kf.r.get((int)MmdBodyBones.グルーブ), kf.r.get((int)MmdBodyBones.センター)), kf.p.get((int)MmdBodyBones.グルーブ).As3()) * 0.1f,
 
+                    //pkf.getpos(MmdBodyBones.全ての親).As3() * 0.1f +
                     a() * 0.1f,
 
                 HumanBodyBones.Hips =>
@@ -121,10 +122,10 @@ namespace AnimLite.Vmd
         {
             var pos = kf.p.getpos(istreams[0]).As3();
 
-            for (var i = 0; i < istreams.Length - 1; i++)
+            for (var i = 1; i < istreams.Length; i++)
             {
-                var lrot = kf.r.getrot(istreams[i + 0]);
-                var lpos = kf.p.getpos(istreams[i + 1]).As3();
+                var lrot = kf.r.getrot(istreams[i - 1]);
+                var lpos = kf.p.getpos(istreams[i - 0]).As3();
 
                 pos += math.rotate(lrot, lpos);
             }

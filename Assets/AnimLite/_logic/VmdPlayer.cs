@@ -2,6 +2,8 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
+using System;
+using System.Threading;
 
 namespace AnimLite.Samples
 {
@@ -10,6 +12,7 @@ namespace AnimLite.Samples
     using AnimLite.Utility;
 
     using AnimLite.Vmd;
+    using AnimLite.vrm;
     using AnimLite.Vrm;
 
 
@@ -58,10 +61,12 @@ namespace AnimLite.Samples
 
         private void OnDisable()
         {
-            this.disposabes?.Dispose();
+            if (this.disposabes == null) return;
+            this.disposabes.Dispose();
             this.disposabes = null;
 
             if (this.anim.IsUnityNull()) return;
+            this.anim.UnbindAllStreamHandles();
             this.anim.ResetPose();
         }
 
@@ -69,11 +74,9 @@ namespace AnimLite.Samples
 
         async Awaitable OnEnable()
         {
-            //this.anim.ResetPose();//
-
             // ファイルからデータを読み下す
-            var vmdStreamData = await VmdParser.ParseVmdAsync(this.VmdFilePath.ToFullPath(), this.destroyCancellationToken);
-            var faceMapping = await VrmParser.ParseFaceMapAsync(this.FaceMappingFilePath.ToFullPath(), this.destroyCancellationToken);
+            var vmdStreamData = await VmdParser.ParseVmdAsync(this.VmdFilePath.ToFullPath(), default);
+            var faceMapping = await VrmParser.ParseFaceMapAsync(this.FaceMappingFilePath.ToFullPath(), default);
 
             // データを利用できる形式に変換する
             this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -109,12 +112,13 @@ namespace AnimLite.Samples
             this.bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(this.bone);
             this.footOperator = this.anim.ToFootIkTransformOperator(this.bone);
             this.faceOperator = this.anim.ToVrmExpressionOperator(this.face);
+
+            if (!this.enabled) this.OnDisable();
         }
 
 
         void Update()
         {
-            //if (!this.rot_data.KeyStreams.Values.IsCreated) return;
             if (this.disposabes == null) return;
 
 

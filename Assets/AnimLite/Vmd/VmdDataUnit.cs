@@ -14,7 +14,7 @@ namespace AnimLite.Vmd
     /// <summary>
     /// 
     /// </summary>
-    public struct VmdStreamData : IDisposable
+    public class VmdStreamData : IDisposable
     {
         public StreamDataHolder<quaternion, Key4StreamCache<quaternion>, StreamIndex> RotationStreams;
         public StreamDataHolder<float4, Key4StreamCache<float4>, StreamIndex> PositionStreams;
@@ -27,30 +27,59 @@ namespace AnimLite.Vmd
             this.RotationStreams.Dispose();
             this.PositionStreams.Dispose();
             this.FaceStreams.Dispose();
+
+            "VmdStreamData disposed".ShowDebugLog();
         }
     }
+
+    public class VmdStreamSupports : IDisposable
+    {
+        public TransformHandleMappings bone;
+        public VrmExpressionMappings face;
+
+        public void Dispose()
+        {
+            this.bone.Dispose();
+            //this.face.Dispose();
+
+            "VmdStreamSupports disposed".ShowDebugLog();
+        }
+    }
+
 
 
     public static class VmdData
     {
 
-        public static Task<(VmdStreamData data, VmdFaceMapping facemap)> BuildVmdStreamDataAsync(
-            PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct) =>
-                BuildVmdStreamDataAsync(vmdFilePath, faceMapFilePath, default, ct);
 
-        public static Task<(VmdStreamData data, VmdFaceMapping facemap)> BuildVmdStreamDataAsync(
-            PathUnit vmdFilePath, PathUnit faceMapFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct) =>
+        public static Task<(VmdStreamData data, VmdFaceMapping facemap)> LoadVmdStreamDataAsync(
+            PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct) =>
                 Task.Run(() =>
                 {
-                    var vmddata = VmdParser.LoadVmd(vmdFilePath);
-                    if (ct.IsCancellationRequested) return default;
+                    var vmddata = VmdParser.ParseVmd(vmdFilePath);
+                    ct.ThrowIfCancellationRequested();
 
-                    var facemap = defaultmap.VmdToVrmMaps ?? VrmParser.ParseFaceMap(faceMapFilePath);
-                    if (ct.IsCancellationRequested) return default;
+                    var facemap = VrmParser.ParseFaceMap(faceMapFilePath);
+                    ct.ThrowIfCancellationRequested();
 
                     var streamdata = vmddata.BuildVmdStreamData(facemap);
+                    
                     return (streamdata, facemap);
                 }, ct);
+
+        public static Task<VmdStreamData> LoadVmdStreamDataAsync(
+            PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct) =>
+                Task.Run(() =>
+                {
+                    var vmddata = VmdParser.ParseVmd(vmdFilePath);
+                    ct.ThrowIfCancellationRequested();
+
+                    var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
+                    
+                    return streamdata;
+                }, ct);
+
+
 
         public static Task<VmdStreamData> BuildVmdStreamDataAsync(
             this VmdMotionData vmdData, VmdFaceMapping facemap, CancellationToken ct) =>

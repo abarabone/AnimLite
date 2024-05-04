@@ -4,19 +4,20 @@ using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
 using UnityEngine.Playables;
+using System;
 
 namespace AnimLite.DancePlayable
 {
     using AnimLite.Utility;
+    using AnimLite.vrm;
     using AnimLite.Vrm;
 
     public class DanceSetHolder : MonoBehaviour
     {
+        public Transform LookAtTarget;
+
         [SerializeField]
         public DanceSet dance;
-
-        //public ProgressState LoadingState { get; private set; } = new ProgressState();
-        public SemaphoreSlim DanceSemapho { get; } = new SemaphoreSlim(1, 1);
 
 
         DanceGraphy graphy;
@@ -24,18 +25,46 @@ namespace AnimLite.DancePlayable
         public PlayableGraph Graph => this.graphy.graph;
 
 
+        public SemaphoreSlim DanceSemapho { get; } = new SemaphoreSlim(1, 1);
+
+        CancellationTokenSource cts;
+
+
+        private void OnDestroy()
+        {
+            this.DanceSemapho.Dispose();
+        }
+
 
         private async Awaitable OnEnable()
         {
-            using var d = await this.DanceSemapho.WaitAsyncDisposable();
+            this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
+            var ct = this.cts.Token;
 
-            moveChildrenMotionsToDanceSet_();
+            try
+            {
+                "load start".ShowDebugLog();
+                using (await this.DanceSemapho.WaitAsyncDisposable(default))
+                {
+                    moveChildrenMotionsToDanceSet_();
+                    getFaceRendererIfNothing_();
+                    adjustModel_();
 
-            getFaceRendererIfNothing_();
-
-            this.graphy = await this.dance.CreateDanceGraphyAsync(this.destroyCancellationToken);
-
-            this.graphy.graph.Play();
+                    this.graphy = await this.dance.CreateDanceGraphyAsync(ct);
+                    this.graphy?.graph.Play();
+                }
+                "load end".ShowDebugLog();
+            }
+            catch (OperationCanceledException e)
+            {
+                e.Message.ShowDebugLog();
+            }
+            finally
+            {
+                this.cts.Dispose();
+                this.cts = null;
+                "canceller disposed".ShowDebugLog();
+            }
 
             return;
 
@@ -45,6 +74,16 @@ namespace AnimLite.DancePlayable
                 this.dance.Motions
                     .Where(motion => motion.FaceRenderer.IsUnityNull())
                     .ForEach(motion => motion.FaceRenderer = motion.ModelAnimator.FindFaceRenderer());
+            }
+
+            void adjustModel_()
+            {
+                this.dance.Motions
+                    .ForEach(x =>
+                    {
+                        x.ModelAnimator.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
+                        x.FaceRenderer.AdjustBbox(x.ModelAnimator);
+                    });
             }
 
             void moveChildrenMotionsToDanceSet_()
@@ -72,43 +111,28 @@ namespace AnimLite.DancePlayable
                     return m;
                 }
             }
-
-            //void toFullpath_()
-            //{
-            //    foreach (var motion in this.dance.Motions)
-            //    {
-            //        motion.FaceMappingFilePath = (FullPath)motion.FaceMappingFilePath;
-            //        motion.VmdFilePath = (FullPath)motion.VmdFilePath;
-            //    }
-            //}
         }
 
         async Awaitable OnDisable()
         {
-            using var d = await this.DanceSemapho.WaitAsyncDisposable();
+            this.cts?.Cancel();
 
-            Debug.Log("disable start");
-            this.graphy?.Dispose();
-            this.graphy = null;
+            "disable start".ShowDebugLog();
+            using (await this.DanceSemapho.WaitAsyncDisposable(default))// ゲームオブジェクトが破棄されても、解放はやり切ってほしいので Token は default
+            {
+                this.graphy?.Dispose();
+                this.graphy = null;
 
-            this.dance.Motions
-                .Where(motion => !motion.ModelAnimator.IsUnityNull())
-                .ForEach(motion =>
-                {
-                    motion.ModelAnimator.UnbindAllStreamHandles();
-                    motion.ModelAnimator.ResetPose();
-                });
+                this.dance.Motions
+                    .Where(motion => !motion.ModelAnimator.IsUnityNull())
+                    .ForEach(motion =>
+                    {
+                        motion.ModelAnimator.UnbindAllStreamHandles();
+                        motion.ModelAnimator.ResetPose();
+                    });
+            }
+            "disable end".ShowDebugLog();
         }
 
-        //private void Awake()
-        //{
-        //    //Debug.Log((string)("abc.txt"));
-        //    Debug.Log(PathUnit.ParentPath);
-        //    Debug.Log(Application.consoleLogPath);
-        //    Debug.Log(Application.dataPath);
-        //    Debug.Log(Application.persistentDataPath);
-        //    Debug.Log(Application.streamingAssetsPath);
-        //    Debug.Log(Application.temporaryCachePath);
-        //}
     }
 }

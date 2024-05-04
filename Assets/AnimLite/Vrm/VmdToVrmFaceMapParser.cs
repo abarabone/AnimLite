@@ -19,35 +19,40 @@ namespace AnimLite.Vrm
     {
         
         static public Task<VmdFaceMapping> ParseFaceMapAsync(PathUnit filepath, CancellationToken ct) =>
-            Task.Run(() => ParseFaceMap(filepath), ct);
+            Task.Run(async () =>
+            {
+                using var s = new StreamReader(filepath);
+                
+                var txt = await s.ReadToEndAsync();
+
+                ct.ThrowIfCancellationRequested();
+
+                return (VmdFaceMapping)parse_(txt);
+            }, ct);
 
         static public VmdFaceMapping ParseFaceMap(PathUnit filepath)
         {
             using var s = new StreamReader(filepath);
 
-            //var txt = await s.ReadToEndAsync();
             var txt = s.ReadToEnd();
-            return parse_(txt);
 
+            return parse_(txt);
         }
 
 
         static public Task<VmdFaceMapping> ParseFaceMapAsync(TextAsset textfile, CancellationToken ct) =>
-            Task.Run(() => ParseFaceMap(textfile), ct);
+            ParseFaceMapAsync(textfile.text, ct);
 
-        static public VmdFaceMapping ParseFaceMap(TextAsset textfile)
-        {
-            return parse_(textfile.text);
-        }
+        static public VmdFaceMapping ParseFaceMap(TextAsset textfile) =>
+            parse_(textfile.text);
 
 
         static public Task<VmdFaceMapping> ParseFaceMapAsync(string text, CancellationToken ct) =>
             Task.Run(() => ParseFaceMap(text), ct);
 
-        static public VmdFaceMapping ParseFaceMap(string text)
-        {
-            return parse_(text);
-        }
+        static public VmdFaceMapping ParseFaceMap(string text) =>
+            parse_(text);
+        
 
         static Dictionary<VmdFaceName, VrmExpressionName> parse_(string text)
         {
@@ -61,9 +66,9 @@ namespace AnimLite.Vrm
                 select (vmd, vrm)
                 ;
 
-#if UNITY_EDITOR
-            string.Join(", ", q.Select((x, i) => $"{i}:{x.vmd.name}:{x.vrm.name}")).ShowDebugLog();
-#endif
+            #if UNITY_EDITOR
+                string.Join(", ", q.Select((x, i) => $"{i}:{x.vmd.name}:{x.vrm.name}")).ShowDebugLog();
+            #endif
 
             return q.ToDictionary(x => x.vmd, x => x.vrm);
         }

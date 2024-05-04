@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Playables;
+using System;
 
 namespace AnimLite.Samples
 {
@@ -27,10 +28,6 @@ namespace AnimLite.Samples
 
         async Awaitable Start()
         {
-            
-            //this.anim.ResetPose();//
-
-
             // ファイルからデータを読み下す
             var vmdStreamData = await VmdParser.ParseVmdAsync(this.VmdFilePath.ToFullPath(), this.destroyCancellationToken);
             var faceMapping = await VrmParser.ParseFaceMapAsync(this.FaceMappingFilePath.ToFullPath(), this.destroyCancellationToken);

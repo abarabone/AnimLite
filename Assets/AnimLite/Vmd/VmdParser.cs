@@ -18,35 +18,44 @@ namespace AnimLite.Vmd
     {
 
         public static Task<VmdMotionData> ParseVmdAsync(PathUnit filepath, CancellationToken ct) =>
-            Task.Run(() => LoadVmd(filepath), ct);
+            Task.Run(async () =>
+            {
+                using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-        public static Task<VmdMotionData> LoadVmdAsync(this TextAsset vmdFileAsset, CancellationToken ct) =>
-            Task.Run(() => LoadVmd(vmdFileAsset), ct);
+                ct.ThrowIfCancellationRequested();
+
+                using var m = new MemoryStream();
+                await f.CopyToAsync(m, ct);
+
+                return ParseVmd(m);
+            }, ct);
+        
+        public static Task<VmdMotionData> ParseVmdAsync(TextAsset vmdFileAsset, CancellationToken ct)
+        {
+            using var m = new MemoryStream(vmdFileAsset.bytes);
+
+            return Task.Run(() => ParseVmd(m), ct);
+        }
 
 
-        public static VmdMotionData LoadVmd(PathUnit filepath)
+        public static VmdMotionData ParseVmd(PathUnit filepath)
         {
             using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-            if (f == null)
-            {
-                return default;
-            }
-
             using var m = new MemoryStream();
-            //await f.CopyToAsync(m, ct);
             f.CopyTo(m);
 
-            return LoadVmd(m);
+            return ParseVmd(m);
         }
-        public static VmdMotionData LoadVmd(this TextAsset vmdFile)
+        public static VmdMotionData ParseVmd(TextAsset vmdFile)
         {
             using var m = new MemoryStream(vmdFile.bytes);
 
-            return LoadVmd(m);
+            return ParseVmd(m);
         }
 
-        public static VmdMotionData LoadVmd(MemoryStream m)
+
+        public static VmdMotionData ParseVmd(MemoryStream m)
         {
             //System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
@@ -57,13 +66,15 @@ namespace AnimLite.Vmd
             //m.Seek(50, SeekOrigin.Begin);
 
             var (h, n) = header_(r);
-            $"format name : {h}".ShowDebugLog();
-            $"model name : {n}".ShowDebugLog();
+            #if UNITY_EDITOR
+                $"format name : {h}".ShowDebugLog();
+                $"model name : {n}".ShowDebugLog();
+            #endif
 
             var bodydata = body_(r);
-#if UNITY_EDITOR
-            string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Count()}")).ShowDebugLog();
-#endif
+            #if UNITY_EDITOR
+                string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Count()}")).ShowDebugLog();
+            #endif
 
 
             var facedata = face_(r);

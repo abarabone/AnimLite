@@ -4,7 +4,7 @@
 - 表情はとりあえず VRM 1.0 の expression に依存
 - burst, playable にも対応した
 - 名前空間 AnimLite.Vrm 関係は、UniVRM 1.x が必要です
-- ワーカースレッドでの .vmd 読み込み
+- 裏スレッドでの .vmd 読み込み
 - .vmd のキャッシュ機構、データ共有機構
 
 # いずれ
@@ -16,7 +16,7 @@
 - ecs でも使えるようにしたい
 - body motion が burst job なのに、face の playable script がメインスレッドなうえに遅い、なんとかならないか…
   - 表情は univrm ではない再生方法もあるといいかも
-- .vrm 変換を高速化したい
+- .vmd 変換を高速化したい
 
 # その他
 - unity 2023.1.19f1, VRM1.20

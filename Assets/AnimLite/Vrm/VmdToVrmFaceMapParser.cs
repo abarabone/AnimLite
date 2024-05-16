@@ -21,6 +21,8 @@ namespace AnimLite.Vrm
         static public Task<VmdFaceMapping> ParseFaceMapAsync(PathUnit filepath, CancellationToken ct) =>
             Task.Run(async () =>
             {
+                ct.ThrowIfCancellationRequested();
+
                 using var s = new StreamReader(filepath);
                 
                 var txt = await s.ReadToEndAsync();
@@ -52,7 +54,7 @@ namespace AnimLite.Vrm
 
         static public VmdFaceMapping ParseFaceMap(string text) =>
             parse_(text);
-        
+
 
         static Dictionary<VmdFaceName, VrmExpressionName> parse_(string text)
         {

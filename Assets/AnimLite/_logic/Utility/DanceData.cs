@@ -57,9 +57,10 @@ namespace AnimLite.DancePlayable
     public static class DanceGraphyExtension
     {
 
-        public static Task<DanceGraphy> CreateDanceGraphyAsync(this DanceSet dance, CancellationToken ct)
+        public static Task<DanceGraphy> CreateDanceGraphyAsync(
+            this DanceSet dance, VmdStreamDataCache cache, CancellationToken ct)
         {
-            return DanceGraphy.CreateDanceGraphyAsync(dance, ct);
+            return DanceGraphy.CreateDanceGraphyAsync(dance, cache, ct);
         }
 
     }

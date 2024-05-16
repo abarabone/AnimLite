@@ -22,10 +22,10 @@ namespace AnimLite.DancePlayable
 
         public PlayableGraph graph { get; private set; }
 
-        MotionResouce[] resources;
+        MotionResource[] resources;
 
 
-        class MotionResouce : IDisposable
+        public class MotionResource : IDisposable
         {
 
             public VmdStreamData vmddata;
@@ -34,12 +34,9 @@ namespace AnimLite.DancePlayable
             public VrmExpressionMappings face;
 
 
-            public void Dispose()
-            {
-                this.vmddata.Dispose();
-                this.bone.Dispose();
-                //this.face.Dispose();
-            }
+            public Action<MotionResource> DisposeAction;
+
+            public void Dispose() => this.DisposeAction(this);
         }
 
 
@@ -56,7 +53,8 @@ namespace AnimLite.DancePlayable
 
 
 
-        public static async Task<DanceGraphy> CreateDanceGraphyAsync(DanceSet dance, CancellationToken ct)
+        public static async Task<DanceGraphy> CreateDanceGraphyAsync(
+            DanceSet dance, VmdStreamDataCache cache, CancellationToken ct)
         {
 
             var motions = dance.Motions
@@ -65,17 +63,15 @@ namespace AnimLite.DancePlayable
                 //.ToArray()
                 ;
 
-            var resources = await buildMotionResourcesAsync_(motions, ct);
+            var resources = cache.IsUnityNull()
+                ? await buildMotionResourcesAsync_(motions, ct)
+                : await cache.GetOrBuildMotionResourcesAsync(motions, ct);
 
+
+            await Awaitable.MainThreadAsync();
 
             var graph = PlayableGraph.Create();
-            using var registed = ct.Register(() =>
-            {
-                resources.ForEach(x => x.Dispose());
-                graph.Destroy();
-
-                "create canceled".ShowDebugLog();
-            });
+            using var registed = registCancel_(resources, graph, ct);
 
             createMotionPlayables_(graph, motions, resources);
 
@@ -89,6 +85,17 @@ namespace AnimLite.DancePlayable
             };
 
 
+            static CancellationTokenRegistration registCancel_(
+                MotionResource[] resources, PlayableGraph graph, CancellationToken ct)
+            =>
+                ct.Register(() =>
+                {
+                    resources.ForEach(x => x.Dispose());
+                    graph.Destroy();
+
+                    "create canceled".ShowDebugLog();
+                });
+
 
             static void createAudioPlayable_(PlayableGraph graph, AudioDefine audio)
             {
@@ -98,12 +105,11 @@ namespace AnimLite.DancePlayable
             }
 
 
-
-            static async Task<MotionResouce[]> buildMotionResourcesAsync_(DanceMotionDefine[] motions, CancellationToken ct)
+            static async Task<MotionResource[]> buildMotionResourcesAsync_(DanceMotionDefine[] motions, CancellationToken ct)
             {
 
-                var defaultFaceMap = motions.Any(x => (x.FaceMappingFilePath.Value ?? "") == "")
-                    ? await VrmParser.ParseFaceMapAsync(await loadDefaultFaceMapAsync_("face_map_default"), ct)
+                var defaultFaceMap = motions.Any(x => x.FaceMappingFilePath.IsBlank())
+                    ? await "".ToPath().LoadFaceMapExAsync(ct)
                     : default;
 
                 var resources = await motions
@@ -113,7 +119,7 @@ namespace AnimLite.DancePlayable
                 return resources;
 
 
-                async Task<MotionResouce> buildAsync_(DanceMotionDefine motion)
+                async Task<MotionResource> buildAsync_(DanceMotionDefine motion)
                 {
                     var vmdfullpath = motion.VmdFilePath.ToFullPath();
                     var facefullpath = motion.FaceMappingFilePath.ToFullPath();
@@ -121,26 +127,27 @@ namespace AnimLite.DancePlayable
                         ? (await VmdData.LoadVmdStreamDataAsync(vmdfullpath, facefullpath, ct))
                         : (await VmdData.LoadVmdStreamDataAsync(vmdfullpath, defaultFaceMap, ct), defaultFaceMap);
 
-                    return new MotionResouce
+                    return new MotionResource
                     {
                         vmddata = vmddata,
 
                         bone = motion.ModelAnimator.BuildVmdPlayableJobTransformMappings(),
                         face = motion.FaceRenderer?.sharedMesh?.BuildStreamingFace(facemap) ?? default,
-                    };
-                }
 
-                static async Awaitable<string> loadDefaultFaceMapAsync_(string path)
-                {
-                    var req = Resources.LoadAsync<TextAsset>(path);
-                    await req;
-                    return (req.asset as TextAsset).text;
+                        DisposeAction = (MotionResource mr) =>
+                        {
+                            mr.vmddata.Dispose();
+                            mr.bone.Dispose();
+                            //mr.face.Dispose();
+                        },
+                    };
                 }
             }
 
 
 
-            static void createMotionPlayables_(PlayableGraph graph, DanceMotionDefine[] motions, MotionResouce[] resources)
+            static void createMotionPlayables_(
+                PlayableGraph graph, DanceMotionDefine[] motions, MotionResource[] resources)
             {
 
                 foreach (var (motion, res) in (motions, resources).Zip())
@@ -151,13 +158,13 @@ namespace AnimLite.DancePlayable
 
                     createFaceMotion_(motion, res, timer);
 
-                    overwritePosition(motion);
+                    overwritePosition_(motion);
                 }
 
                 return;
 
 
-                void createBodyMotion_(DanceMotionDefine motion, MotionResouce res, StreamingTimer timer)
+                void createBodyMotion_(DanceMotionDefine motion, MotionResource res, StreamingTimer timer)
                 {
                     var pkf = res.vmddata.PositionStreams
                         .ToKeyFinderWith<Key4CatmulPos, Clamp>();
@@ -170,7 +177,7 @@ namespace AnimLite.DancePlayable
                     graph.CreateVmdAnimationJobWithSyncScript(motion.ModelAnimator, job, motion.DelayTime);
                 }
 
-                void createFaceMotion_(DanceMotionDefine motion, MotionResouce res, StreamingTimer timer)
+                void createFaceMotion_(DanceMotionDefine motion, MotionResource res, StreamingTimer timer)
                 {
                     if (res.face.Expressions == default) return;
                     if (motion.FaceRenderer.AsUnityNull() == default) return;
@@ -181,7 +188,7 @@ namespace AnimLite.DancePlayable
                     graph.CreateVmdFaceAnimation(motion.ModelAnimator, fkf, res.face, timer, motion.DelayTime);
                 }
 
-                void overwritePosition(DanceMotionDefine motion)
+                void overwritePosition_(DanceMotionDefine motion)
                 {
                     if (!motion.OverWritePositionAndRotation) return;
 

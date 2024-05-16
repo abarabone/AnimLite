@@ -15,17 +15,21 @@ namespace AnimLite.Utility
 
         public static void ResetPose(this Animator anim)
         {
-            var bonedict = anim.GetComponentInChildren<SkinnedMeshRenderer>().bones
-                .ToDictionary(x => x.name, x => x);
-
             var avatar = anim.avatar;
             var desc = avatar.humanDescription;
-            foreach (var s in desc.skeleton)
-            {
-                var tf = bonedict.TryGetOrDefault(s.name); 
-                if (tf == null) continue;
 
-                tf.SetLocalPositionAndRotation(s.position, s.rotation);// 再計算とか走るんだろうか…
+            var skeltondict = desc.skeleton
+                .ToDictionary(x => x.name, x => x);
+
+            var q = Enumerable.Range(0, (int)HumanBodyBones.LastBone)
+                .Select(i => anim.GetBoneTransform((HumanBodyBones)i));
+            foreach (var tf in q)
+            {
+                var isExists = skeltondict.TryGetValue(tf.name, out var skelton);
+                if (!isExists) continue;
+
+                //skelton.name.ShowDebugLog();//
+                tf.SetLocalPositionAndRotation(skelton.position, skelton.rotation);// 再計算とか走るんだろうか…
             }
         }
 

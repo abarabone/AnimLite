@@ -10,6 +10,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.VisualScripting;
 using System.IO;
+using System.Collections.Concurrent;
 
 
 namespace AnimLite.Utility
@@ -26,7 +27,7 @@ namespace AnimLite.Utility
     }
 
     [Serializable]
-    public struct PathUnit
+    public struct PathUnit : IEquatable<PathUnit>
     {
 
         public string Value;
@@ -50,6 +51,24 @@ namespace AnimLite.Utility
                 };
             }
         }
+
+
+        // dictionary 用 boxing 回避 ------------------------------------
+        public override bool Equals(object obj)
+        {
+            return obj is PathUnit unit && Equals(unit);
+        }
+
+        public bool Equals(PathUnit other)
+        {
+            return Value == other.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Value);
+        }
+        // dictionary 用 boxing 回避 ------------------------------------
     }
 
 
@@ -57,7 +76,7 @@ namespace AnimLite.Utility
     {
 
         public static PathUnit ToFullPath(this PathUnit path, string parentpath) =>
-            path.Value == default || path.Value == "" || path.Value[1..3].Contains(':') || path.Value[0] == '/'
+            path.IsBlank() || path.Value[1..3].Contains(':') || path.Value[0] == '/' || path.Value.EndsWith("as resource", StringComparison.OrdinalIgnoreCase)
                 ? (path.Value ?? "")
                 : $"{parentpath}/{path.Value}"
             ;
@@ -71,11 +90,15 @@ namespace AnimLite.Utility
 
         static PathUnit show_(this PathUnit fullpath, PathUnit path)
         {
-            //#if UNITY_EDITOR
-            //    Debug.Log($"{path.Value} => {fullpath.Value}");
-            //#endif
+//#if UNITY_EDITOR
+//            Debug.Log($"{path.Value} => {fullpath.Value}");
+//#endif
             return fullpath;
         }
+
+        static public bool IsBlank(this PathUnit path) =>
+            (path.Value ?? "") == "";
+            //path.Value == default || path.Value == "";
     }
 
 
@@ -200,6 +223,23 @@ namespace AnimLite.Utility
         }
     }
 
+    /// <summary>
+    /// Task は複数回 await しても問題ない様子
+    /// ValueTask はダメみたい
+    /// </summary>
+    public class AsyncLazy<T> : Lazy<Task<T>>
+    {
+        public AsyncLazy(Func<T> valueFactory) :
+            base(() => Task.Factory.StartNew(valueFactory))
+        { }
+
+        public AsyncLazy(Func<Task<T>> taskFactory) :
+            base(() => Task.Factory.StartNew(() => taskFactory()).Unwrap())
+        { }
+
+        public TaskAwaiter<T> GetAwaiter() => this.Value.GetAwaiter();
+    }
+
     //public class ProgressState : IDisposable
     //{
     //    TaskCompletionSource<bool> tcs;
@@ -310,6 +350,38 @@ namespace AnimLite.Utility
             where T : unmanaged =>
             src.ToArray().ToNativeArray(allocator);
 
+
+
+        /// <summary>
+        /// キーと非同期生成関数を登録する。
+        /// キャンセルが発生した場合は、AsyncLazy を辞書から消す。
+        /// もしかすると、キャンセルした瞬間から削除までの間に、ほかのスレッドから取得がされることがあるかも？
+        /// その場合は、.Value にアクセスしたとき、キャッシュされた例外が投げられるようだ。
+        /// </summary>
+        //public static AsyncLazy<TValue> GetOrAddLazyAaync<TKey, TValue>(
+        //    this ConcurrentDictionary<TKey, AsyncLazy<TValue>> dict, TKey key, Func<Task<TValue>> f)
+        public static async Task<TValue> GetOrAddLazyAaync<TKey, TValue>(
+            this ConcurrentDictionary<TKey, AsyncLazy<TValue>> dict, TKey key, Func<Task<TValue>> f)
+        {
+            try
+            {
+                return await dict.GetOrAdd(key, new AsyncLazy<TValue>(f));
+            }
+            catch (OperationCanceledException)
+            {
+                // エラーとここの間に取得するスレッドがあったら、不完全な LazyAsync が返されるかもしれない
+                // そういう場合、.Value はキャッシュした例外を投げるらしいので、キャンセルされた挙動をとればよい…？
+                //dict[key] = new AsyncLazy<TValue>(f);
+                dict.TryRemove(key, out var _);// すでに削除済の場合は失敗する
+
+                throw;
+            }
+        }
+
+        //public static AsyncLazy<TValue> GetOrAddLazyAaync<TKey, TValue>(
+        //    this ConcurrentDictionary<TKey, AsyncLazy<TValue>> dict, TKey key, Func<Task<TValue>> f)
+        //=>
+        //    dict.GetOrAdd(key, new AsyncLazy<TValue>(f));
 
 
 

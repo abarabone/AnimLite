@@ -20,18 +20,22 @@ namespace AnimLite.Vmd
         public static Task<VmdMotionData> ParseVmdAsync(PathUnit filepath, CancellationToken ct) =>
             Task.Run(async () =>
             {
-                using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-
                 ct.ThrowIfCancellationRequested();
+
+                using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
                 using var m = new MemoryStream();
                 await f.CopyToAsync(m, ct);
+
+                ct.ThrowIfCancellationRequested();
 
                 return ParseVmd(m);
             }, ct);
         
         public static Task<VmdMotionData> ParseVmdAsync(TextAsset vmdFileAsset, CancellationToken ct)
         {
+            ct.ThrowIfCancellationRequested();
+
             using var m = new MemoryStream(vmdFileAsset.bytes);
 
             return Task.Run(() => ParseVmd(m), ct);

@@ -13,6 +13,7 @@ using UniVRM10;
 
 namespace AnimLite.Utility
 {
+    using AnimLite.Utility;
     using AnimLite.Utility.Linq;
 
 
@@ -92,65 +93,6 @@ namespace AnimLite.Utility
             holder.dance = ds;
         }
 
-        public static async Awaitable<AudioClip> ReadAudioAsync(PathUnit path, CancellationToken ct)
-        {
-            var atype = Path.GetExtension(path) switch
-            {
-                ".mp3" => AudioType.MPEG,
-                ".ogg" => AudioType.OGGVORBIS,
-                ".acc" => AudioType.ACC,
-                ".wav" => AudioType.WAV,
-                _ => AudioType.UNKNOWN,
-            };Debug.Log($"{atype} {path.Value} {File.Exists(path)}");
-
-            if (atype == AudioType.UNKNOWN || !File.Exists(path)) return default;
-
-            return await audio_(path, atype);
-
-
-            async Awaitable<AudioClip> audio_(PathUnit path, AudioType audioType)
-            {
-                using var req = UnityWebRequestMultimedia.GetAudioClip(path, audioType);
-                ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;
-
-                await req.SendWebRequest();
-
-                var clip = DownloadHandlerAudioClip.GetContent(req);
-                clip.name = Path.GetFileNameWithoutExtension(path);
-                return clip;
-            }
-        }
-
-        public static async Awaitable<Animator> LoadAnimatorResourceAsync(string path)
-        {
-            var name = path.ToLower().Split("as ")[0].Trim();
-
-            var req = Resources.LoadAsync<GameObject>(name);
-            await req;
-
-            var go = req.asset as GameObject;
-            return GameObject.Instantiate(go.GetComponent<Animator>());
-        }
-        public static async Awaitable<AudioClip> LoadAudioClipResourceAsync(string path)
-        {
-            var name = path.ToLower().Split("as ")[0].Trim();
-
-            var req = Resources.LoadAsync<AudioClip>(name);
-            await req;
-
-            return req.asset as AudioClip;
-        }
-
-        public static async Awaitable<Animator> ReadModelAnimatorVrmAsync(PathUnit path, CancellationToken ct)
-        {
-            if (Path.GetExtension(path) != ".vrm" || !File.Exists(path)) return default;
-
-            var vrm10 = await Vrm10.LoadPathAsync(
-                path, true, ControlRigGenerationOption.None, true, null, null, null, null, ct);
-
-            return vrm10.GetComponent<Animator>();
-        }
-
 
 
         public static DanceSetJson ToDanceSetJson(this DanceSet src) =>
@@ -182,9 +124,7 @@ namespace AnimLite.Utility
             {
                 Audio = new AudioDefine
                 {
-                    AudioClip = src.AudioPath.EndsWith("as audioclip", StringComparison.OrdinalIgnoreCase)
-                        ? await LoadAudioClipResourceAsync(src.AudioPath)
-                        : await ReadAudioAsync(src.AudioPath.ToPath().ToFullPath(), ct),
+                    AudioClip = await src.AudioPath.ToPath().ToFullPath().LoadAudioClipExAsync(ct),
                     DelayTime = src.DelayTime,
                     AudioSource = setvolume_(audiosrc, src.Volume),
                 },
@@ -230,9 +170,7 @@ namespace AnimLite.Utility
         public static async Awaitable<DanceMotionDefine> ToDanceMotionDefineAsync(this DanceMotionDefineJson src, CancellationToken ct) =>
             new DanceMotionDefine
             {
-                ModelAnimator = src.VrmFilePath.EndsWith("as animator", StringComparison.OrdinalIgnoreCase)
-                    ? await LoadAnimatorResourceAsync(src.VrmFilePath)
-                    : await ReadModelAnimatorVrmAsync(src.VrmFilePath.ToPath().ToFullPath(), ct),
+                ModelAnimator = await src.VrmFilePath.ToPath().ToFullPath().LoadModelExAsync(ct),
                 FaceMappingFilePath = src.FaceMappingFilePath.ToPath().ToFullPath(),
                 VmdFilePath = src.VmdFilePath.ToPath().ToFullPath(),
                 FaceRenderer = null,

@@ -9,6 +9,7 @@ namespace AnimLite.Vmd
 {
     using AnimLite.Vrm;
     using AnimLite.Utility;
+    using VRM;
 
 
     /// <summary>
@@ -52,10 +53,31 @@ namespace AnimLite.Vmd
     {
 
 
+        //public static async Task<(VmdStreamData data, VmdFaceMapping facemap)> LoadVmdStreamDataAsync(
+        //    PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct)
+        //{
+        //    await Awaitable.BackgroundThreadAsync();
+
+        //    ct.ThrowIfCancellationRequested();
+
+        //    var vmddata = VmdParser.ParseVmd(vmdFilePath);
+        //    ct.ThrowIfCancellationRequested();
+
+        //    var facemap = VrmParser.ParseFaceMap(faceMapFilePath);
+        //    ct.ThrowIfCancellationRequested();
+
+        //    var streamdata = vmddata.BuildVmdStreamData(facemap);
+        //    if (ct.IsCancellationRequested) streamdata.Dispose();
+        //    ct.ThrowIfCancellationRequested();
+
+        //    return (streamdata, facemap);
+        //}
         public static Task<(VmdStreamData data, VmdFaceMapping facemap)> LoadVmdStreamDataAsync(
             PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct) =>
                 Task.Run(() =>
                 {
+                    ct.ThrowIfCancellationRequested();
+
                     var vmddata = VmdParser.ParseVmd(vmdFilePath);
                     ct.ThrowIfCancellationRequested();
 
@@ -63,27 +85,58 @@ namespace AnimLite.Vmd
                     ct.ThrowIfCancellationRequested();
 
                     var streamdata = vmddata.BuildVmdStreamData(facemap);
-                    
+                    if (ct.IsCancellationRequested) streamdata.Dispose();
+                    ct.ThrowIfCancellationRequested();
+
                     return (streamdata, facemap);
                 }, ct);
 
+        //public static async Task<VmdStreamData> LoadVmdStreamDataAsync(
+        //    PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct)
+        //{
+        //    await Awaitable.BackgroundThreadAsync();
+
+        //    ct.ThrowIfCancellationRequested();
+
+        //    var vmddata = VmdParser.ParseVmd(vmdFilePath);
+        //    ct.ThrowIfCancellationRequested();
+
+        //    var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
+        //    if (ct.IsCancellationRequested) streamdata.Dispose();
+        //    ct.ThrowIfCancellationRequested();
+
+        //    return streamdata;
+        //}
         public static Task<VmdStreamData> LoadVmdStreamDataAsync(
             PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct) =>
                 Task.Run(() =>
                 {
+                    ct.ThrowIfCancellationRequested();
+
                     var vmddata = VmdParser.ParseVmd(vmdFilePath);
                     ct.ThrowIfCancellationRequested();
 
                     var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
-                    
+                    if (ct.IsCancellationRequested) streamdata.Dispose();
+                    ct.ThrowIfCancellationRequested();
+
                     return streamdata;
                 }, ct);
 
 
 
         public static Task<VmdStreamData> BuildVmdStreamDataAsync(
-            this VmdMotionData vmdData, VmdFaceMapping facemap, CancellationToken ct) =>
-                Task.Run(() => vmdData.BuildVmdStreamData(facemap), ct);
+            this VmdMotionData vmddata, VmdFaceMapping facemap, CancellationToken ct) =>
+                Task.Run(() =>
+                {
+                    ct.ThrowIfCancellationRequested();
+
+                    var streamdata = vmddata.BuildVmdStreamData(facemap);
+                    if (ct.IsCancellationRequested) streamdata.Dispose();
+                    ct.ThrowIfCancellationRequested();
+
+                    return streamdata;
+                }, ct);
 
 
         public static VmdStreamData BuildVmdStreamData(this VmdMotionData vmdData, VmdFaceMapping facemap)

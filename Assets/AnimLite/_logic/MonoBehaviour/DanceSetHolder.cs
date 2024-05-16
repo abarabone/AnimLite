@@ -11,10 +11,13 @@ namespace AnimLite.DancePlayable
     using AnimLite.Utility;
     using AnimLite.vrm;
     using AnimLite.Vrm;
+    using AnimLite.Vmd;
 
     public class DanceSetHolder : MonoBehaviour
     {
         public Transform LookAtTarget;
+
+        public VmdStreamDataCache Cache;
 
         [SerializeField]
         public DanceSet dance;
@@ -50,7 +53,7 @@ namespace AnimLite.DancePlayable
                     getFaceRendererIfNothing_();
                     adjustModel_();
 
-                    this.graphy = await this.dance.CreateDanceGraphyAsync(ct);
+                    this.graphy = await this.dance.CreateDanceGraphyAsync(this.Cache, ct);
                     this.graphy?.graph.Play();
                 }
                 "load end".ShowDebugLog();
@@ -59,6 +62,10 @@ namespace AnimLite.DancePlayable
             {
                 e.Message.ShowDebugLog();
             }
+            //catch (Exception e)
+            //{
+            //    e.ToSafeString().ShowDebugLog();
+            //}
             finally
             {
                 this.cts.Dispose();

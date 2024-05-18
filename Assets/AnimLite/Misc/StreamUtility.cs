@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
-//using static Unity.VisualScripting.AnnotationUtility;
+using Unity.VisualScripting;
 using System.Linq;
 
 namespace AnimLite.Utility
@@ -19,12 +19,16 @@ namespace AnimLite.Utility
             var desc = avatar.humanDescription;
 
             var skeltondict = desc.skeleton
+                //.Do(x => Debug.Log(x.name))
                 .ToDictionary(x => x.name, x => x);
 
             var q = Enumerable.Range(0, (int)HumanBodyBones.LastBone)
-                .Select(i => anim.GetBoneTransform((HumanBodyBones)i));
+                .Select(i => anim.GetBoneTransform((HumanBodyBones)i))
+                .Append(anim.GetBoneTransform(HumanBodyBones.Hips).parent)
+                .Where(tf => !tf.IsUnityNull());
             foreach (var tf in q)
             {
+                //Debug.Log($"tf {tf.name}");
                 var isExists = skeltondict.TryGetValue(tf.name, out var skelton);
                 if (!isExists) continue;
 

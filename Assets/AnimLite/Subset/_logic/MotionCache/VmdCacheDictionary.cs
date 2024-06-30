@@ -14,7 +14,6 @@ namespace AnimLite.Vmd
     using AnimLite.DancePlayable;
     using AnimLite.Utility.Linq;
     using VRM;
-    using UnityEngine.WSA;
 
 
     public class VmdCacheDictionary

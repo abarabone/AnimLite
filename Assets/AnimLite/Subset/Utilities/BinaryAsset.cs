@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using UnityEditor.AssetImporters;
 using System.IO;
 
 namespace AnimLite.Vmd
@@ -13,7 +11,14 @@ namespace AnimLite.Vmd
         [HideInInspector]
         public byte[] bytes;
     }
+}
+
+namespace AnimLite.Vmd
+{
 #if UNITY_EDITOR
+    using UnityEditor;
+    using UnityEditor.AssetImporters;
+
     [ScriptedImporter(version: 3, ext: "vmd")]
     public class ImportScript : ScriptedImporter
     {
@@ -30,4 +35,3 @@ namespace AnimLite.Vmd
     }
 #endif
 }
-

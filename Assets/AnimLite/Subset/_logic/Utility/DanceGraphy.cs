@@ -17,7 +17,7 @@ namespace AnimLite.DancePlayable
     using AnimLite.Vmd;
     using AnimLite.Vrm;
     using static AnimLite.DancePlayable.DanceGraphy;
-    using static UnityEditor.Progress;
+    //using static UnityEditor.Progress;
 
 
     public class DanceGraphy : IDisposable

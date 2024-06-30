@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,14 +11,12 @@ using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.VisualScripting;
-using System.IO;
-using System.Collections.Concurrent;
-
 
 namespace AnimLite.Utility
 {
 
     using AnimLite.Utility.Linq;
+    using System.Data.Common;
 
 
     public enum FullPathMode
@@ -76,7 +76,13 @@ namespace AnimLite.Utility
     {
 
         public static PathUnit ToFullPath(this PathUnit path, string parentpath) =>
-            path.IsBlank() || path.Value[1..3].Contains(':') || path.Value[0] == '/' || path.Value.EndsWith("as resource", StringComparison.OrdinalIgnoreCase)
+            path.IsBlank()
+            ||
+            path.Value[1..3].Contains(':')
+            ||
+            path.Value[0] == '/'
+            ||
+            path.Value.EndsWith("as resource", StringComparison.OrdinalIgnoreCase)
                 ? (path.Value ?? "")
                 : $"{parentpath}/{path.Value}"
             ;
@@ -85,8 +91,17 @@ namespace AnimLite.Utility
             path.ToFullPath(PathUnit.ParentPath).show_(path);
 
 
+
         public static PathUnit ToPath(this string path) =>
             new PathUnit(path);
+
+
+        public static bool IsResource(this PathUnit path) =>
+            path.Value.EndsWith("as resource", StringComparison.InvariantCultureIgnoreCase);
+
+        public static PathUnit ToPathForResource(this PathUnit path) =>
+            path.Value[0..^("as resource".Length)].TrimEnd();
+
 
         static PathUnit show_(this PathUnit fullpath, PathUnit path)
         {
@@ -96,44 +111,14 @@ namespace AnimLite.Utility
             return fullpath;
         }
 
+
+
         static public bool IsBlank(this PathUnit path) =>
             (path.Value ?? "") == "";
             //path.Value == default || path.Value == "";
     }
 
 
-
-    //public struct FullPath
-    //{
-    //    public string fullpath;
-
-    //    static public FullPathMode mode = FullPathMode.DataPath;
-
-    //    public FullPath(string path) =>
-    //        this.fullpath = mode switch
-    //        {
-    //            FullPathMode.PersistentDataPath => path == default || path[1..3].Contains(':') || path[0] == '/'
-    //                ? path
-    //                : Application.persistentDataPath + "/" + path,
-
-    //            FullPathMode.DataPath => path == default || path[1..3].Contains(':') || path[0] == '/'
-    //                ? path
-    //                : Application.dataPath + "/../" + path,
-
-    //            _ => path,
-    //        };
-
-    //    public static implicit operator string(FullPath path) => path.fullpath;
-
-    //    public static implicit operator FullPath(string path) => show_(path, new FullPath(path));
-
-    //    static FullPath show_(string path, FullPath fullpath)
-    //    {
-    //        Debug.Log($"{path} => {fullpath.fullpath}");
-
-    //        return fullpath;
-    //    }
-    //}
 
 
     public class DisposableBag : IDisposable, IEnumerable<IDisposable>
@@ -165,8 +150,16 @@ namespace AnimLite.Utility
             disposables.Add(disposable);
             return disposable;
         }
+
+
+        public static void DisposeAll(this IEnumerable<IDisposable> src) =>
+            src.ForEach(x => x.Dispose());
+
     }
 
+    /// <summary>
+    /// action Çìoò^ÇµÇƒÅADispose() éûÇ…é¿çsÇ≥ÇÍÇÈÇÊÇ§Ç…Ç∑ÇÈÅB
+    /// </summary>
     public struct DisposableWrap<T> : IDisposable
     {
         Action<T> action;
@@ -334,20 +327,70 @@ namespace AnimLite.Utility
 
     }
 
+    public struct a
+    {
+        //Func<Task<T>> func;
+        CancellationToken ct;
+
+        public a With(CancellationToken ct)
+        {
+            this.ct = ct;
+            return this;
+        }
+
+        public static Task<T> Run<T>(Func<Task<T>> f) => Task.Run(async () => await f());
+
+        ////public TaskAwaiter<T> GetAwaiter() => Task.Run(async () => await this.func(), this.ct).GetAwaiter();
+        //public TaskAwaiter<T> GetAwaiter()
+        //{
+        //    var f = this.func;
+        //    return Task.Run(async () => await f(), this.ct).GetAwaiter();
+        //}
+    }
+
+    //public static class BackTask
+    //{
+    //    public static Task<T> RunAsync<T>(Func<Task<T>> f, CancellationToken ct) where T : IDisposable =>
+    //        Task.Run(async () =>
+    //        {
+    //            ct.ThrowIfCancellationRequested();
+
+    //            var result = await f();
+    //            if (ct.IsCancellationRequested) result.Dispose();
+    //            ct.ThrowIfCancellationRequested();
+
+    //            return result;
+    //        }, ct);
+
+    //    public static Task<T> RunAsync<T>(Func<T> f, CancellationToken ct) where T : IDisposable =>
+    //        Task.Run(() =>
+    //        {
+    //            ct.ThrowIfCancellationRequested();
+
+    //            var result = f();
+    //            if (ct.IsCancellationRequested) result.Dispose();
+    //            ct.ThrowIfCancellationRequested();
+
+    //            return result;
+    //        }, ct);
+    //}
 
     public static class UtilityExtension
     {
 
 
-        public static DisposableWrap<T> AsDisposable<T>(this T src, Action<T> action) => new DisposableWrap<T>(src, action);
+        public static DisposableWrap<T> AsDisposable<T>(this T src, Action<T> action) =>
+            new DisposableWrap<T>(src, action);
 
 
         public static NativeArray<T> ToNativeArray<T>(this T[] src, Allocator allocator = Allocator.Persistent)
-            where T : unmanaged =>
+            where T : unmanaged
+        =>
             new NativeArray<T>(src, allocator);
 
         public static NativeArray<T> ToNativeArray<T>(this IEnumerable<T> src, Allocator allocator = Allocator.Persistent)
-            where T : unmanaged =>
+            where T : unmanaged
+        =>
             src.ToArray().ToNativeArray(allocator);
 
 
@@ -382,6 +425,7 @@ namespace AnimLite.Utility
         //    this ConcurrentDictionary<TKey, AsyncLazy<TValue>> dict, TKey key, Func<Task<TValue>> f)
         //=>
         //    dict.GetOrAdd(key, new AsyncLazy<TValue>(f));
+
 
 
 
@@ -447,7 +491,103 @@ namespace AnimLite.Utility
         }
 
 
+        public static void AddOrUpdateOrRemove<TKey, TValue>(
+            this IDictionary<TKey, TValue> dict, TKey key, TValue value) where TValue:class
+        {
+            if (value == default)
+                dict.Remove(key);
+            else
+                dict[key] = value;
+        }
 
+    }
+
+    public static class Err
+    {
+        public static void Logging(Action action) => Err<Exception>.Logging(action);
+        public static Task LoggingAsync(Func<Task> action) => Err<Exception>.LoggingAsync(action);
+        public static ValueTask LoggingAsync(Func<ValueTask> action) => Err<Exception>.LoggingAsync(action);
+        public static Awaitable LoggingAsync(Func<Awaitable> action) => Err<Exception>.LoggingAsync(action);
+
+        public static Task<T> OnErrToDefault<T>(Func<Task<T>> f) => Err<Exception>.OnErrToDefault(f);        
+        public static T OnErrToDefault<T>(Func<T> f) => Err<Exception>.OnErrToDefault(f);
+    }
+
+    public static class Err<TException>
+        where TException : Exception
+    {
+        public static void Logging(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (TException e)
+            {
+                Debug.LogException(e);
+                //Debug.LogError(e.ToSafeString());
+            }
+        }
+        public static async Task LoggingAsync(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (TException e)
+            {
+                Debug.LogException(e);
+                //Debug.LogError(e.ToSafeString());
+            }
+        }
+        public static async ValueTask LoggingAsync(Func<ValueTask> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (TException e)
+            {
+                Debug.LogException(e);
+                //Debug.LogError(e.ToSafeString());
+            }
+        }
+        public static async Awaitable LoggingAsync(Func<Awaitable> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (TException e)
+            {
+                Debug.LogException(e);
+                //Debug.LogError(e.ToSafeString());
+            }
+        }
+
+
+        public static async Task<T> OnErrToDefault<T>(Func<Task<T>> f)
+        {
+            try
+            {
+                return await f();
+            }
+            catch (TException)
+            {
+                return default;
+            }
+        }
+        public static T OnErrToDefault<T>(Func<T> f)
+        {
+            try
+            {
+                return f();
+            }
+            catch (TException)
+            {
+                return default;
+            }
+        }
     }
 }
 

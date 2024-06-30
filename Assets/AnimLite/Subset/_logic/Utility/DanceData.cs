@@ -1,0 +1,164 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.Playables;
+
+namespace AnimLite.DancePlayable
+{
+    using AnimLite.Utility;
+    using AnimLite.Utility.Linq;
+
+    using AnimLite.Vmd;
+    using AnimLite.Vrm;
+    using VRM;
+    using static AnimLite.DancePlayable.DanceGraphy;
+
+    [System.Serializable]
+    public class DanceSet
+    {
+        public AudioDefine Audio;
+
+        public DanceMotionDefine[] Motions;
+    }
+
+    [System.Serializable]
+    public class AudioDefine
+    {
+        public AudioSource AudioSource;
+        public AudioClip AudioClip;
+
+        public float DelayTime;
+    }
+
+    [System.Serializable]
+    public class DanceMotionDefine
+    {
+        [FilePath]
+        public PathUnit AnimationFilePath;
+        [FilePath]
+        public PathUnit FaceMappingFilePath;
+
+        public Animator ModelAnimator;
+        public SkinnedMeshRenderer FaceRenderer;
+
+        public float DelayTime;
+
+        public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
+        public float BodyScale = 0;
+
+        /*[HideInInspector]*/
+        public bool OverWritePositionAndRotation;
+        /*[HideInInspector]*/
+        public Vector3 Position;
+        /*[HideInInspector]*/
+        public Quaternion Rotation;
+    }
+
+
+    //public interface IAudioMedia
+    //{
+    //    PathUnit path { get; }
+    //    AudioClip clip { get; }
+    //}
+    //public interface IModel
+    //{
+    //    PathUnit path { get; }
+    //    Animator model { get; }
+    //}
+    //public interface IMotion
+    //{
+    //    PathUnit path { get; }
+
+    //}
+
+
+
+    public static class DanceGraphyExtension
+    {
+
+        public static async Task<MotionResource[]> BuildMotionResourcesAsync(
+            this DanceSet dance, VmdStreamDataCache cache, CancellationToken ct)
+        {
+
+            var motions = dance.Motions;
+
+            return await BuildMotionResourcesAsync(motions, cache, ct);
+        }
+
+
+        public static async Task<MotionResource[]> BuildMotionResourcesAsync(
+            this DanceMotionDefine[] motions, VmdStreamDataCache cache, CancellationToken ct)
+        {
+
+            var defaultFaceMap =
+                cache.IsUnityNull()
+                &&
+                motions.Any(x => x.FaceMappingFilePath.IsBlank())
+                    ? await "".ToPath().ParseFaceMapExAsync(ct)
+                    : default;
+
+            var resources = await motions
+                .Select(motion => buildAsync_(motion))
+                .WhenAll();
+
+            if (ct.IsCancellationRequested) resources.DisposeAll();
+            ct.ThrowIfCancellationRequested();
+
+            return resources;
+
+
+            async Task<MotionResource> buildAsync_(DanceMotionDefine motion)
+            {
+                var vmdfullpath = motion.AnimationFilePath.ToFullPath();
+                var facefullpath = motion.FaceMappingFilePath.ToFullPath();
+
+                var useDefaultFacemap = defaultFaceMap.VmdToVrmMaps != default;
+                var useCache = !cache.IsUnityNull();
+
+                var (vmddata, facemap) = useCache
+                    ? await loadWithCacheAsync_()
+                    : await loadAsync_();
+                    
+                return vmddata.ToMotionResource(facemap, motion.ModelAnimator, motion.FaceRenderer);
+
+
+                Task<(VmdStreamData, VmdFaceMapping)> loadAsync_() =>
+                    Task.Run(async () =>
+                    {
+                        var facemap = useDefaultFacemap
+                            ? defaultFaceMap
+                            : await facefullpath.ParseFaceMapAsync(ct);
+
+                        var vmddata = await vmdfullpath.LoadVmdStreamDataAsync(facemap, ct);
+
+                        return (vmddata, facemap);
+                    }, ct);
+
+                Task<(VmdStreamData, VmdFaceMapping)> loadWithCacheAsync_() =>
+                    Task.Run(async () =>
+                    {
+                        var (vmddata, facemap) =
+                            await cache.GetOrLoadVmdStreamDataAsync(vmdfullpath, facefullpath, ct);
+
+                        return (vmddata, facemap);
+                    }, ct);
+            }
+        }
+
+
+        public static MotionResource ToMotionResource(
+            this VmdStreamData vmddata, VmdFaceMapping facemap, Animator anim, SkinnedMeshRenderer faceRenderer) =>
+                new MotionResource
+                {
+                    vmddata = vmddata,
+
+                    bone = anim.BuildVmdPlayableJobTransformMappings(),
+                    face = faceRenderer?.sharedMesh?.BuildStreamingFace(facemap) ?? default,
+                };
+
+    }
+
+}

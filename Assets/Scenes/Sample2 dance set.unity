@@ -662,7 +662,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath:
+    AnimationFilePath:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
@@ -719,7 +719,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath:
+    AnimationFilePath:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
@@ -781,7 +781,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath:
+    AnimationFilePath:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
@@ -2514,13 +2514,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LookAtTarget: {fileID: 1399767122}
+  Cache: {fileID: 0}
   dance:
     Audio:
       AudioSource: {fileID: 1720885308}
       AudioClip: {fileID: 0}
       DelayTime: 0
     Motions:
-    - VmdFilePath:
+    - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
@@ -2532,7 +2533,7 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath:
+    - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
@@ -2544,7 +2545,7 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath:
+    - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
@@ -2556,7 +2557,7 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
-    - VmdFilePath:
+    - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
@@ -3930,7 +3931,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Motion:
-    VmdFilePath:
+    AnimationFilePath:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 

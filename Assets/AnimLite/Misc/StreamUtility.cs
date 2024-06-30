@@ -28,7 +28,7 @@ namespace AnimLite.Utility
                 .Where(tf => !tf.IsUnityNull());
             foreach (var tf in q)
             {
-                //Debug.Log($"tf {tf.name}");
+                //Debug.Log($"tf {tf.name}");//
                 var isExists = skeltondict.TryGetValue(tf.name, out var skelton);
                 if (!isExists) continue;
 

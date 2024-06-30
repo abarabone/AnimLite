@@ -21,8 +21,8 @@
 # なやみちゅう
 - 非同期と並列うまく扱えてない感　特に unity の Awaitable
 - 非同期とバックグラウンドスレッドを分けた関数にしようかな
-  ~~- xxxAsync() と xxxBg() とか？~~
-  -> 基本的に async は非同期であって並列化ではないようにした
+  ~~- xxxAsync() と xxxBg() とか？~~  
+  -> 基本的に async は非同期であって並列化ではないようにした  
      （並列化は Task.Run() や Awaitable.MainThreadAsync() などでやる）
 - .json のパース関係が整理できてない、VR 向けの仕組みを考慮して再構成したい
   -> autio, animation, model でブロック化した、でもちょっと複雑化したので要検討

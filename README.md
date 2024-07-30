@@ -30,12 +30,12 @@
 # その他
 - unity 2023.1.19f1, VRM1.20
 - テストコードは書いてない（よくわからない）、サンプルシーンが動けばとりあえずいいかみたいな
-- とりあえず meta ~~quest2~~quest3（買った！！）で遊びながら修正していきたい
+- とりあえず ~~quest2~~ quest3（買った！！）で遊びながら修正していきたい
 
 # .json について
 - Sample5 load from json シーンにサンプルがある
-- ＶＲＭモデルが踊るのをもっと気軽に見たいので、なんかこういうフォーマットが世間に１つあるといいなと思う（すでにあったら乗っかりたい）
-- zip を読めるようにした。「固めてアップロードしたので好きなビューワで見て」みたいな世界がくるといいなーとか思いつつ
+- ＶＲＭモデルが踊るのをもっと気軽に見たいので、なんかこういうフォーマットが世間に１つあるといいなと思う
+- zip を読めるようにしたし「固めてアップロードしたので好きなビューワで見て」みたいな世界がくるといいなーとか思うし
 - 楽曲、モデル、アニメーション、の作者情報をビューワーが積極的に表示するようにすれば、作者さんも公開しようという気持ちになるんじゃないかなと願いつつ
 ```
 {
@@ -87,7 +87,7 @@
                 "FootIkMode": "auto"              // .vmd のフットＩＫをどうするか。auto|on|off から選ぶ。auto は .vmd の足ＩＫにキーがあるかないかで自動判別する
             },
             "ModelInformation": {                 // キャラクターモデルの情報
-                "Caption": "",                    // キャラクター名のとして表示される
+                "Caption": "",                    // キャラクター名として表示される
                 "Author": "",                     // 作者情報として表示される
                 "Url": "",
                 "Description": ""
@@ -105,7 +105,7 @@
 - パスの形式
   - 相対パス指定： ds/step1.vmd
   - 絶対パス指定： c:/xxxx/ds/step1.vmd
-  - web から： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd
+  - web から： https://github.com/abarabone/AnimLite/raw/master/Asset/ds/step1.vmd
   - zip を指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip
   - zip 内のパスを指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd
   - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt&st=hrqrzch6&dl=1 ← 末尾を dl=1 にすればよいみたい
@@ -116,3 +116,6 @@
   - FullPathMode.PersistentDataPath => Application.persistentDataPath + /ds/step1.vmd
   - FullPathMode.DataPath => Application.dataPath + /ds/step1.vmd
   - セキュリティ的にアレなので、上記位置より深いフォルダにアクセスできないモードも作る予定
+- json なのでいろいろ省略しても読める
+  - ただしまだエラー処理とかテストとかしてないので、いろいろエラーも出ると思う
+  - 各パスとキャラ位置さえ指定しておけば、あとは初期値（または省略）でもなんとなくOkだと思う

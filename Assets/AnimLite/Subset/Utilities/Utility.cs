@@ -78,4 +78,19 @@ namespace AnimLite.Vmd
         public static VmdFaceName AsVmdFaceName(this string name) => new VmdFaceName { name = name };
     }
 
+
+
+    public static class VmdPoseExtension
+    {
+
+        public static void SetFirstPose(this Animator anim, VmdStreamData vmddata)
+        {
+
+
+
+        }
+
+
+    }
+
 }

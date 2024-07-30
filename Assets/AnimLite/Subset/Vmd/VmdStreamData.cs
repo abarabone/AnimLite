@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO.Compression;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -52,16 +53,22 @@ namespace AnimLite.Vmd
     {
 
 
-        public static async Task<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct)
-        {
-            var vmddata = await VmdParser.ParseVmdExAsync(vmdFilePath, ct);
 
-            var facemap = await faceMapFilePath.ParseFaceMapExAsync(ct);
+
+        public static ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
+            this PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct)
+        =>
+            VmdData.LoadVmdStreamDataExAsync(vmdFilePath, faceMapFilePath, null, ct);
+
+
+        public static async ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
+            this PathUnit vmdFilePath, PathUnit faceMapFilePath, ZipArchive archive, CancellationToken ct)
+        {
+            var vmddata = await VmdParser.ParseVmdExAsync(vmdFilePath, archive, ct);
+            var facemap = await VrmParser.LoadFaceMapExAsync(faceMapFilePath, ct);
 
             var streamdata = vmddata.BuildVmdStreamData(facemap);
-            if (ct.IsCancellationRequested) streamdata.Dispose();
-            ct.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested(streamdata.Dispose);
 
             return (streamdata, facemap);
         }
@@ -69,17 +76,32 @@ namespace AnimLite.Vmd
 
 
 
-        public static async Task<VmdStreamData> LoadVmdStreamDataAsync(
+        public static ValueTask<VmdStreamData> LoadVmdStreamDataExAsync(
             this PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap, CancellationToken ct)
+        =>
+            VmdData.LoadVmdStreamDataExAsync(vmdFilePath, defaultmap, null, ct);
+
+
+        public static async ValueTask<VmdStreamData> LoadVmdStreamDataExAsync(
+            this PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap, ZipArchive archive, CancellationToken ct)
         {
-            var vmddata = await VmdParser.ParseVmdAsync(vmdFilePath, ct);
+            var vmddata = await VmdParser.ParseVmdExAsync(vmdFilePath, archive, ct);
 
             var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
-            if (ct.IsCancellationRequested) streamdata.Dispose();
-            ct.ThrowIfCancellationRequested();
+            ct.ThrowIfCancellationRequested(streamdata.Dispose);
 
             return streamdata;
         }
+
+        //public static VmdStreamData LoadVmdStreamData(
+        //    this PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap)
+        //{
+        //    var vmddata = VmdParser.ParseVmd(vmdFilePath);
+
+        //    var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
+            
+        //    return streamdata;
+        //}
 
 
 

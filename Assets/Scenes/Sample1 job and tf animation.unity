@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -644,7 +644,7 @@ MonoBehaviour:
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
-    Value: Resources/face_map_default.txt
+    Value: AnimLite/Resources/default_facemap.txt
   anim: {fileID: 1175109454}
   FaceMeshRenderer: {fileID: 1175109453}
 --- !u!4 &774669174
@@ -1607,7 +1607,7 @@ MonoBehaviour:
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
-    Value: Resources/face_map_default.txt
+    Value: AnimLite/Resources/default_facemap.txt
   anim: {fileID: 504929960}
   faceRenderer: {fileID: 1617998271}
 --- !u!1001 &1273240305
@@ -2050,7 +2050,7 @@ MonoBehaviour:
   VmdFilePath:
     Value: "motions/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
-    Value: Resources/face_map_default.txt
+    Value: AnimLite/Resources/default_facemap.txt
   anim: {fileID: 1273240307}
   faceRenderer: {fileID: 1273240306}
 --- !u!4 &1939900938
@@ -2100,7 +2100,7 @@ MonoBehaviour:
   VmdFilePath:
     Value: "motions/\u3010\u9234\u6728\u30D2\u30CA\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
-    Value: Resources/face_map_default.txt
+    Value: AnimLite/Resources/default_facemap.txt
   anim: {fileID: 1077456492}
   faceRenderer: {fileID: 1077456491}
 --- !u!4 &1941398668

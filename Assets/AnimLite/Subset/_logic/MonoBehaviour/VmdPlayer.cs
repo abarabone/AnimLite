@@ -74,8 +74,8 @@ namespace AnimLite.Samples
         async Awaitable OnEnable()
         {
             // ファイルからデータを読み下す
-            var vmdStreamData = await VmdParser.ParseVmdExAsync(this.VmdFilePath.ToFullPath(), default);
-            var faceMapping = await VrmParser.ParseFaceMapExAsync(this.FaceMappingFilePath.ToFullPath(), default);
+            var vmdStreamData = await VmdParser.ParseVmdExAsync(this.VmdFilePath, default);
+            var faceMapping = await VrmParser.LoadFaceMapExAsync(this.FaceMappingFilePath, default);
 
             // データを利用できる形式に変換する
             this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -102,10 +102,11 @@ namespace AnimLite.Samples
 
             // 時間範囲などの情報を持ったタイマーを作成する
             this.timer = new StreamingTimer(rot_data.GetLastKeyTime());
-
+            
             // ヒューマノイドモデルの情報を構築する
             this.bone = this.anim.BuildVmdTransformMappings();
-            this.face = this.anim.FindFaceRendererIfNothing(this.FaceMeshRenderer)?.sharedMesh?.BuildStreamingFace(faceMapping) ?? default;
+            this.face = faceMapping.BuildStreamingFace();
+            //this.face = this.anim.FindFaceRendererIfNothing(this.FaceMeshRenderer)?.sharedMesh?.BuildStreamingFace(faceMapping) ?? default;
 
             // ＶＭＤを再生のための情報を構築する
             this.bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(this.bone);

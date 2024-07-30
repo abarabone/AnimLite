@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.IO;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO.Compression;
+using System.Data.Common;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -16,7 +19,33 @@ namespace AnimLite.Utility
 {
 
     using AnimLite.Utility.Linq;
-    using System.Data.Common;
+
+
+
+    public static class LocalEncoding
+    {
+        public static Encoding sjis = Encoding.GetEncoding("shift_jis");
+    }
+
+    public static class EncodeUtility
+    {
+
+        public static string ToUtf8(this string src)
+        {
+            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var sjis = LocalEncoding.sjis;
+            var utf8 = Encoding.UTF8;
+
+            var srcbytes = sjis.GetBytes(src);
+            var dstbytes = Encoding.Convert(sjis, utf8, srcbytes);
+
+            var res = utf8.GetString(dstbytes);
+            return res;
+        }
+
+    }
+
+
 
 
     public enum FullPathMode
@@ -30,7 +59,7 @@ namespace AnimLite.Utility
     public struct PathUnit : IEquatable<PathUnit>
     {
 
-        public string Value;
+        public string Value;// { get; private set; }
 
 
         public PathUnit(string path) => this.Value = path;
@@ -38,7 +67,14 @@ namespace AnimLite.Utility
         public static implicit operator string(PathUnit path) => path.Value;
         public static implicit operator PathUnit(string path) => new PathUnit(path);
 
+        /// <summary>
+        /// .ToPath() で付加される親パスを指定する。
+        /// デフォルトは Application.dataPath 
+        /// </summary>
         static public string ParentPath { get; private set; } = Application.dataPath;
+        /// <summary>
+        /// フルパスモードをセットすると、ParentPath が変化する。
+        /// </summary>
         static public FullPathMode mode
         {
             set
@@ -71,36 +107,131 @@ namespace AnimLite.Utility
         // dictionary 用 boxing 回避 ------------------------------------
     }
 
+    public struct ResourceName
+    {
+        public string Value { get; private set; }
+
+        public ResourceName(string name) => this.Value = name;
+
+        public static implicit operator string(ResourceName res) => res.Value;
+    }
+
 
     public static class PathUtilityExtension
     {
 
+        /// <summary>
+        /// 単純に文字列を PathUnit で包んで返す。
+        /// </summary>
+        public static PathUnit ToPath(this string path) =>
+            new PathUnit(path);
+
+
+
+        /// <summary>
+        /// フルパスでなければ parentpath を付加して返す。null は "" を返す。
+        /// </summary>
         public static PathUnit ToFullPath(this PathUnit path, string parentpath) =>
-            path.IsBlank()
-            ||
-            path.Value[1..3].Contains(':')
-            ||
-            path.Value[0] == '/'
-            ||
-            path.Value.EndsWith("as resource", StringComparison.OrdinalIgnoreCase)
+            path.IsFullPath() || path.IsBlank()
                 ? (path.Value ?? "")
                 : $"{parentpath}/{path.Value}"
             ;
 
+        /// <summary>
+        /// フルパスでなければ PathUnit.ParentPath を付加して返す。null は "" を返す。
+        /// </summary>
         public static PathUnit ToFullPath(this PathUnit path) =>
-            path.ToFullPath(PathUnit.ParentPath).show_(path);
+            path.ToFullPath(PathUnit.ParentPath)
+            .show_(path)
+            ;
+
+        //public static PathUnit ToFullPath(this PathUnit path, ZipArchive archive) =>
+        //    archive == null
+        //        ? path.ToFullPath(PathUnit.ParentPath)
+        //        : path
+        //    .show_(path)
+        //    ;
+
+
+        /// <summary>
+        /// フルパスなら true を返す。
+        /// フルパスは ドライブレター/ＵＲＬスキームから始まる（１～７文字目までに : を含む）, / から始まる, as resource で終わる
+        /// </summary>
+        public static bool IsFullPath(this PathUnit path) =>
+            //path.IsBlank()
+            //||
+            path.Value[1..6].Contains(':')// ドライブレター、ＵＲＩスキーム
+            ||
+            path.Value[0] == '/'
+            ||
+            path.IsResource()
+            ;
 
 
 
-        public static PathUnit ToPath(this string path) =>
-            new PathUnit(path);
+
+        public static bool IsHttp(this PathUnit path) =>
+            path.Value.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase)
+            ||
+            path.Value.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase);
+
 
 
         public static bool IsResource(this PathUnit path) =>
             path.Value.EndsWith("as resource", StringComparison.InvariantCultureIgnoreCase);
 
-        public static PathUnit ToPathForResource(this PathUnit path) =>
-            path.Value[0..^("as resource".Length)].TrimEnd();
+        /// <summary>
+        /// as resource が付加されていれば除去した名前を、そうでなければ "" を返す。
+        /// </summary>
+        public static ResourceName ToResourceName(this PathUnit path) =>
+            path.IsResource()
+                ? new ResourceName(path.Value[0..^("as resource".Length)].TrimEnd())
+                : new ResourceName("");
+
+
+        public static bool IsZip(this PathUnit path) =>
+            path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
+
+        public static bool IsZipEntry(this PathUnit path) =>
+            path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase);
+
+        /// <summary>
+        /// パスを .zip/ で分割し、.zip までと / より後ろを返す。
+        /// zip でなければ ("", "") を返す。
+        /// </summary>
+        public static (PathUnit zipPath, PathUnit entryPath) DividZipAndEntry(this PathUnit path)
+        {
+            var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            return (i >= 0) switch
+            {
+                true =>
+                    divpath(),
+                false when path.IsZip() => 
+                    (path, ""),
+                false =>
+                    ("", ""),
+            };
+            
+            (PathUnit, PathUnit) divpath()
+            {
+                var zippath = path.Value[0..(i + 4)];
+                var entrypath = path.Value[(i + 5)..];
+                return (zippath, entrypath);
+            }
+        }
+
+        /// <summary>
+        /// パスを .zip/ で分割し、/ より後ろを返す。
+        /// zip でなければ "" を返す。
+        /// </summary>
+        public static PathUnit ToZipEntryPath(this PathUnit path)
+        {
+            var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            if (i == -1) return "".ToPath();
+
+            return path.Value[(i + 5)..];
+        }
+
 
 
         static PathUnit show_(this PathUnit fullpath, PathUnit path)
@@ -116,7 +247,34 @@ namespace AnimLite.Utility
         static public bool IsBlank(this PathUnit path) =>
             (path.Value ?? "") == "";
             //path.Value == default || path.Value == "";
+
+
+        //public static PathType DetectPathType(this PathUnit path)
+        //{
+        //    var isResource = path.IsResource();
+        //    var isWeb = path.IsHttp();
+        //    var isZip = 
+        //}
+
     }
+
+
+
+
+    //public enum PathType
+    //{
+    //    File,
+    //    Web,
+    //    Resource,
+        
+    //    ZipAsFile,
+    //    ZipOnWeb,
+    //    ZipInResource,
+
+    //    ZipEntryInFile,
+    //    ZipEntryOnWeb,
+    //    ZipEntryInResource,
+    //}
 
 
 
@@ -157,22 +315,50 @@ namespace AnimLite.Utility
 
     }
 
+
+    public struct Disposable : IDisposable
+    {
+        public Action disposeAction;
+        public void Dispose() => this.disposeAction();
+        public Disposable(Action disposeAction) => this.disposeAction = disposeAction;
+    }
+
+
     /// <summary>
     /// action を登録して、Dispose() 時に実行されるようにする。
     /// </summary>
     public struct DisposableWrap<T> : IDisposable
     {
-        Action<T> action;
+        Action<T> disposeAction;
+        
         public T Valule { get; }
+
+
         public DisposableWrap(T src, Action<T> action)
         {
             this.Valule = src;
-            this.action = action;
+            this.disposeAction = action;
         }
-        public void Dispose() => this.action(this.Valule);
+        public void Dispose() => this.disposeAction(this.Valule);
+
 
         public static implicit operator T(DisposableWrap<T> src) => src.Valule;
     }
+
+    public static class DisposableWrapExtension
+    {
+
+        public static DisposableWrap<T> AsDisposable<T>(this T src, Action<T> disposeAction) =>
+            new DisposableWrap<T>(src, disposeAction);
+
+
+        // 負荷よりも書き味を優先する用
+        public static async ValueTask<DisposableWrap<T>> AsDisposableAsync<T>(this Task<T> srcAsync, Action<T> disposeAction)
+        {
+            return (await srcAsync).AsDisposable(disposeAction);
+        }
+    }
+
 
 
     /// <summary>
@@ -267,6 +453,9 @@ namespace AnimLite.Utility
     public static class MathUtilityExtenstion
     {
 
+        public static bool IsZero(this Vector3 v) => (v.x * v.x + v.y * v.y + v.z * v.z) == 0.0f;
+
+
         //public static float3 As3(this float4 v) => (float3)v;
         public static float3 As3(this float4 v) => new float3(v.x, v.y, v.z);
 
@@ -286,6 +475,56 @@ namespace AnimLite.Utility
 
     public static class ObjectUtilityExtension
     {
+
+        public static async ValueTask DestroyOnMainThreadAsync(this UnityEngine.Object obj)
+        {
+            await Awaitable.MainThreadAsync();
+            obj.Destroy();
+        }
+
+        public static async ValueTask DestroyOnMainThreadAsync(this GameObject obj)
+        {
+            await Awaitable.MainThreadAsync();
+            obj.Destroy();
+        }
+
+
+        //public static void Destroy(this UnityEngine.Object obj) =>
+        //    UnityEngine.Object.Destroy(obj);
+        public static void Destroy(this UnityEngine.Object obj)
+        {
+        #if UNITY_EDITOR
+            if (Application.isPlaying)
+            {
+                UnityEngine.Object.Destroy(obj);
+            }
+            else
+            {
+                UnityEngine.Object.DestroyImmediate(obj);
+            }
+        #else
+            UnityEngine.Object.Destroy(obj);
+        #endif
+        }
+
+        //public static void Destroy(this GameObject obj) =>
+        //    GameObject.Destroy(obj);
+        public static void Destroy(this GameObject obj)
+        {
+        #if UNITY_EDITOR
+            if (Application.isPlaying)
+            {
+                GameObject.Destroy(obj);
+            }
+            else
+            {
+                UnityEngine.Object.DestroyImmediate(obj);
+            }
+        #else
+            GameObject.Destroy(obj);
+        #endif
+        }
+
 
         public static SkinnedMeshRenderer FindFaceRendererIfNothing(this Animator anim, SkinnedMeshRenderer r) =>
             r.IsUnityNull()
@@ -377,10 +616,6 @@ namespace AnimLite.Utility
 
     public static class UtilityExtension
     {
-
-
-        public static DisposableWrap<T> AsDisposable<T>(this T src, Action<T> action) =>
-            new DisposableWrap<T>(src, action);
 
 
         public static NativeArray<T> ToNativeArray<T>(this T[] src, Allocator allocator = Allocator.Persistent)
@@ -589,6 +824,42 @@ namespace AnimLite.Utility
             }
         }
     }
+
+    public static class TaskExtension
+    {
+
+        public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) =>
+            await t;
+
+        public static async Awaitable<T[]> AwaitAllAsync<T>(
+            this IEnumerable<Awaitable<T>> src, Func<T, bool> criteria = default)
+        {
+            var dst = new List<T>();
+            foreach (var e in src)
+            {
+                var t = await e;
+                if (!criteria?.Invoke(t) ?? false) continue;
+                dst.Add(t);
+            }
+            return dst.ToArray();
+        }
+
+        public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) =>
+            Task.WhenAll(src);
+        //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) =>
+        //    Task.WhenAll(src);
+
+        //public static Task<Task<T>> WhenAny<T>(this IEnumerable<Task<T>> src) =>
+        //    Task.WhenAny(src);
+
+
+
+        public static async ValueTask<T> AwaitAsync<T>(
+            this ValueTask<Stream> stream, Func<Stream, ValueTask<T>> act)
+        =>
+            await act(await stream);
+
+    }
 }
 
 
@@ -628,26 +899,6 @@ namespace AnimLite.Utility.Linq
             ;
 
 
-        public static async Awaitable<T[]> AwaitAllAsync<T>(
-            this IEnumerable<Awaitable<T>> src, Func<T, bool> criteria = default)
-        {
-            var dst = new List<T>();
-            foreach (var e in src)
-            {
-                var t = await e;
-                if (!criteria?.Invoke(t) ?? false) continue;
-                dst.Add(t);
-            }
-            return dst.ToArray();
-        }
-
-        public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) =>
-            Task.WhenAll(src);
-        //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) =>
-        //    Task.WhenAll(src);
-
-        public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) =>
-            await t;
 
 
         public static IEnumerable<T> Zip<T1, T2, T>(this (IEnumerable<T1> src1, IEnumerable<T2> src2) x, Func<T1, T2, T> f) =>
@@ -657,4 +908,5 @@ namespace AnimLite.Utility.Linq
             (x.src1, x.src2).Zip((x, y) => (x, y));
 
     }
+
 }

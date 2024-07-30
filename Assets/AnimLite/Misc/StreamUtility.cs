@@ -11,8 +11,8 @@ namespace AnimLite.Utility
     public static class StreamUtility
     {
 
-        // ResetToStancePose() の後に hips だけ local をセットする、でも大丈夫だったが、常に大丈夫か信じきれないので全部やる 
 
+        // ResetToStancePose() の後に hips だけ local をセットする、でも大丈夫だったが、常に大丈夫か信じきれないので全部やる 
         public static void ResetPose(this Animator anim)
         {
             var avatar = anim.avatar;

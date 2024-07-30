@@ -29,10 +29,10 @@ namespace AnimLite.Samples
         async Awaitable Start()
         {
             // ファイルからデータを読み下す
-            var vmdpath = this.VmdFilePath.ToFullPath();
-            var facemap = this.FaceMappingFilePath.ToFullPath();
-            var vmdStreamData = await VmdParser.ParseVmdAsync(vmdpath, this.destroyCancellationToken);
-            var faceMapping = await VrmParser.ParseFaceMapExAsync(facemap, this.destroyCancellationToken);
+            var vmdpath = this.VmdFilePath;
+            var facemap = this.FaceMappingFilePath;
+            var vmdStreamData = await VmdParser.ParseVmdExAsync(vmdpath, this.destroyCancellationToken);
+            var faceMapping = await VrmParser.LoadFaceMapExAsync(facemap, this.destroyCancellationToken);
 
             // データを利用できる形式に変換する
             using var rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -55,7 +55,8 @@ namespace AnimLite.Samples
 
             // ヒューマノイドモデルの情報を構築する
             using var bone = this.anim.BuildVmdPlayableJobTransformMappings();
-            var face = this.faceRenderer.sharedMesh.BuildStreamingFace(faceMapping);
+            var face = faceMapping.BuildStreamingFace();
+            //var face = this.faceRenderer.sharedMesh.BuildStreamingFace(faceMapping);
 
 
 

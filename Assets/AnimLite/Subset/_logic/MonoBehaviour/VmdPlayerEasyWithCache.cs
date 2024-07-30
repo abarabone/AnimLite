@@ -29,14 +29,15 @@ namespace AnimLite.Samples
         async Awaitable Start()
         {
             // ＶＭＤデータをファイルからパースし、ストリームデータをビルドする
-            var vmdpath = this.VmdFilePath.ToFullPath();
-            var facemappath = this.FaceMappingFilePath.ToFullPath();
+            var vmdpath = this.VmdFilePath;
+            var facemappath = this.FaceMappingFilePath;
             var (vmddata, facemap) = await this.Cache.GetOrLoadVmdStreamDataAsync(vmdpath, facemappath, this.destroyCancellationToken);
             using var _ = vmddata;
-
+            
             // ＶＭＤを再生のための情報を構築する
             var bone = this.anim.BuildVmdTransformMappings();
-            var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(facemap) ?? default;
+            var face = facemap.BuildStreamingFace();
+            //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(facemap) ?? default;
             var bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(bone);
             var footOperator = this.anim.ToFootIkTransformOperator(bone);
             var faceOperator = this.anim.ToVrmExpressionOperator(face);

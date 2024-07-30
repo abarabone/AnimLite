@@ -24,13 +24,15 @@ namespace AnimLite.Vrm
     }
 
 
+
+
     /// <summary>
     /// ＶＭＤの表情をＶＲＭの表情に変換する対応表テキストファイルを読み下し、対応辞書を構築する。
     /// </summary>
     public static partial class VrmParser
     {
-        
-        static public async Task<VmdFaceMapping> ParseFaceMapAsync(this PathUnit filepath, CancellationToken ct)
+
+        static public async ValueTask<VmdFaceMapping> ParseFaceMapAsync(this PathUnit filepath, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -55,9 +57,35 @@ namespace AnimLite.Vrm
         }
 
 
-        static public VmdFaceMapping ParseFaceMapFromText(string text) =>
-            parse_(text);
 
+        static public async ValueTask<VmdFaceMapping> ParseFaceMapAsync(this Stream stream, CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            using var s = new StreamReader(stream);
+
+            var txt = await s.ReadToEndAsync();
+            ct.ThrowIfCancellationRequested();
+
+            var result = (VmdFaceMapping)parse_(txt);
+            ct.ThrowIfCancellationRequested();
+
+            return result;
+        }
+
+        static public VmdFaceMapping ParseFaceMap(this Stream stream)
+        {
+            using var s = new StreamReader(stream);
+
+            var txt = s.ReadToEnd();
+
+            return parse_(txt);
+        }
+
+
+
+        static public VmdFaceMapping ParseFaceMap(string text) =>
+            parse_(text);
 
 
 

@@ -20,49 +20,34 @@ namespace AnimLite.Vmd
     public static partial class VmdParser
     {
 
-        public static async Awaitable<VmdMotionData> ParseVmdExAsync(this PathUnit filepath, CancellationToken ct) =>
-            filepath.IsResource()
-                ? await VmdParser.LoadVmdFromResourceAsync(filepath, ct)
-                : await VmdParser.ParseVmdAsync(filepath, ct);
 
+        //public async static Task<VmdMotionData> ParseVmdAsync(this PathUnit filepath, CancellationToken ct)
+        //{
+        //    ct.ThrowIfCancellationRequested();
 
-        public static async Awaitable<VmdMotionData> LoadVmdFromResourceAsync(this PathUnit filepath, CancellationToken ct)
-        {
-            ct.ThrowIfCancellationRequested();
+        //    using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-            var name = filepath.ToPathForResource();
+        //    using var m = new MemoryStream();
+        //    await f.CopyToAsync(m, ct);
 
-            //await Awaitable.MainThreadAsync();
-            var asset = await Addressables.LoadAssetAsync<BinaryAsset>(name).Task;
-            var result = VmdParser.ParseVmd(asset.bytes);
-
-            Addressables.Release(asset);
-            return result;
-        }
-
-
-
-        public async static Task<VmdMotionData> ParseVmdAsync(this PathUnit filepath, CancellationToken ct)
-        {
-            ct.ThrowIfCancellationRequested();
-
-            using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-
-            using var m = new MemoryStream();
-            await f.CopyToAsync(m, ct);
-
-            return ParseVmd(m);
-        }
+        //    return ParseVmd(m);
+        //}
         
 
+        //public static VmdMotionData ParseVmd(this PathUnit filepath)
+        //{
+        //    using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+
+        //    using var m = new MemoryStream();
+        //    f.CopyTo(m);
+
+        //    return ParseVmd(m);
+        //}
         public static VmdMotionData ParseVmd(this PathUnit filepath)
         {
             using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-            using var m = new MemoryStream();
-            f.CopyTo(m);
-
-            return ParseVmd(m);
+            return ParseVmd(f);
         }
         public static VmdMotionData ParseVmd(byte[] byteData)
         {
@@ -72,13 +57,13 @@ namespace AnimLite.Vmd
         }
 
 
-        public static VmdMotionData ParseVmd(this MemoryStream m)
+        public static VmdMotionData ParseVmd(this Stream s)
         {
             //System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-            m.Seek(0, SeekOrigin.Begin);
+            s.Seek(0, SeekOrigin.Begin);
 
-            using var r = new BinaryReader(m);
+            using var r = new BinaryReader(s);
 
             //m.Seek(50, SeekOrigin.Begin);
 
@@ -102,6 +87,7 @@ namespace AnimLite.Vmd
                 faceKeyStreams = facedata,
             };
         }
+
 
 
         static (string formatName, string modelName) header_(BinaryReader r)

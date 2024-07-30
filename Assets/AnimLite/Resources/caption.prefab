@@ -453,9 +453,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "<size=100%><indent=0>\u3042\u305B\u3075\u3041\u3048\u3042\u3075\u3047\u3042e\u3042\n<size=80%><indent=1em>\u6F22\u5B57aasfaefawsefaefawef 
-    afe\n<size=80%><indent=1em>\u6F22\u5B57aasfaefawsefaefawef  afe\n<size=30%>\n<size=100%><indent=0>\u3042\u305B\u3075\u3041\u3048\u3042\u3075\u3047\u3042e\u3042\n<size=80%><indent=1em>\u6F22\u5B57aasfaefawsefaefawef 
-    afe\n<size=80%><indent=1em>\u6F22\u5B57aasfaefawsefaefawef  afe"
+  m_text: "<size=100%><indent=0>\u30E2\u30C7\u30EB\u540D\u79F0 / \u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u540D\u79F0\n<size=80%><indent=1em>\u30E2\u30C7\u30EB\u306E\u4F5C\u8005\u60C5\u5831\n<size=80%><indent=1em>\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u306E\u4F5C\u8005\u60C5\u5831\n<size=30%>\n<size=100%><indent=0>\u30E2\u30C7\u30EB\u540D\u79F0
+    / \u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u540D\u79F0\n<size=80%><indent=1em>\u30E2\u30C7\u30EB\u306E\u4F5C\u8005\u60C5\u5831\n<size=80%><indent=1em>\u30A2\u30CB\u30E1\u30FC\u30B7\u30E7\u30F3\u306E\u4F5C\u8005\u60C5\u5831"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8843bc830863344d98085daa4c36779, type: 2}
   m_sharedMaterial: {fileID: -5992263500109430803, guid: a8843bc830863344d98085daa4c36779, type: 2}
@@ -518,7 +517,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -79.79205, y: -87.86279, z: 487.08362, w: 43.904785}
+  m_margin: {x: -174.9159, y: -87.86279, z: 487.08362, w: 43.904785}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -589,7 +588,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "jvjh\u3042\u3042bjhvjfvjgvjyv\n<indent=1em><size=20%>\n<size=50%>\u97F3\u697D\u3000\u3042\u3042\u3042\u3042\u3042\u3042"
+  m_text: "\u30BF\u30A4\u30C8\u30EB\u30AD\u30E3\u30D7\u30B7\u30E7\u30F3\n<indent=1em><size=20%>\n<size=50%>\u97F3\u697D\u306E\u4F5C\u8005\u60C5\u5831"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a8843bc830863344d98085daa4c36779, type: 2}
   m_sharedMaterial: {fileID: -5992263500109430803, guid: a8843bc830863344d98085daa4c36779, type: 2}

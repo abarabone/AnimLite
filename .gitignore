@@ -18,7 +18,8 @@
 /Assets/VRMShaders.meta
 
 /Assets/AnimLite/**/*.meta
-!/Assets/AnimLite/_logic/MonoBehaviour/*.meta
+!/Assets/AnimLite/Subset/_logic/MonoBehaviour/*.meta
+!/Assets/AnimLite/Subset/DanceSet/MonoBehaviour/*.meta
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

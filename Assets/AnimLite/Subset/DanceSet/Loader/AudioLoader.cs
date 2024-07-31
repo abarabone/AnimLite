@@ -65,6 +65,7 @@ namespace AnimLite.Utility
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
             var fullpath = path.ToFullPath();
+            fullpath.ThrowIfAccessedOutsideOfParentFolder();
 
             return fullpath.DividZipAndEntry() switch
             {

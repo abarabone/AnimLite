@@ -88,6 +88,12 @@ namespace AnimLite.Utility
             }
         }
 
+        /// <summary>
+        /// true にすると、ParentPath 以下にしかアクセスできない。デフォルトは true
+        /// </summary>
+        static public bool IsAccessWithinParentPathOnly = true;
+
+
 
         // dictionary 用 boxing 回避 ------------------------------------
         public override bool Equals(object obj)
@@ -255,6 +261,34 @@ namespace AnimLite.Utility
         //    var isWeb = path.IsHttp();
         //    var isZip = 
         //}
+
+
+        /// <summary>
+        /// target が PathUnit.ParentPath 以下なら true を返す。
+        /// リソースや web かどうかは考慮しない。
+        /// </summary>
+        static public bool IsWithinParentFolder(this PathUnit target)
+        {
+            var _parent = Path.GetFullPath(PathUnit.ParentPath + "/");
+            var _target = Path.GetFullPath(target);
+
+            return
+                _parent.Length < _target.Length
+                &&
+                _parent == _target[0 .._parent.Length];
+        }
+
+        /// <summary>
+        /// target が PathUnit.ParentPath の外側をさしていれば IOException をスローする。
+        /// ただし、リソースや Http の web url であれば許容する。
+        /// </summary>
+        static public void ThrowIfAccessedOutsideOfParentFolder(this PathUnit path)
+        {
+            if (path.IsHttp() || path.IsResource()) return;
+            if (!PathUnit.IsAccessWithinParentPathOnly || path.IsWithinParentFolder()) return;
+
+            throw new IOException("Attempted to access a file beyond the scope of 'PathUnit.ParentPath'.");
+        }
 
     }
 

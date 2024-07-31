@@ -97,6 +97,7 @@ namespace AnimLite.Utility
                 path.OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct);
 
             var fullpath = path.ToFullPath();
+            fullpath.ThrowIfAccessedOutsideOfParentFolder();
 
             return fullpath.DividZipAndEntry() switch
             {

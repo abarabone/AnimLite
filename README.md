@@ -111,11 +111,12 @@
   - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt&st=hrqrzch6&dl=1 ← 末尾を dl=1 にすればよいみたい
   - unity のリソースは末尾に as resource をつける： step1 as resource
 - 現状、zip だとマルチスレッドロードが利かない（非同期ではあるが）のでなんとかしたい
-- いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される恐ろしい仕様らしい）
+- いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
 - 相対パスは、下記のように絶対パスに変換される
-  - FullPathMode.PersistentDataPath => Application.persistentDataPath + /ds/step1.vmd
-  - FullPathMode.DataPath => Application.dataPath + /ds/step1.vmd
-  - セキュリティ的にアレなので、上記位置より深いフォルダにアクセスできないモードも作る予定
+  - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
+  - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
+  - デフォルトは dataPath
+  - セキュリティ的にアレなので、上記位置より浅いフォルダにアクセスできないモードも作る予定
 - json なのでいろいろ省略しても読める
   - ただしまだエラー処理とかテストとかしてないので、いろいろエラーも出ると思う
   - 各パスとキャラ位置さえ指定しておけば、あとは初期値（または省略）でもなんとなくOkだと思う

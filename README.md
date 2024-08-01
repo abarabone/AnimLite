@@ -116,7 +116,9 @@
   - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
   - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
   - デフォルトは dataPath
-  - セキュリティ的にアレなので、上記位置より浅いフォルダにアクセスできないモードも作る予定
+- PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできない
+  - デフォルトは true
+  - アクセスすると IOException がスローされる（ null が返されるとかのほうがいいだろうか）
 - json なのでいろいろ省略しても読める
   - ただしまだエラー処理とかテストとかしてないので、いろいろエラーも出ると思う
   - 各パスとキャラ位置さえ指定しておけば、あとは初期値（または省略）でもなんとなくOkだと思う

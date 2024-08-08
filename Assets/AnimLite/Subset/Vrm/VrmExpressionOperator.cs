@@ -44,6 +44,10 @@ namespace AnimLite.Vrm
 
     public static class VrmExpressionOperatorFactoryExtension
     {
+
+        public static VrmExpressionOperator ToVrmExpressionOperator(this GameObject model, VrmExpressionMappings face) =>
+            model.GetComponent<Animator>().ToVrmExpressionOperator(face);
+
         public static VrmExpressionOperator ToVrmExpressionOperator(this Animator anim, VrmExpressionMappings face)
         {
 

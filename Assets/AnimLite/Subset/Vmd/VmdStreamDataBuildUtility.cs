@@ -40,7 +40,7 @@ namespace AnimLite.Vmd
                 from x in Enumerable.Range(0, (int)MmdBodyBones.length)
                 join y in src on (MmdBodyBones)x equals y.boneid into ys
                 let boneid = (MmdBodyBones)x
-                let blankkeys = new BlankEnumerableStruct<VmdBodyMotionKey>()
+                let blankkeys = new EmptyEnumerableStruct<VmdBodyMotionKey>()
                 from ny in ys.DefaultIfEmpty((boneid, blankkeys))
                     //orderby x
                 select ny

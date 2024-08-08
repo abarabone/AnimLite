@@ -63,9 +63,19 @@ namespace AnimLite.DancePlayable
         public struct Order
         {
             public AudioOrder Audio;
+            public ModelOrder[] BackGrouds;
             public MotionOrder[] Motions;
 
             public Action DisposeAction;
+        }
+
+        public class ModelOrder
+        {
+            public GameObject Model;
+
+            public Vector3 Position;
+            public Quaternion Rotation;
+            public float Scale;
         }
 
         public class AudioOrder
@@ -77,9 +87,8 @@ namespace AnimLite.DancePlayable
             public float DelayTime;
         }
 
-        public class MotionOrder
+        public class MotionOrder : ModelOrder
         {
-            public Animator ModelAnimator;
             public SkinnedMeshRenderer FaceRenderer;
 
             public VmdStreamData vmddata;
@@ -91,12 +100,27 @@ namespace AnimLite.DancePlayable
 
             public VmdFootIkMode FootIkMode;
             public float BodyScale;
-
-            public bool OverWritePositionAndRotation;
-            public Vector3 Position;
-            public Quaternion Rotation;
-            public float Scale;
         }
+        //public class MotionOrder
+        //{
+        //    public GameObject Model;
+        //    public SkinnedMeshRenderer FaceRenderer;
+
+        //    public VmdStreamData vmddata;
+
+        //    public TransformHandleMappings bone;
+        //    public VrmExpressionMappings face;
+
+        //    public float DelayTime;
+
+        //    public VmdFootIkMode FootIkMode;
+        //    public float BodyScale;
+
+        //    //public bool OverWritePositionAndRotation;
+        //    public Vector3 Position;
+        //    public Quaternion Rotation;
+        //    public float Scale;
+        //}
 
 
         public void Dispose()
@@ -110,24 +134,26 @@ namespace AnimLite.DancePlayable
 
         public static DanceGraphy2 CreateGraphy(Order order)
         {
-            var graphy = CreateGraphyWithoutDispose(order.Motions, order.Audio);
+            var graphy = CreateGraphyWithoutDispose(order);
 
             graphy.DisposeAction = order.DisposeAction;
 
             return graphy;
         }
 
-        public static DanceGraphy2 CreateGraphyWithoutDispose(IEnumerable<MotionOrder> motions, AudioOrder audio)
+        public static DanceGraphy2 CreateGraphyWithoutDispose(Order order)
         {
 
             var graph = PlayableGraph.Create();
 
 
-            createMotionPlayables_(graph, motions);
+            showBackGround_(order.BackGrouds);
 
-            createAudioPlayable_(graph, audio);
+            createMotionPlayables_(graph, order.Motions);
 
-            audio.AudioSource.volume = audio.Volume;// playable の weight で変えるべきとも思うが、audio の playable output にそういう機能はないようなのでとりあえずここで
+            createAudioPlayable_(graph, order.Audio);
+
+            order.Audio.AudioSource.volume = order.Audio.Volume;// playable の weight で変えるべきとも思うが、audio の playable output にそういう機能はないようなのでとりあえずここで
 
 
             return new DanceGraphy2
@@ -137,6 +163,17 @@ namespace AnimLite.DancePlayable
                 DisposeAction = () => { }
             };
 
+
+            static void showBackGround_(ModelOrder[] orders)
+            {
+                if (orders == null) return;
+
+                foreach (var order in orders)
+                {
+                    overwritePosition_(order);
+                    overwriteScale_(order);
+                }
+            }
 
 
             static void createAudioPlayable_(PlayableGraph graph, AudioOrder order)
@@ -175,9 +212,9 @@ namespace AnimLite.DancePlayable
                     var rkf = order.vmddata.RotationStreams
                         .ToKeyFinderWith<Key4CatmulRot, Clamp>();
 
-                    var job = order.ModelAnimator.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
-
-                    graph.CreateVmdAnimationJobWithSyncScript(order.ModelAnimator, job, order.DelayTime);
+                    var anim = order.Model.GetComponent<Animator>();
+                    var job = anim.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
+                    graph.CreateVmdAnimationJobWithSyncScript(anim, job, order.DelayTime);
                 }
 
                 void createFaceMotion_(MotionOrder order, StreamingTimer timer)
@@ -188,26 +225,25 @@ namespace AnimLite.DancePlayable
                     var fkf = order.vmddata.FaceStreams
                         .ToKeyFinderWith<Key2NearestShift, Clamp>();
 
-                    graph.CreateVmdFaceAnimation(order.ModelAnimator, fkf, order.face, timer, order.DelayTime);
-                }
-
-                void overwritePosition_(MotionOrder order)
-                {
-                    if (!order.OverWritePositionAndRotation) return;
-
-                    var tf = order.ModelAnimator.transform;
-                    tf.position = order.Position;
-                    tf.rotation = order.Rotation;
-                }
-                void overwriteScale_(MotionOrder order)
-                {
-                    if (order.Scale == 0.0f) return;
-
-                    var tf = order.ModelAnimator.transform;
-                    tf.localScale = new Vector3(order.Scale, order.Scale, order.Scale);
+                    graph.CreateVmdFaceAnimation(order.Model, fkf, order.face, timer, order.DelayTime);
                 }
             }
 
+            static void overwritePosition_(ModelOrder order)
+            {
+                //if (!order.OverWritePositionAndRotation) return;
+
+                var tf = order.Model.transform;
+                tf.position = order.Position;
+                tf.rotation = order.Rotation;
+            }
+            static void overwriteScale_(ModelOrder order)
+            {
+                if (order.Scale == 0.0f) return;
+
+                var tf = order.Model.transform;
+                tf.localScale = new Vector3(order.Scale, order.Scale, order.Scale);
+            }
 
         }
 

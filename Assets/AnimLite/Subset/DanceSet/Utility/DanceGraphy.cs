@@ -40,7 +40,7 @@ namespace AnimLite.DancePlayable
 
         public class MotionOrder
         {
-            public Animator ModelAnimator;
+            public GameObject Model;
             public SkinnedMeshRenderer FaceRenderer;
 
             public float DelayTime;
@@ -162,9 +162,9 @@ namespace AnimLite.DancePlayable
                     var rkf = res.vmddata.RotationStreams
                         .ToKeyFinderWith<Key4CatmulRot, Clamp>();
 
-                    var job = order.ModelAnimator.create(res.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
-
-                    graph.CreateVmdAnimationJobWithSyncScript(order.ModelAnimator, job, order.DelayTime);
+                    var anim = order.Model.GetComponent<Animator>();
+                    var job = anim.create(res.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
+                    graph.CreateVmdAnimationJobWithSyncScript(anim, job, order.DelayTime);
                 }
 
                 void createFaceMotion_(MotionOrder order, MotionResource res, StreamingTimer timer)
@@ -175,14 +175,14 @@ namespace AnimLite.DancePlayable
                     var fkf = res.vmddata.FaceStreams
                         .ToKeyFinderWith<Key2NearestShift, Clamp>();
 
-                    graph.CreateVmdFaceAnimation(order.ModelAnimator, fkf, res.face, timer, order.DelayTime);
+                    graph.CreateVmdFaceAnimation(order.Model, fkf, res.face, timer, order.DelayTime);
                 }
 
                 void overwritePosition_(MotionOrder motion)
                 {
                     if (!motion.OverWritePositionAndRotation) return;
 
-                    var tf = motion.ModelAnimator.transform;
+                    var tf = motion.Model.transform;
                     tf.position = motion.Position;
                     tf.rotation = motion.Rotation;
                 }

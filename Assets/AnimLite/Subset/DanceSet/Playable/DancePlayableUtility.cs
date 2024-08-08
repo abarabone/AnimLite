@@ -59,15 +59,15 @@ namespace AnimLite.DancePlayable
         /// </summary>
         public static void CreateVmdFaceAnimation(
             this PlayableGraph graph,
-            Animator anim, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer, float delay = 0)
+            GameObject model, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer, float delay = 0)
         {
-            var name = $"{anim.name} Facial";
+            var name = $"{model.name} Facial";
 
 
             var output = ScriptPlayableOutput.Create(graph, name);
 
 
-            var playable_face = FaceShifterPlayable.Create(graph, anim, kf, face, timer);
+            var playable_face = FaceShifterPlayable.Create(graph, model, kf, face, timer);
             playable_face.SetInputCount(1);
             playable_face.SetOutputCount(1);
             playable_face.SetInputWeight(0, 1);

@@ -194,7 +194,7 @@ namespace AnimLite.Utility
             {
                 Model = new ModelDefineJson
                 {
-                    ModelFilePath = $"{src.ModelAnimator.name} as resource",
+                    ModelFilePath = $"{src.Model.name} as resource",
                     //UsePositionAndDirection = false,
                     Position = src.Position,
                     EulerAngles = src.Rotation.eulerAngles,
@@ -219,7 +219,7 @@ namespace AnimLite.Utility
             {
                 Model = new ModelDefineJson
                 {
-                    ModelFilePath = $"{src.ModelAnimator.name} as resource",
+                    ModelFilePath = $"{src.Model.name} as resource",
                     //UsePositionAndDirection = true,
                     Position = tf.position,
                     EulerAngles = tf.rotation.eulerAngles,
@@ -242,7 +242,7 @@ namespace AnimLite.Utility
         public static async Awaitable<DanceMotionDefine> ToDanceMotionDefineAsync(this DanceMotionDefineJson src, CancellationToken ct) =>
             new DanceMotionDefine
             {
-                ModelAnimator = await src.Model.ModelFilePath.ToPath().LoadModelExAsync(ct),
+                Model = await src.Model.ModelFilePath.ToPath().LoadModelExAsync(ct),
                 FaceMappingFilePath = src.Animation.FaceMappingFilePath.ToPath(),
                 AnimationFilePath = src.Animation.AnimationFilePath.ToPath(),
                 FaceRenderer = null,
@@ -275,11 +275,12 @@ namespace AnimLite.Utility
         public AudioDefineJson Audio;
         public AnimationDefineJson DefaultAnimation;
 
+        public ModelDefineJson[] BackGrounds;
+        public DanceMotionDefineJson[] Motions;
+
         public string CaptionMode;
         public InformationDefain AudioInformation;
         public InformationDefain AnimationInformation;
-
-        public DanceMotionDefineJson[] Motions;
     }
     [System.Serializable]
     public struct DanceMotionDefineJson

@@ -4,11 +4,25 @@
         "Volume": 0.487,
         "DelayTime": 0.0
     },
+    "BackGrounds": [
+      {
+        "ModelFilePath": "Resources/神社橋配布用test.glb",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -17.2
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 90.0,
+          "z": 0.0
+        }
+      }
+    ],
     "Motions": [
         {
             "Model": {
                 "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,
@@ -33,7 +47,6 @@
         {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/ぶいけっとにゃん.vrm",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": 1.0,
                     "y": 0.0,
@@ -58,7 +71,6 @@
         {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/ぶいけっとにゃん.vrm",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": -1.0,
                     "y": 0.0,
@@ -83,7 +95,6 @@
         {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources/PronamaChan_shorts.vrm",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": 2.0,
                     "y": 0.0,
@@ -108,7 +119,6 @@
         {
             "Model": {
                 "ModelFilePath": "Resources/AliciaSolid.vrm",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": -2.0,
                     "y": 0.0,
@@ -133,7 +143,6 @@
         {
             "Model": {
                 "ModelFilePath": "5239679709811772970 as resource",
-                "UsePositionAndDirection": true,
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,

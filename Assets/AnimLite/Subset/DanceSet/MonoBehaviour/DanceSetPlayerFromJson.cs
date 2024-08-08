@@ -80,8 +80,10 @@ namespace AnimLite.DancePlayable
 
             void changeVisibility_(Order order, bool isVisible)
             {
+                order.BackGrouds
+                    ?.ForEach(x => x.Model.SetActive(isVisible));
                 order.Motions
-                    .ForEach(x => x.ModelAnimator.gameObject.SetActive(isVisible));
+                    ?.ForEach(x => x.Model.SetActive(isVisible));
             }
 
             void adjustModel_(Order order)
@@ -89,8 +91,8 @@ namespace AnimLite.DancePlayable
                 order.Motions
                     .ForEach(x =>
                     {
-                        x.ModelAnimator.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
-                        x.FaceRenderer.AdjustBbox(x.ModelAnimator);
+                        x.Model.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
+                        x.FaceRenderer.AdjustBbox(x.Model.GetComponent<Animator>());
                     });
             }
         }

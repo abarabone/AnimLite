@@ -30,11 +30,12 @@ namespace AnimLite.Utility
         public AudioDefineData Audio;
         public AnimationDefineData DefaultAnimation;
 
+        public ModelDefineData[] BackGrounds;
+        public DanceMotionDefineData[] Motions;
+
         public string CaptionMode;
         public InformationDefain AudioInformation;
         public InformationDefain AnimationInformation;
-
-        public DanceMotionDefineData[] Motions;
     }
     public class DanceMotionDefineData
     {
@@ -64,7 +65,7 @@ namespace AnimLite.Utility
     {
         public PathUnit ModelFilePath;
 
-        public bool UsePositionAndDirection;
+        //public bool UsePositionAndDirection;
         public Vector3 Position;
         public Quaternion Rotation;
         public float Scale;
@@ -106,6 +107,17 @@ namespace AnimLite.Utility
                     DelayTime = json.DefaultAnimation.DelayTime,
                 },
 
+                BackGrounds = Enumerable.ToArray(
+                    from model in json.BackGrounds ?? json.BackGrounds.EmptyEnumerable()
+                    select new ModelDefineData()
+                    {
+                        ModelFilePath = model.ModelFilePath,
+                        Position = model.Position,
+                        Rotation = Quaternion.Euler(model.EulerAngles),
+                        Scale = model.Scale,
+                    }
+                ),
+
                 Motions = Enumerable.ToArray(
                     from motion in json.Motions
                     select new DanceMotionDefineData
@@ -114,7 +126,7 @@ namespace AnimLite.Utility
                         {
                             ModelFilePath = motion.Model.ModelFilePath,
                             //UsePositionAndDirection = motion.Model.UsePositionAndDirection,
-                            UsePositionAndDirection = !(motion.Model.Position.IsZero() && motion.Model.EulerAngles.IsZero()),
+                            //UsePositionAndDirection = !(motion.Model.Position.IsZero() && motion.Model.EulerAngles.IsZero()),
                             Position = motion.Model.Position,
                             Rotation = Quaternion.Euler(motion.Model.EulerAngles),
                             Scale = motion.Model.Scale,
@@ -183,6 +195,15 @@ namespace AnimLite.Utility
             var aorder =
                 await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct);
 
+            var bgorder = archive == null
+                ? await ds.BackGrounds
+                    .Select(model => Task.Run(() => model.buildBackGroundOrderAsync(archive, ct)))
+                    .WhenAll()
+                : await ds.BackGrounds.ToAsyncEnumerable()
+                    .SelectAwait(async model => await model.buildBackGroundOrderAsync(archive, ct))
+                    .ToArrayAsync()
+                ;
+
             // どうも ziparchive はマルチスレッドに対応してないっぽいので、暫定的に非同期列挙で対応。なんとかならんか？
             var morders = archive == null
                 ? await ds.Motions
@@ -196,16 +217,18 @@ namespace AnimLite.Utility
             //        .Select(motion => motion.buildMotionOrderAsync(archive, cache, ct))
             //        .WhenAll();
 
-            var disposeAction = (aorder, morders).buildDisposeAction();
+            var disposeAction = (aorder, bgorder, morders).buildDisposeAction();
             ct.ThrowIfCancellationRequested(disposeAction);
 
             return new()
             {
                 Audio = aorder,
+                BackGrouds = bgorder,
                 Motions = morders,
                 DisposeAction = disposeAction,
             };
         }
+
 
         static async ValueTask<AudioOrder> buildAudioOrderAsync(
             this AudioDefineData audio, ZipArchive archive, AudioSource audioSource, CancellationToken ct) =>
@@ -218,10 +241,22 @@ namespace AnimLite.Utility
                 };
 
 
+        static async Task<ModelOrder> buildBackGroundOrderAsync(
+            this ModelDefineData model, ZipArchive archive, CancellationToken ct)
+        =>
+            new()
+            {
+                Model = await model.ModelFilePath.LoadModelExAsync(archive, ct),
+                Position = model.Position,
+                Rotation = model.Rotation,
+                Scale = model.Scale,
+            };
+        
+
         static async Task<MotionOrder> buildMotionOrderAsync(
             this DanceMotionDefineData motion, ZipArchive archive, VmdStreamDataCache cache, CancellationToken ct)
         {
-            var anim = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
+            var model = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
 
             var vmdfullpath = motion.Animation.AnimationFilePath;
             var facefullpath = motion.Animation.FaceMappingFilePath;
@@ -230,7 +265,7 @@ namespace AnimLite.Utility
                 : await buildWithCacheAsync_();
 
             await Awaitable.MainThreadAsync();
-            return motion.toOrder(vmddata, facemap, anim);
+            return motion.toOrder(vmddata, facemap, model);
 
 
             async ValueTask<(VmdStreamData, VmdFaceMapping)> buildWithCacheAsync_()
@@ -241,7 +276,7 @@ namespace AnimLite.Utility
             }
             async ValueTask<(VmdStreamData, VmdFaceMapping)> buildAsync_()
             {
-                var facemap = await facefullpath.LoadFaceMapExAsync(ct);
+                var facemap = await facefullpath.LoadFaceMapExAsync(archive, ct);
                 var vmddata = await vmdfullpath.LoadVmdStreamDataExAsync(facemap, archive, ct);
 
                 return (vmddata, facemap);
@@ -250,39 +285,44 @@ namespace AnimLite.Utility
 
 
         static MotionOrder toOrder(
-            this DanceMotionDefineData m, VmdStreamData vmddata, VmdFaceMapping facemap, Animator animator)
+            this DanceMotionDefineData m, VmdStreamData vmddata, VmdFaceMapping facemap, GameObject model)
         {
             return new MotionOrder
             {
-                ModelAnimator = animator,
-                FaceRenderer = animator.FindFaceRenderer(),
+                Model = model,
+                FaceRenderer = model.FindFaceRenderer(),
 
                 vmddata = vmddata,
-                bone = animator.BuildVmdPlayableJobTransformMappings(),
+                bone = model.GetComponent<Animator>().BuildVmdPlayableJobTransformMappings(),
                 face = facemap.BuildStreamingFace(),
 
                 DelayTime = m.Animation.DelayTime,
                 BodyScale = m.Options.BodyScaleFromHuman,
                 FootIkMode = m.Options.FootIkMode,
 
-                OverWritePositionAndRotation = m.Model.UsePositionAndDirection,
+                //OverWritePositionAndRotation = m.Model.UsePositionAndDirection,
                 Position = m.Model.Position,
                 Rotation = m.Model.Rotation,
                 Scale = m.Model.Scale,
             };
         }
 
-        static Action buildDisposeAction(this (AudioOrder audio, MotionOrder[] motions) order) =>
+        static Action buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrder[] motions) order) =>
             () =>
             {
                 order.audio.AudioClip.Dispose();
+
+                foreach (var bg in order.bgs)
+                {
+                    bg.Model.AsUnityNull()?.Destroy();
+                }
 
                 foreach (var m in order.motions)
                 {
                     //m.face.Dispose();
                     m.bone.Dispose();
                     m.vmddata.Dispose();
-                    m.ModelAnimator.AsUnityNull()?.gameObject?.Destroy();
+                    m.Model.AsUnityNull()?.Destroy();
                 }
             };
     }

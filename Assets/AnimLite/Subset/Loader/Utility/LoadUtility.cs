@@ -29,7 +29,7 @@ namespace AnimLite.Utility
         // ReadAsync() などの非同期メソッドは、Task.Run() の非同期と同じらしい（ＧＵＩスレッドをブロックさせないなどの意味しかない）
         // だがこちらの方が圧倒的にはやい、なぜだろう…（ドキュメントには小さいファイルでは不利とはあったが）
         public static Stream OpenReadFileStream(this PathUnit path) =>
-        new FileStream(path, FileMode.Open, FileAccess.Read);
+            new FileStream(path, FileMode.Open, FileAccess.Read);
 
 
         // ちゃんとした I/O の非同期になるが、ものによってはかなり遅くなるようだ

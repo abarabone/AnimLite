@@ -45,7 +45,7 @@ namespace AnimLite.DancePlayable
         void changeVisivility(bool isVisible)
         {
             this.dance.Motions
-                .ForEach(x => x.Model.gameObject.SetActive(isVisible));
+                .ForEach(x => x.Model.SetActive(isVisible));
         }
 
         private async Awaitable OnEnable()

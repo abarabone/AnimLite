@@ -7,7 +7,13 @@
 - 裏スレッドでの .vmd 読み込み
 - .vmd のキャッシュ機構、データ共有機構
 - .json で音楽、モデル、アニメーション、配置、を設定する機能
-- local, web から file, zip をロード、また resource(addressable) もロードできるようにした　<- new
+- local, web から file, zip をロード、また resource(addressable) もロードできるようにした  <- new
+- .glb を読めるようにした(BackGrounds)  <- new
+
+# やりたい
+- シーン上の game object インスタンスのキャッシュ（同じパス？のモデルを再ロードしなくてもよいように）
+- DanceSetSimpleCaption において、キャラが多いとテロップが意味不明になるので、複数回に分けるとかスクロールするとか対処したい
+- WebGL でサンプル作ってどっかに置きたい
 
 # いずれ
 - 表面的な最適化もやらねば
@@ -37,6 +43,7 @@
 - ＶＲＭモデルが踊るのをもっと気軽に見たいので、なんかこういうフォーマットが世間に１つあるといいなと思う
 - zip を読めるようにしたし「固めてアップロードしたので好きなビューワで見て」みたいな世界がくるといいなーとか思うし
 - 楽曲、モデル、アニメーション、の作者情報をビューワーが積極的に表示するようにすれば、作者さんも公開しようという気持ちになるんじゃないかなと願いつつ
+- DanceSetSimpleCaption はとりあえずシンプルな作者情報を表示するテロップの例
 ```
 {
     "Audio": {
@@ -49,23 +56,25 @@
         "FaceMappingFilePath": "",
         "DelayTime": 0.0
     },
-    "AudioInformation": {                         // 音楽の情報
-        "Caption": "",                            // 曲名のキャプションとして表示される
-        "Author": "",                             // 音楽の作者として表示される
-        "Url": "",
-        "Description": ""
-    },
-    "AnimationInformation": {                     // デフォルトアニメーションの情報（現在は機能していない）
-        "Caption": "",                            // アニメーション名として表示される
-        "Author": "",                             // アニメーションの作者として表示される
-        "Url": "",
-        "Description": ""
-    },
+    "BackGrounds": [                              // 背景用モデルを配列で定義（ .glb を想定）
+      {
+        "ModelFilePath": "",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    ],
     "Motions": [                                  // キャラクターのモデル、アニメーション、を配列で定義
         {
             "Model": {
                 "ModelFilePath": "",
-                "UsePositionAndDirection": true,  // true なら、position, euler angles をキャラクーの位置に反映する
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,
@@ -99,7 +108,19 @@
                 "Description": ""
             }
         }
-    ]
+    ],
+    "AudioInformation": {                         // 音楽の情報
+        "Caption": "",                            // 曲名のキャプションとして表示される
+        "Author": "",                             // 音楽の作者として表示される
+        "Url": "",
+        "Description": ""
+    },
+    "AnimationInformation": {                     // デフォルトアニメーションの情報（現在は機能していない）
+        "Caption": "",                            // アニメーション名として表示される
+        "Author": "",                             // アニメーションの作者として表示される
+        "Url": "",
+        "Description": ""
+    }
 }
 ```
 - パスの形式

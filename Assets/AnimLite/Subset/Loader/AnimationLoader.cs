@@ -80,21 +80,6 @@ namespace AnimLite.Vmd
         }
 
 
-        //public static async ValueTask<VmdMotionData> ParseVmdInArchiveExAsync(
-        //    this PathUnit zipentrypath, ZipArchive zip, CancellationToken ct)
-        //{
-        //    if (!zipentrypath.IsFullPath())
-        //    {
-        //        var data = await zip.UnzipAsync(zipentrypath, parseVmdViaMemoryStreamAsync_);
-
-        //        if (data.bodyKeyStreams != null) return data;
-        //    }
-            
-        //    return await zipentrypath.ToFullPath()
-        //        .OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct)
-        //        .UsingAsync(VmdParser.ParseVmd);
-        //}
-
 
 
         /// <summary>

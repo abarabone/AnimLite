@@ -560,14 +560,14 @@ namespace AnimLite.Utility
         }
 
 
-        public static SkinnedMeshRenderer FindFaceRendererIfNothing(this Animator anim, SkinnedMeshRenderer r) =>
+        public static SkinnedMeshRenderer FindFaceRendererIfNothing(this GameObject model, SkinnedMeshRenderer r) =>
             r.IsUnityNull()
-                ? anim.FindFaceRenderer()
+                ? model.FindFaceRenderer()
                 : r
             ;
 
-        public static SkinnedMeshRenderer FindFaceRenderer(this Animator anim) =>
-            anim.GetComponentsInChildren<SkinnedMeshRenderer>()
+        public static SkinnedMeshRenderer FindFaceRenderer(this GameObject model) =>
+            model.GetComponentsInChildren<SkinnedMeshRenderer>()
                 .FirstOrDefault(r => r.sharedMesh.bindposeCount > 0);
         //{
         //    var tf = anim.transform;
@@ -704,7 +704,7 @@ namespace AnimLite.Utility
         public static IEnumerable<TElement> TryGetOrBlank<TKey, TElement>(
             this ILookup<TKey, TElement> src, TKey key)
         {
-            if (!src.Contains(key)) return new BlankEnumerableStruct<TElement>();
+            if (!src.Contains(key)) return new EmptyEnumerableStruct<TElement>();
 
             return src[key];
         }
@@ -716,7 +716,7 @@ namespace AnimLite.Utility
             //this IDictionary<TKey, IEnumerable<TElement>> src, TKey key)
             this Dictionary<TKey, TElement[]> src, TKey key)
         {
-            return src.TryGetOrDefault(key, new BlankEnumerableStruct<TElement>());
+            return src.TryGetOrDefault(key, new EmptyEnumerableStruct<TElement>());
         }
 
         /// <summary>
@@ -859,7 +859,8 @@ namespace AnimLite.Utility
         }
     }
 
-    public static class TaskExtension
+
+    public static class TaskUtility
     {
 
         public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) =>
@@ -893,6 +894,36 @@ namespace AnimLite.Utility
         =>
             await act(await stream);
 
+
+
+        public static async Awaitable OnMainThreadAsync(this Action action)
+        {
+            await Awaitable.MainThreadAsync();
+
+            action();
+        }
+
+        public static async Awaitable OnMainThreadAsync(this Func<ValueTask> action)
+        {
+            await Awaitable.MainThreadAsync();
+
+            await action();
+        }
+
+
+        public static async Awaitable<T> OnMainThreadAsync<T>(this Func<T> action)
+        {
+            await Awaitable.MainThreadAsync();
+
+            return action();
+        }
+
+        public static async Awaitable<T> OnMainThreadAsync<T>(this Func<ValueTask<T>> action)
+        {
+            await Awaitable.MainThreadAsync();
+
+            return await action();
+        }
     }
 }
 
@@ -905,7 +936,7 @@ namespace AnimLite.Utility.Linq
     /// <summary>
     /// 
     /// </summary>
-    public struct BlankEnumerableStruct<T> : IEnumerable<T>
+    public struct EmptyEnumerableStruct<T> : IEnumerable<T>
     {
         public IEnumerator<T> GetEnumerator() => new Enumerator();
 
@@ -932,6 +963,8 @@ namespace AnimLite.Utility.Linq
             e.Select((x, i) => { f(x, i); return x; })
             ;
 
+
+        public static IEnumerable<T> EmptyEnumerable<T>(this IEnumerable<T> src) => new EmptyEnumerableStruct<T>();
 
 
 

@@ -20,22 +20,22 @@ namespace AnimLite.DancePlayable
 
 
         public static ScriptPlayable<FaceShifterPlayable> Create(
-            PlayableGraph graph, Animator anim, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer)
+            PlayableGraph graph, GameObject model, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer)
         {
             var playable = ScriptPlayable<FaceShifterPlayable>.Create(graph);
 
-            playable.GetBehaviour().Initialize(anim, kf, face, timer);
+            playable.GetBehaviour().Initialize(model, kf, face, timer);
 
             return playable;
         }
 
 
-        public void Initialize(Animator anim, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer)
+        public void Initialize(GameObject model, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer)
         {
             this.kf = kf;
             this.timer = timer;
             this.indexBlockTime = kf.IndexBlockTimeRange;
-            this.opface = anim.ToVrmExpressionOperator(face);
+            this.opface = model.ToVrmExpressionOperator(face);
         }
 
         public override void OnGraphStart(Playable playable)

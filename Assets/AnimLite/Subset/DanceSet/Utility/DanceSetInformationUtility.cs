@@ -43,7 +43,7 @@ namespace AnimLite.DancePlayable
                 if (d.ModelInformation.IsBlank())
                 {
                     d.ModelInformation =
-                        d.Model.ToInformation(o.ModelAnimator.GetComponent<UniVRM10.Vrm10Instance>());
+                        d.Model.ToInformation(o.Model.GetComponent<UniVRM10.Vrm10Instance>());
                 }
 
                 if (d.AnimationInformation.IsBlank())

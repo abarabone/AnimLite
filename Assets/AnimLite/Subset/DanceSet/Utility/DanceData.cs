@@ -45,7 +45,7 @@ namespace AnimLite.DancePlayable
         [FilePath]
         public PathUnit FaceMappingFilePath;
 
-        public Animator ModelAnimator;
+        public GameObject Model;
         public SkinnedMeshRenderer FaceRenderer;
 
         public float DelayTime;
@@ -141,7 +141,7 @@ namespace AnimLite.DancePlayable
                     : await loadAsync_();
 
                 await Awaitable.MainThreadAsync();
-                return vmddata.ToMotionResource(facemap, motion.ModelAnimator);//, motion.FaceRenderer);
+                return vmddata.ToMotionResource(facemap, motion.Model);//, motion.FaceRenderer);
 
 
                 async Task<(VmdStreamData, VmdFaceMapping)> loadAsync_()
@@ -166,12 +166,12 @@ namespace AnimLite.DancePlayable
 
 
         public static MotionResource ToMotionResource(
-            this VmdStreamData vmddata, VmdFaceMapping facemap, Animator anim) =>//, SkinnedMeshRenderer faceRenderer) =>
+            this VmdStreamData vmddata, VmdFaceMapping facemap, GameObject model) =>//, SkinnedMeshRenderer faceRenderer) =>
                 new MotionResource
                 {
                     vmddata = vmddata,
 
-                    bone = anim.BuildVmdPlayableJobTransformMappings(),
+                    bone = model.GetComponent<Animator>().BuildVmdPlayableJobTransformMappings(),
                     face = facemap.BuildStreamingFace(),
                     //face = faceRenderer?.sharedMesh?.BuildStreamingFace(facemap) ?? default,
                 };

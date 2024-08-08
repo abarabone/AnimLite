@@ -1,0 +1,168 @@
+{
+    "Audio": {
+        "AudioFilePath": "ds/ポップキャンディ.mp3",
+        "Volume": 0.487,
+        "DelayTime": 0.0
+    },
+    "BackGrounds":  [
+      {
+        "ModelFilePath": "Resources/神社橋配布用test.glb",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -17.2
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 90.0,
+          "z": 0.0
+        }
+      }
+    ],
+    "Motions": [
+        {
+            "Model": {
+                "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "ds/step1.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        },
+        {
+            "Model": {
+                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/ぶいけっとにゃん.vrm",
+                "Position": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": -0.5
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": 30.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        },
+        {
+            "Model": {
+                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/ぶいけっとにゃん.vrm",
+                "Position": {
+                    "x": -1.0,
+                    "y": 0.0,
+                    "z": -0.5
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": -30.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/step1.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        },
+        {
+            "Model": {
+                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources/PronamaChan_shorts.vrm",
+                "Position": {
+                    "x": 2.0,
+                    "y": 0.0,
+                    "z": -1.0
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": 45.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources/step2.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        },
+        {
+            "Model": {
+                "ModelFilePath": "Resources/AliciaSolid.vrm",
+                "Position": {
+                    "x": -2.0,
+                    "y": 0.0,
+                    "z": -1.0
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": -45.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "Resources/step2.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        },
+        {
+            "Model": {
+                "ModelFilePath": "5239679709811772970 as resource",
+                "Position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": -1.0
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "step2 as resource",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        }
+    ]
+}

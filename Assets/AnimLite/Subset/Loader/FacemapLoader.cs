@@ -60,7 +60,7 @@ namespace AnimLite.Vrm
         public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
             this PathUnit path, ZipArchive archive, CancellationToken ct)
         {
-            if (archive != null && !path.IsFullPath())
+            if (!path.IsBlank() && archive != null && !path.IsFullPath())
             {
                 var facemap = await archive.UnzipAsync(path, s => s.ParseFaceMapAsync(ct));
 
@@ -106,22 +106,6 @@ namespace AnimLite.Vrm
                     await openAsync_(fullpath).UsingAsync(s => s.ParseFaceMapAsync(ct)),
             };
         }
-
-
-        //public static async ValueTask<VmdFaceMapping> LoadFaceMapInArchiveExAsync(
-        //    this PathUnit zipentrypath, ZipArchive zip, CancellationToken ct)
-        //{
-        //    if (!zipentrypath.IsFullPath())
-        //    {
-        //        var facemap = await zip.UnzipAsync(zipentrypath, s => s.ParseFaceMapAsync(ct));
-
-        //        if (facemap.VmdToVrmMaps != null) return facemap;
-        //    }
-
-        //    return await zipentrypath.ToFullPath()
-        //        .OpenStreamFileOrWebOrAssetAsync<TextAsset>(asset => asset.bytes, ct)
-        //        .UsingAsync(s => s.ParseFaceMapAsync(ct));
-        //}
 
 
     }

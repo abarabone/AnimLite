@@ -120,6 +120,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &113109319 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1895562552}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &234360146
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,10 +617,10 @@ SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5292355953843914932, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
   m_PrefabInstance: {fileID: 311476655}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &311476657 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 311476655}
+--- !u!1 &451768223 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1886257854}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &568680178
 GameObject:
@@ -666,7 +671,7 @@ MonoBehaviour:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
-    ModelAnimator: {fileID: 802923685}
+    Model: {fileID: 113109319}
     FaceRenderer: {fileID: 0}
     DelayTime: 1.2
     FootIkMode: 0
@@ -674,6 +679,22 @@ MonoBehaviour:
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: 0
+    ModelInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+--- !u!1 &618911040 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1879075435}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &635451078
 GameObject:
   m_ObjectHideFlags: 0
@@ -723,7 +744,7 @@ MonoBehaviour:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
-    ModelAnimator: {fileID: 901753835}
+    Model: {fileID: 850935942}
     FaceRenderer: {fileID: 0}
     DelayTime: 1
     FootIkMode: 0
@@ -731,10 +752,26 @@ MonoBehaviour:
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!95 &802923685 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1895562552}
+    Scale: 0
+    ModelInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+--- !u!1 &736945930 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1693636016}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &850935942 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1236239881}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &893173482
 GameObject:
@@ -785,7 +822,7 @@ MonoBehaviour:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
-    ModelAnimator: {fileID: 2086145749}
+    Model: {fileID: 618911040}
     FaceRenderer: {fileID: 0}
     DelayTime: 1.4
     FootIkMode: 0
@@ -793,11 +830,17 @@ MonoBehaviour:
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!95 &901753835 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1236239881}
-  m_PrefabAsset: {fileID: 0}
+    Scale: 0
+    ModelInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
 --- !u!1001 &910147281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1194,11 +1237,6 @@ PrefabInstance:
 --- !u!137 &910147282 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5292355953843914932, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 910147281}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &910147283 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
   m_PrefabInstance: {fileID: 910147281}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &990026636
@@ -1987,6 +2025,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+--- !u!1 &1387303418 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 990026636}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1399767119
 GameObject:
   m_ObjectHideFlags: 0
@@ -2079,6 +2122,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1412791726 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 311476655}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1658732042 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 910147281}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1693636016
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2477,11 +2530,6 @@ SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5292355953843914932, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
   m_PrefabInstance: {fileID: 1693636016}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &1693636018 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1693636016}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1720885305
 GameObject:
   m_ObjectHideFlags: 0
@@ -2518,14 +2566,31 @@ MonoBehaviour:
   dance:
     Audio:
       AudioSource: {fileID: 1720885308}
-      AudioClip: {fileID: 0}
       DelayTime: 0
+    DefaultAnimation:
+      AnimationFilePath:
+        Value: 
+      FaceMappingFilePath:
+        Value: 
+      DelayTime: 0
+      FootIkMode: 0
+      BodyScale: 0
+    AudioInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
     Motions:
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1693636018}
+      Model: {fileID: 736945930}
       FaceRenderer: {fileID: 1693636017}
       DelayTime: 0
       FootIkMode: 0
@@ -2533,11 +2598,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 910147283}
+      Model: {fileID: 1658732042}
       FaceRenderer: {fileID: 910147282}
       DelayTime: 0.2
       FootIkMode: 0
@@ -2545,11 +2621,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1886257856}
+      Model: {fileID: 451768223}
       FaceRenderer: {fileID: 1886257855}
       DelayTime: 0.4
       FootIkMode: 0
@@ -2557,11 +2644,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 311476657}
+      Model: {fileID: 1412791726}
       FaceRenderer: {fileID: 311476656}
       DelayTime: 0.6
       FootIkMode: 0
@@ -2569,6 +2667,17 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
 --- !u!4 &1720885307
 Transform:
   m_ObjectHideFlags: 0
@@ -3488,11 +3597,6 @@ SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5292355953843914932, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
   m_PrefabInstance: {fileID: 1886257854}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &1886257856 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1886257854}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1895562552
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3935,7 +4039,7 @@ MonoBehaviour:
       Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
     FaceMappingFilePath:
       Value: 
-    ModelAnimator: {fileID: 2088713431}
+    Model: {fileID: 1387303418}
     FaceRenderer: {fileID: 0}
     DelayTime: 0.8
     FootIkMode: 0
@@ -3943,16 +4047,17 @@ MonoBehaviour:
     OverWritePositionAndRotation: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!95 &2086145749 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1879075435}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &2088713431 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 990026636}
-  m_PrefabAsset: {fileID: 0}
+    Scale: 0
+    ModelInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -45,7 +45,7 @@ namespace AnimLite.DancePlayable
         void changeVisivility(bool isVisible)
         {
             this.dance.Motions
-                .ForEach(x => x.ModelAnimator.gameObject.SetActive(isVisible));
+                .ForEach(x => x.Model.gameObject.SetActive(isVisible));
         }
 
         private async Awaitable OnEnable()
@@ -105,7 +105,7 @@ namespace AnimLite.DancePlayable
                     from m in this.dance.Motions
                     select new DanceGraphy.MotionOrder
                     {
-                        ModelAnimator = m.ModelAnimator,
+                        Model = m.Model,
                         FaceRenderer = m.FaceRenderer,
                         
                         DelayTime = m.DelayTime,
@@ -133,7 +133,7 @@ namespace AnimLite.DancePlayable
             {
                 this.dance.Motions
                     .Where(motion => motion.FaceRenderer.IsUnityNull())
-                    .ForEach(motion => motion.FaceRenderer = motion.ModelAnimator.FindFaceRenderer());
+                    .ForEach(motion => motion.FaceRenderer = motion.Model.FindFaceRenderer());
             }
 
             void adjustModel_()
@@ -141,8 +141,8 @@ namespace AnimLite.DancePlayable
                 this.dance.Motions
                     .ForEach(x =>
                     {
-                        x.ModelAnimator.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
-                        x.FaceRenderer.AdjustBbox(x.ModelAnimator);
+                        x.Model.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
+                        x.FaceRenderer.AdjustBbox(x.Model.GetComponent<Animator>());
                     });
             }
 
@@ -184,11 +184,12 @@ namespace AnimLite.DancePlayable
                 this.Graphy = null;
 
                 this.dance.Motions
-                    .Where(motion => !motion.ModelAnimator.IsUnityNull())
+                    .Where(motion => !motion.Model.IsUnityNull())
                     .ForEach(motion =>
                     {
-                        motion.ModelAnimator.UnbindAllStreamHandles();
-                        motion.ModelAnimator.ResetPose();
+                        var anim = motion.Model.GetComponent<Animator>();
+                        anim.UnbindAllStreamHandles();
+                        anim.ResetPose();
                     });
             }
             "disable end".ShowDebugLog();

@@ -28,6 +28,7 @@ namespace AnimLite.Vrm
 {
     using AnimLite.Utility;
     using AnimLite.Vmd;
+    using UniGLTF;
 
     // todo
     // リソース時、gameobject でロードできなかったら .vrm でロードする
@@ -39,7 +40,7 @@ namespace AnimLite.Vrm
 
 
 
-        public static async ValueTask<Animator> LoadModelExAsync(
+        public static async ValueTask<GameObject> LoadModelExAsync(
             this PathUnit path, ZipArchive archive, CancellationToken ct)
         {
 
@@ -63,7 +64,7 @@ namespace AnimLite.Vrm
 
 
 
-        public static async ValueTask<Animator> LoadModelExAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<GameObject> LoadModelExAsync(this PathUnit path, CancellationToken ct)
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
@@ -73,13 +74,13 @@ namespace AnimLite.Vrm
             return fullpath.DividZipAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath).UnzipAsync(entrypath, s => s.convertVrmToModelAsync(ct)),
+                    await openAsync_(zippath).UnzipAsync(entrypath, s => s.convert(entrypath, ct)),
                 var (zippath, _) when fullpath.IsZip() =>
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".vrm", (s, _) => s.convertVrmToModelAsync(ct)),
+                    await openAsync_(zippath).UnzipFirstEntryAsync(".vrm", (s, path) => s.convert(path, ct)),
                 var (_, _) when fullpath.IsResource() =>
                     await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
                 var (_, _) =>
-                    await openAsync_(fullpath).UsingAsync(s => s.convertVrmToModelAsync(ct)),
+                    await openAsync_(fullpath).UsingAsync(s => s.convert(fullpath, ct)),
             };
 
             //async ValueTask<Animator> loadResource_(PathUnit path) =>
@@ -96,30 +97,38 @@ namespace AnimLite.Vrm
         }
 
 
-        //public static async ValueTask<Animator> LoadModelInArchiveExAsync(
-        //    this PathUnit zipentrypath, ZipArchive zip, CancellationToken ct)
-        //{
 
-        //    if (!zipentrypath.IsFullPath())
-        //    {
-        //        var model = await zip.UnzipAsync(zipentrypath, s => s.convertVrmToModelAsync(ct));
 
-        //        if (model != null) return model;
-        //    }
-
-        //    return await zipentrypath.ToFullPath()
-        //        .OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct)
-        //        .UsingAsync(s => s.convertVrmToModelAsync(ct));
-        //}
+        static ValueTask<GameObject> convert(this Stream s, PathUnit path, CancellationToken ct) =>
+            Path.GetExtension(path.Value).ToLower() switch
+            {
+                ".vrm" => s.convertVrmToModelAsync(ct),
+                ".glb" => s.convertGlbToModelAsync(ct),
+                _ => default,
+            };
 
 
 
+        static async ValueTask<GameObject> convertGlbToModelAsync(this Stream s, CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
 
+            using var m = new MemoryStream();
+            await s.CopyToAsync(m, ct);
 
+            using var data = new GlbBinaryParser(m.ToArray(), "_").Parse();
+            using var context = new UniGLTF.ImporterContext(data);
+            await Awaitable.MainThreadAsync();
+            var instance = await context.LoadAsync(new VRMShaders.RuntimeOnlyNoThreadAwaitCaller());
 
+            await Awaitable.MainThreadAsync();
+            instance.ShowMeshes();
+            ct.ThrowIfCancellationRequested(instance.gameObject.Destroy);
 
+            return instance.gameObject.hideModel();
+        }
 
-        static async ValueTask<Animator> convertVrmToModelAsync(this Stream s, CancellationToken ct)
+        static async ValueTask<GameObject> convertVrmToModelAsync(this Stream s, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -133,10 +142,10 @@ namespace AnimLite.Vrm
             await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
 
             await Awaitable.MainThreadAsync();
-            return vrm10.GetComponent<Animator>().hideModel();
+            return vrm10.gameObject.hideModel();
         }
 
-        static async ValueTask<Animator> loadModelFromResourceAsync(this ResourceName name, CancellationToken ct)
+        static async ValueTask<GameObject> loadModelFromResourceAsync(this ResourceName name, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
@@ -149,21 +158,21 @@ namespace AnimLite.Vrm
             await ct.ThrowIfCancellationRequested(go.DestroyOnMainThreadAsync);
 
             await Awaitable.MainThreadAsync();
-            return go.GetComponent<Animator>().hideModel();
+            return go.hideModel();
         }
 
 
 
-        static Animator hideModel(this Animator anim)
+        static GameObject hideModel(this GameObject go)
         {
-            anim.gameObject.SetActive(false);
-            return anim;
+            go.SetActive(false);
+            return go;
         }
-        static async ValueTask<Animator> hideModelAsync(this Animator anim)
+        static async ValueTask<GameObject> hideModelAsync(this GameObject go)
         {
             await Awaitable.MainThreadAsync();
-            anim.gameObject.SetActive(false);
-            return anim;
+            go.SetActive(false);
+            return go;
         }
 
     }

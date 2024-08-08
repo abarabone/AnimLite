@@ -169,7 +169,7 @@ namespace AnimLite.Utility
             this ZipArchive zip, PathUnit entryPath, Func<Stream, T> createAction)
         {
             //zip.Entries.ForEach(x => Debug.Log(x.FullName));
-            zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
+            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
             var entry = zip.GetEntry(entryPath);
             if (entry == null) return default;
 
@@ -190,7 +190,7 @@ namespace AnimLite.Utility
             this ZipArchive zip, PathUnit entryPath, Func<Stream, ValueTask<T>> createAction)
         {
             //return await zip.Unzip(entryPath, createAction);
-            zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
+            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
             var entry = zip.GetEntry(entryPath);
             if (entry == null) return default;
 
@@ -234,7 +234,7 @@ namespace AnimLite.Utility
         public static T UnzipFirstEntry<T>(this ZipArchive zip, string extension, Func<Stream, string, T> createAction)
         {
             var extlist = extension.Split(";");
-            var entry = zip.Entries.FirstOrDefault(x => extlist.Where(ext => x.Name.EndsWith(ext)).Any());
+            var entry = zip.Entries.FirstOrDefault(x => extlist.Where(ext => x.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase)).Any());
             if (entry == null) return default;
 
             using var s = entry.Open();
@@ -253,10 +253,10 @@ namespace AnimLite.Utility
             this ZipArchive zip, string extension, Func<Stream, string, ValueTask<T>> createAction)
         {
             var extlist = extension.Split(";");
-            var entry = zip.Entries.FirstOrDefault(x => extlist.Where(ext => x.Name.EndsWith(ext)).Any());
+            var entry = zip.Entries.FirstOrDefault(x => extlist.Where(ext => x.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase)).Any());
             if (entry == null) return default;
 
-            Debug.Log(entry.Name);
+            //Debug.Log(entry.Name);
             using var s = entry.Open();
 
             return await createAction(s, entry.Name);

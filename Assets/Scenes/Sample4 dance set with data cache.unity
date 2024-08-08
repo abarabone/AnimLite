@@ -155,14 +155,31 @@ MonoBehaviour:
   dance:
     Audio:
       AudioSource: {fileID: 363315072}
-      AudioClip: {fileID: 0}
       DelayTime: 0
+    DefaultAnimation:
+      AnimationFilePath:
+        Value: 
+      FaceMappingFilePath:
+        Value: 
+      DelayTime: 0
+      FootIkMode: 0
+      BodyScale: 0
+    AudioInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
     Motions:
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1688244421}
+      Model: {fileID: 1611551793}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -170,6 +187,17 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
 --- !u!114 &65608884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -418,6 +446,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &400411484 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 549557768}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &549557768
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -811,11 +844,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
---- !u!95 &549557769 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 549557768}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &680260205
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1209,10 +1237,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
---- !u!95 &680260206 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 680260205}
+--- !u!1 &700759374 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1957541972}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &960961159
 GameObject:
@@ -1263,6 +1291,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1170167814 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1629253492}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1504456966 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 1846959517}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1532275631
 GameObject:
   m_ObjectHideFlags: 0
@@ -1307,6 +1345,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1611551793 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 2024174977}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1629253492
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1700,16 +1743,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
---- !u!95 &1629253493 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1629253492}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &1688244421 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 2024174977}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1846959517
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2103,11 +2136,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
---- !u!95 &1846959518 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1846959517}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1861737057
 GameObject:
   m_ObjectHideFlags: 0
@@ -2156,14 +2184,31 @@ MonoBehaviour:
   dance:
     Audio:
       AudioSource: {fileID: 363315072}
-      AudioClip: {fileID: 0}
       DelayTime: 0
+    DefaultAnimation:
+      AnimationFilePath:
+        Value: 
+      FaceMappingFilePath:
+        Value: 
+      DelayTime: 0
+      FootIkMode: 0
+      BodyScale: 0
+    AudioInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
     Motions:
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 680260206}
+      Model: {fileID: 1170167814}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2171,11 +2216,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 549557769}
+      Model: {fileID: 400411484}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2183,11 +2239,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1629253493}
+      Model: {fileID: 1504456966}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2195,11 +2262,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1846959518}
+      Model: {fileID: 1611551793}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2207,6 +2285,17 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
 --- !u!4 &1861737060
 Transform:
   m_ObjectHideFlags: 0
@@ -2270,14 +2359,31 @@ MonoBehaviour:
   dance:
     Audio:
       AudioSource: {fileID: 363315072}
-      AudioClip: {fileID: 0}
       DelayTime: 0
+    DefaultAnimation:
+      AnimationFilePath:
+        Value: 
+      FaceMappingFilePath:
+        Value: 
+      DelayTime: 0
+      FootIkMode: 0
+      BodyScale: 0
+    AudioInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
+    AnimationInfo:
+      Caption: 
+      Author: 
+      Url: 
+      Description: 
     Motions:
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 1957541973}
+      Model: {fileID: 700759374}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2285,11 +2391,22 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
     - AnimationFilePath:
         Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
       FaceMappingFilePath:
         Value: 
-      ModelAnimator: {fileID: 549557769}
+      Model: {fileID: 1981032842}
       FaceRenderer: {fileID: 0}
       DelayTime: 0
       FootIkMode: 0
@@ -2297,6 +2414,17 @@ MonoBehaviour:
       OverWritePositionAndRotation: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0, w: 0}
+      Scale: 0
+      ModelInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
+      AnimationInfo:
+        Caption: 
+        Author: 
+        Url: 
+        Description: 
 --- !u!4 &1899545357
 Transform:
   m_ObjectHideFlags: 0
@@ -2705,10 +2833,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: -3956505258223990651, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
---- !u!95 &1957541973 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4870552773557632513, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
-  m_PrefabInstance: {fileID: 1957541972}
+--- !u!1 &1981032842 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+  m_PrefabInstance: {fileID: 680260205}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2024174977
 PrefabInstance:

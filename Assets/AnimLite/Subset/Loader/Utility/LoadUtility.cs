@@ -26,10 +26,20 @@ namespace AnimLite.Utility
     static public class StreamOpenUtility
     {
 
-
+        // ReadAsync() などの非同期メソッドは、Task.Run() の非同期と同じらしい（ＧＵＩスレッドをブロックさせないなどの意味しかない）
+        // だがこちらの方が圧倒的にはやい、なぜだろう…（ドキュメントには小さいファイルでは不利とはあったが）
         public static Stream OpenReadFileStream(this PathUnit path) =>
-            new FileStream(path, FileMode.Open, FileAccess.Read);
+        new FileStream(path, FileMode.Open, FileAccess.Read);
 
+
+        // ちゃんとした I/O の非同期になるが、ものによってはかなり遅くなるようだ
+        public static Stream OpenAsyncReadFileStream(this PathUnit path)
+        {
+            #if UNITY_EDITOR
+                Debug.Log($"open file with async i/o mode: {path.Value}");
+            #endif
+            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
+        }
 
 
         public static async ValueTask<Stream> OpenStreamFileOrWebAsync(this PathUnit path, CancellationToken ct) =>
@@ -37,9 +47,13 @@ namespace AnimLite.Utility
             {
                 var x when x.IsHttp() =>
                     await path.LoadFromWebAsync(ct),
+                //var x when x.Value.EndsWith(".vrm", StringComparison.InvariantCultureIgnoreCase) || x.Value.EndsWith(".vmd", StringComparison.InvariantCultureIgnoreCase) =>
+                var x when new FileInfo(x).Length >= 3 * 1024 * 1024 =>// サイズに根拠はないが 3MB とした
+                    path.OpenAsyncReadFileStream(),
                 _ =>
                     path.OpenReadFileStream(),
             };
+
 
 
         public static async ValueTask<Stream> OpenStreamFileOrWebOrAssetAsync<TAsset>(

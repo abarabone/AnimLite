@@ -88,7 +88,7 @@ namespace AnimLite.Samples
 
             graph.CreateVmdAnimationJobWithSyncScript(this.anim, job, delay: 1);
 
-            graph.CreateVmdFaceAnimation(anim, faceKeyFinder, face, timer, delay: 1);
+            graph.CreateVmdFaceAnimation(anim.gameObject, faceKeyFinder, face, timer, delay: 1);
 
 
             graph.Play();

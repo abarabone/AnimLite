@@ -80,19 +80,6 @@ namespace AnimLite.Utility
             };
         }
 
-        //public static async ValueTask<AudioClipAsDisposable> LoadAudioClipInArchiveExAsync(
-        //    this PathUnit entrypath, ZipArchive zip, CancellationToken ct)
-        //{
-        //    if (!entrypath.IsFullPath())
-        //    {
-        //        var clip = await zip.UnzipAsync(entrypath, s => s.LoadAudioClipViaTmpFileAsync(entrypath, ct));
-
-        //        if (clip.clip != null) return clip;
-        //    }
-
-        //    return await entrypath.ToFullPath().LoadAudioClipAsync(ct);
-        //}
-
 
 
         //public static async Awaitable<AudioClip> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct) =>

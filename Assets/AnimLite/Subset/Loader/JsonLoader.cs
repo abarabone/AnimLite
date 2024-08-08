@@ -49,24 +49,19 @@ namespace AnimLite.Utility
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
-            return path.ToFullPath().DividZipAndEntry() switch
+            var fullpath = path.ToFullPath();
+            fullpath.ThrowIfAccessedOutsideOfParentFolder();
+
+            return fullpath.DividZipAndEntry() switch
             {
                 var (zippath, _) when zippath != "" =>
                     await openAsync_(zippath).OpenZipAsync(),
                 _ =>
-                    null,
+                    null,// ありえない
             };
         }
 
 
-
-        //public static async ValueTask<T> ReadJsonExAsync<T>(
-        //    this PathUnit entrypath, ZipArchive archive, CancellationToken ct)
-        //=>
-        //    archive == null
-        //        ? await entrypath.ReadJsonExAsync<T>(ct)
-        //        : await entrypath.ToZipEntryPath().ReadJsonInArchiveExAsync<T>(archive, ct);
-        //// .json だけは .zip 自体の entry path を参照する。他のメディアでは .json に記されたパスを entry path と解釈する。
 
         public static async ValueTask<T> ReadJsonExAsync<T>(
             this PathUnit path, ZipArchive archive, CancellationToken ct)
@@ -110,21 +105,6 @@ namespace AnimLite.Utility
             };
         }
 
-        //public static async ValueTask<T> ReadJsonInArchiveExAsync<T>(
-        //    this PathUnit zipentrypath, ZipArchive zip, CancellationToken ct)
-        //{
-        //    var json = zipentrypath switch
-        //    {
-        //        _ when zipentrypath != "" =>
-        //            await zip.UnzipAsync(zipentrypath, DeserializeJsonAsync<T>),
-        //        _ =>
-        //            await zip.UnzipFirstEntryAsync(".json", DeserializeJsonAsync<T>),
-        //    };
-
-        //    return json ?? await zipentrypath.ToFullPath()
-        //        .OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct)
-        //        .UsingAsync(DeserializeJsonAsync<T>);
-        //}
 
 
 

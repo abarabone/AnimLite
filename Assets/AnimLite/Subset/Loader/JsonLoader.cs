@@ -21,7 +21,7 @@ namespace AnimLite.Utility
     using AnimLite.Vmd;
     using AnimLite.Vrm;
     using System.IO.Compression;
-    using UnityEditor.VersionControl;
+    //using UnityEditor.VersionControl;
     using static AnimLite.DancePlayable.DanceGraphy2;
 
 
@@ -89,7 +89,7 @@ namespace AnimLite.Utility
         public static async ValueTask<T> ReadJsonExAsync<T>(this PathUnit path, CancellationToken ct)
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
-                path.OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct);
+                path.OpenStreamFileOrWebOrAssetAsync<TextAsset>(asset => asset.bytes, ct);
 
             var fullpath = path.ToFullPath();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();

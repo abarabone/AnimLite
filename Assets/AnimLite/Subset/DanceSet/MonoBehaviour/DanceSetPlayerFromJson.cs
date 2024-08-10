@@ -12,7 +12,7 @@ namespace AnimLite.DancePlayable
     using AnimLite.Utility;
     using AnimLite.Vrm;
     using AnimLite.Vmd;
-    using static UnityEditor.Progress;
+    //using static UnityEditor.Progress;
     using System.Collections.Generic;
     using static AnimLite.DancePlayable.DanceGraphy2;
 

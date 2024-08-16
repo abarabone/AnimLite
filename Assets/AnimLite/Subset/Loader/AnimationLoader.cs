@@ -35,32 +35,26 @@ namespace AnimLite.Vmd
 
 
 
-        public static async ValueTask<VmdMotionData> ParseVmdExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct)
+        public static async ValueTask<VmdMotionData> LoadVmdExAsync(
+            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
 
             if (archive != null && !path.IsFullPath())
             {
-                var data = await archive.UnzipAsync(path, parseVmdViaMemoryStreamAsync_);
+                var data = archive.Unzip(path, VmdParser.ParseVmd);
 
                 if (data.bodyKeyStreams != null) return data;
             }
 
-            return await path.ParseVmdExAsync(ct);
-        }
-
-        //public static async ValueTask<VmdMotionData> ParseVmdExAsync(
-        //    this PathUnit path, ZipArchive archive, CancellationToken ct)
-        //=>
-        //    archive == null
-        //        ? await path.ParseVmdExAsync(ct)
-        //        : await path.ParseVmdInArchiveExAsync(archive, ct);
+            return await path.LoadVmdExAsync(ct);
+        });
 
 
 
 
-
-        public static async ValueTask<VmdMotionData> ParseVmdExAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<VmdMotionData> LoadVmdExAsync(this PathUnit path, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
                 path.OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct);
@@ -71,27 +65,27 @@ namespace AnimLite.Vmd
             return fullpath.DividZipAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath).UnzipAsync(entrypath, parseVmdViaMemoryStreamAsync_),
-                var (zippath, _) when fullpath.IsZip() => 
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".vmd", parseVmdViaMemoryStreamAsync_),
+                    await openAsync_(zippath).UnzipAsync(entrypath, VmdParser.ParseVmd),
+                var (zippath, _) when fullpath.IsZip() =>
+                    await openAsync_(zippath).UnzipFirstEntryAsync(".vmd", VmdParser.ParseVmd),
                 _ =>
                     await openAsync_(fullpath).UsingAsync(VmdParser.ParseVmd),
             };
-        }
+        });
 
 
 
 
-        /// <summary>
-        /// zip などのストリームをシーク可能にするために、メモリーストリームを介してパースする
-        /// </summary>
-        static async ValueTask<VmdMotionData> parseVmdViaMemoryStreamAsync_(Stream s)
-        {
-            using var m = new MemoryStream();
-            await s.CopyToAsync(m);
+        /////// <summary>
+        /////// zip などのストリームをシーク可能にするために、メモリーストリームを介してパースする
+        /////// </summary>
+        //static async ValueTask<VmdMotionData> parseVmdViaMemoryStreamAsync_(Stream s)
+        //{
+        //    using var m = new MemoryStream();
+        //    await s.CopyToAsync(m);
 
-            return VmdParser.ParseVmd(m);
-        }
+        //    return VmdParser.ParseVmd(m);
+        //}
 
     }
 }

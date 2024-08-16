@@ -14,16 +14,17 @@ namespace AnimLite.Vmd
     using AnimLite.Utility;
     using AnimLite.DancePlayable;
     using AnimLite.Utility.Linq;
-    using VRM;
+    //using VRM;
 
 
+    [Serializable]
     public class VmdCacheDictionary
     {
 
         //Dictionary<PathUnit, DataCache> cache { get; } = new();
         ConcurrentDictionary<PathUnit, AsyncLazy<InnerCache>> cache { get; } = new();
 
-        CancellationTokenSource cts = new();
+        //CancellationTokenSource cts = new();
 
 
         struct InnerCache
@@ -42,12 +43,12 @@ namespace AnimLite.Vmd
 
 
 
-        public Awaitable<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
+        public Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
             PathUnit vmdpath, PathUnit facemappath, CancellationToken ct) =>
                 GetOrLoadAsync(vmdpath, facemappath, null, ct);
 
 
-        public async Awaitable<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
+        public async Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
             PathUnit vmdpath, PathUnit facemappath, ZipArchive archive, CancellationToken ct)
         {
 

@@ -15,8 +15,9 @@ namespace AnimLite.DancePlayable
     //using static UnityEditor.Progress;
     using System.Collections.Generic;
     using static AnimLite.DancePlayable.DanceGraphy2;
+    using System.IO.Compression;
 
-    public class DanceSetPlayerFromJson : DanceSetPlayerBase
+    public class DanceSetPlayerFromJson : MonoBehaviour
     {
         public Transform LookAtTarget;
         public AudioSource AudioSource;
@@ -32,47 +33,62 @@ namespace AnimLite.DancePlayable
         public PlayableGraph Graph => this.graphy.graph;
 
 
-        public override Awaitable<DanceSetDefineData> WaitForPlayingAsync => this._waitForPlaying.Awaitable;
+        [SerializeField]
+        public DanceSceneCaptionBase DanceSceneCaption;
 
-        AwaitableCompletionSource<DanceSetDefineData> _waitForPlaying = new();
 
 
-        private async void Start()
+        public SemaphoreSlim DanceSemapho { get; } = new SemaphoreSlim(1, 1);
+
+        CancellationTokenSource cts;
+
+
+
+
+        private async Awaitable OnEnable()
         {
-            var ct = this.destroyCancellationToken;
-            //this._waitForPlaying.Reset();
+            this.DanceSceneCaption?.SetEnable(true);
+            this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
+            var ct = this.cts.Token;
 
             try
             {
-                await Task.Run(async () =>
+                "load start".ShowDebugLog();
+                using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
-                    var path = this.JsonFile;//.ToFullPath();
-                    using var archive = await path.OpenZipAsync(ct);
-
-                    var json = await path.ReadJsonExAsync<DanceSetJson>(archive, ct);
-                    var ds = json.ToData();
-                    var order = await ds.BuildDanceOrderAsync(archive, this.Cache, this.AudioSource, ct);
-                    await ds.OrverrideInformationIfBlankAsync(order);
+                    var jsonpath = this.JsonFile;
+                    using var archive = await jsonpath.OpenZipAsync(ct);
+                    var ds = await jsonpath.LoadDanceSceneAsync(archive, ct);
+                    var order = await ds.BuildDanceGraphyOrderAsync(this.Cache, archive, this.AudioSource, ct);
 
                     await Awaitable.MainThreadAsync();
                     this.graphy = DanceGraphy2.CreateGraphy(order);
 
                     this.graphy.graph.Play();
-                    this._waitForPlaying.SetResult(ds);
+                    this.DanceSceneCaption?.NortifyPlaying(ds);
 
                     adjustModel_(order);
                     changeVisibility_(order, true);
-                });
+                }
+                "load end".ShowDebugLog();
             }
             catch (OperationCanceledException e)
             {
-                this._waitForPlaying.SetCanceled();
                 e.Message.ShowDebugLog();
+                this.graphy?.Dispose();
+                this.graphy = null;
             }
             catch (Exception e)
             {
-                this._waitForPlaying.SetException(e);
                 Debug.LogError(e);
+                this.graphy?.Dispose();
+                this.graphy = null;
+            }
+            finally
+            {
+                this.cts.Dispose();
+                this.cts = null;
+                "canceller disposed".ShowDebugLog();
             }
 
             return;
@@ -81,9 +97,9 @@ namespace AnimLite.DancePlayable
             void changeVisibility_(Order order, bool isVisible)
             {
                 order.BackGrouds
-                    ?.ForEach(x => x.Model.SetActive(isVisible));
+                    ?.ForEach(x => x.Model?.SetActive(isVisible));
                 order.Motions
-                    ?.ForEach(x => x.Model.SetActive(isVisible));
+                    ?.ForEach(x => x.Model?.SetActive(isVisible));
             }
 
             void adjustModel_(Order order)
@@ -91,15 +107,30 @@ namespace AnimLite.DancePlayable
                 order.Motions
                     .ForEach(x =>
                     {
-                        x.Model.GetComponent<UniVRM10.Vrm10Instance>().AdjustLootAt(Camera.main.transform);
-                        x.FaceRenderer.AdjustBbox(x.Model.GetComponent<Animator>());
+                        x.Model?.GetComponent<UniVRM10.Vrm10Instance>()?.AdjustLootAt(Camera.main.transform);
+                        x.FaceRenderer?.AdjustBbox(x.Model.GetComponent<Animator>());
                     });
             }
         }
 
-        private void OnDestroy()
+        private async Awaitable OnDisable()
         {
-            this.graphy?.Dispose();
+            await Err.LoggingAsync(async () =>
+            {
+                this.cts?.Cancel();
+
+                "disable start".ShowDebugLog();
+                using (await this.DanceSemapho.WaitAsyncDisposable(default))// ゲームオブジェクトが破棄されても、解放はやり切ってほしいので Token は default
+                {
+                    await (this.Cache?.HideAndDestroyModelAsync() ?? default);
+
+                    this.graphy?.Dispose();
+                    this.graphy = null;
+                }
+                "disable end".ShowDebugLog();
+
+                this.DanceSceneCaption?.SetEnable(false);
+            });
         }
     }
 

@@ -13,12 +13,9 @@ namespace AnimLite.DancePlayable
     //using AnimLite.Vrm;
     //using AnimLite.Vmd;
 
-    public class DanceSetSimpleCaption : MonoBehaviour
+    public class DanceSetSimpleCaption : DanceSceneCaptionBase
     {
 
-        [SerializeField]
-        //[SerializeReference]
-        public DanceSetPlayerBase DanceSetPlayer;
 
         public Canvas Canvas;
         public CanvasGroup LoadingGroup;
@@ -31,6 +28,14 @@ namespace AnimLite.DancePlayable
         CancellationTokenSource cts;
 
 
+
+        public override void NortifyPlaying(DanceSetDefineData ds) => this.waitForPlaying.SetResult(ds);
+
+        AwaitableCompletionSource<DanceSetDefineData> waitForPlaying = new();
+
+
+
+
         private void Awake()
         {
             this.Canvas.gameObject.SetActive(false);
@@ -39,6 +44,7 @@ namespace AnimLite.DancePlayable
         private async Awaitable OnEnable()
         {
             this.Canvas.gameObject.SetActive(true);
+            this.waitForPlaying.Reset();
 
             try
             {
@@ -47,7 +53,7 @@ namespace AnimLite.DancePlayable
 
                 showInfomatonCaption_(false);
 
-                var ds = await this.DanceSetPlayer.WaitForPlayingAsync;
+                var ds = await this.waitForPlaying.Awaitable;
                 ct.ThrowIfCancellationRequested();
 
                 showInfomatonCaption_(true);
@@ -107,7 +113,7 @@ namespace AnimLite.DancePlayable
 
                             var author = string.Join("\r\n", new[]
                             {
-                                    model, anim,
+                                model, anim,
                             }
                             .Where(x => x != "")
                             .Select(x => $"<size=80%><indent=1em>{x}"));

@@ -6,7 +6,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Concurrent;
-using VRM;
+//using VRM;
 
 namespace AnimLite.Vmd
 {
@@ -28,7 +28,11 @@ namespace AnimLite.Vmd
     public class VmdStreamDataCache : MonoBehaviour
     {
 
+        [SerializeField]
         VmdCacheDictionary Cache = new();
+
+        [SerializeField]
+        ModelGameObjectStocker ModelStocker = new();// Ç∆ÇËÇ†Ç¶Ç∏Ç±Ç±Ç…íuÇ≠Ç™ÅAçló∂Ç∑ÇÈÇ±Ç∆
 
 
         public async Awaitable OnDisable()
@@ -54,6 +58,20 @@ namespace AnimLite.Vmd
 
             return (vmddata, facemap);
         }
+
+
+
+
+        public Task<GameObject> GetOrLoadModelAsync(PathUnit path, CancellationToken ct) =>
+            this.GetOrLoadModelAsync(path, null, ct);
+
+        public Task<GameObject> GetOrLoadModelAsync(PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            this.ModelStocker.GetOrLoadAsync(path, archive, ct);
+
+
+        public ValueTask HideAndDestroyModelAsync() =>
+            this.ModelStocker.TrimGameObjectsAsync();
+
 
 
     }

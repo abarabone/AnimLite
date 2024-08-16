@@ -41,30 +41,40 @@ namespace AnimLite.Utility
     // json は、zip first entry, zip entry, なら zip entry として archive を開いてから、その中の json を開く
     // 
 
-    public static class JsonLoader
+    public static class DanceSceneLoader
     {
 
-
-        public static async ValueTask<ZipArchive> OpenZipAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(this PathUnit path, ZipArchive archive, CancellationToken ct)
         {
-            ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
-            var fullpath = path.ToFullPath();
-            fullpath.ThrowIfAccessedOutsideOfParentFolder();
+            var json = await path.LoadJsonAsync<DanceSetJson>(archive, ct);
 
-            return fullpath.DividZipAndEntry() switch
-            {
-                var (zippath, _) when zippath != "" =>
-                    await openAsync_(zippath).OpenZipAsync(),
-                _ =>
-                    null,// ありえない
-            };
+            return json.ToData();
+
+        }
+
+
+        public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(this PathUnit path, CancellationToken ct)
+        {
+
+            var json = await path.LoadJsonAsync<DanceSetJson>(ct);
+
+            return json.ToData();
+
         }
 
 
 
-        public static async ValueTask<T> ReadJsonExAsync<T>(
-            this PathUnit path, ZipArchive archive, CancellationToken ct)
+    }
+
+
+    public static class JsonLoader
+    {
+
+
+        public static async ValueTask<T> LoadJsonAsync<T>(
+            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             if (archive != null)
             {
@@ -74,19 +84,20 @@ namespace AnimLite.Utility
                         await archive.UnzipAsync(entrypath, DeserializeJsonAsync<T>),
                     _ =>
                         await archive.UnzipFirstEntryAsync(".json", DeserializeJsonAsync<T>),
-                        // .json だけは .zip 自体の entry path を参照する。
-                        // 他のメディアでは .json に記されたパスを entry path と解釈する。
+                    // .json だけは .zip 自体の entry path を参照する。
+                    // 他のメディアでは .json に記されたパスを entry path と解釈する。
                 };
 
                 if (json != null) return json;
             }
 
-            return await path.ReadJsonExAsync<T>(ct);
-        }
+            return await path.LoadJsonAsync<T>(ct);
+        });
 
 
 
-        public static async ValueTask<T> ReadJsonExAsync<T>(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<T> LoadJsonAsync<T>(this PathUnit path, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
                 path.OpenStreamFileOrWebOrAssetAsync<TextAsset>(asset => asset.bytes, ct);
@@ -103,7 +114,7 @@ namespace AnimLite.Utility
                 var (_, _) =>
                     await openAsync_(fullpath).UsingAsync(DeserializeJsonAsync<T>),
             };
-        }
+        });
 
 
 

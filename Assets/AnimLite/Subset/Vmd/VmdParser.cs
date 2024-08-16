@@ -61,11 +61,7 @@ namespace AnimLite.Vmd
         {
             //System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-            s.Seek(0, SeekOrigin.Begin);
-
             using var r = new BinaryReader(s);
-
-            //m.Seek(50, SeekOrigin.Begin);
 
             var (h, n) = header_(r);
             #if UNITY_EDITOR
@@ -121,7 +117,7 @@ namespace AnimLite.Vmd
                 let qy = r.ReadSingle()
                 let qz = r.ReadSingle()
                 let qw = r.ReadSingle()
-                let _ = r.BaseStream.Seek(64, SeekOrigin.Current)
+                let _ = r.ReadBytes(64)
                 let key = new VmdBodyMotionKey
                 {
                     frameno = frameno,

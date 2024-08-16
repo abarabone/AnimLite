@@ -43,7 +43,8 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct)
+            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
 
             if (archive != null && !path.IsFullPath())
@@ -54,7 +55,7 @@ namespace AnimLite.Utility
             }
 
             return await path.LoadAudioClipExAsync(ct);
-        }
+        });
 
 
 
@@ -92,12 +93,12 @@ namespace AnimLite.Utility
         {
             ct.ThrowIfCancellationRequested();
 
-            var atype = Path.GetExtension(path) switch
+            var atype = Path.GetExtension(path).Split('?')[0].ToLower() switch
             {
-                var x when x.StartsWith(".mp3") => AudioType.MPEG,
-                var x when x.StartsWith(".ogg") => AudioType.OGGVORBIS,
-                var x when x.StartsWith(".acc") => AudioType.ACC,
-                var x when x.StartsWith(".wav") => AudioType.WAV,
+                ".mp3" => AudioType.MPEG,
+                ".ogg" => AudioType.OGGVORBIS,
+                ".acc" => AudioType.ACC,
+                ".wav" => AudioType.WAV,
                 _ => AudioType.UNKNOWN,
             };
 #if UNITY_EDITOR
@@ -132,6 +133,18 @@ namespace AnimLite.Utility
 
                 return clip;
             }
+            //AudioClip getAudioClip_(UnityWebRequest req)
+            //{
+            //    try
+            //    {
+            //        return DownloadHandlerAudioClip.GetContent(req);
+            //    }
+            //    catch (System.InvalidOperationException e)
+            //    {
+            //        Debug.LogWarning(e);
+            //        return null;
+            //    }
+            //}
         }
 
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipViaTmpFileAsync(
@@ -173,6 +186,7 @@ namespace AnimLite.Utility
 
     }
 
+    [Serializable]
     public struct AudioClipAsDisposable : IDisposable
     {
         public AudioClip clip;// { get; private set; }

@@ -15,7 +15,6 @@ using Unity.VisualScripting;
 
 namespace AnimLite.Utility
 {
-    using AnimLite.Utility;
     using AnimLite.Utility.Linq;
 
     using AnimLite.Vmd;
@@ -108,7 +107,7 @@ namespace AnimLite.Utility
                 },
 
                 BackGrounds = Enumerable.ToArray(
-                    from model in json.BackGrounds ?? json.BackGrounds.EmptyEnumerable()
+                    from model in json.BackGrounds ?? json.BackGrounds.EmptyEnumerable().Box()
                     select new ModelDefineData()
                     {
                         ModelFilePath = model.ModelFilePath,
@@ -163,167 +162,206 @@ namespace AnimLite.Utility
 
 
 
-    public static class DanceSetBuildUtility
-    {
+    //public static class DanceSetBuildUtility
+    //{
 
-        //public static async ValueTask<Order> a(
-        //    this PathUnit jsonpath, VmdStreamDataCache cache, CancellationToken ct)
-        //{
-        //    using var archive = await jsonpath.OpenZipAsync(ct);
+    //    //public static async ValueTask<Order> a(
+    //    //    this PathUnit jsonpath, VmdStreamDataCache cache, CancellationToken ct)
+    //    //{
+    //    //    using var archive = await jsonpath.OpenZipAsync(ct);
 
-        //    var json = archive == null
-        //        ? await jsonpath.ReadJsonExAsync<DanceSetJson>(ct)
-        //        : await jsonpath.ToZipEntryPath().ReadJsonExAsync<DanceSetJson>(archive, ct);
+    //    //    var json = archive == null
+    //    //        ? await jsonpath.ReadJsonExAsync<DanceSetJson>(ct)
+    //    //        : await jsonpath.ToZipEntryPath().ReadJsonExAsync<DanceSetJson>(archive, ct);
 
-        //    var ds = json.ToData();
+    //    //    var ds = json.ToData();
 
-        //    return ds;
-        //}
-
-
-        public static ValueTask<Order> BuildDanceOrderAsync(
-            this DanceSetDefineData ds, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
-        =>
-            ds.BuildDanceOrderAsync(null, cache, audioSource, ct);
+    //    //    return ds;
+    //    //}
 
 
-
-        public static async ValueTask<Order> BuildDanceOrderAsync(
-            this DanceSetDefineData ds, ZipArchive archive, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
-        {
-
-            var aorder =
-                await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct);
-
-            var bgorder = archive == null
-                ? await ds.BackGrounds
-                    .Select(model => Task.Run(() => model.buildBackGroundOrderAsync(archive, ct)))
-                    .WhenAll()
-                : await ds.BackGrounds.ToAsyncEnumerable()
-                    .SelectAwait(async model => await model.buildBackGroundOrderAsync(archive, ct))
-                    .ToArrayAsync()
-                ;
-
-            // どうも ziparchive はマルチスレッドに対応してないっぽいので、暫定的に非同期列挙で対応。なんとかならんか？
-            var morders = archive == null
-                ? await ds.Motions
-                    .Select(motion => Task.Run(() => motion.buildMotionOrderAsync(archive, cache, ct)))
-                    .WhenAll()
-                : await ds.Motions.ToAsyncEnumerable()
-                    .SelectAwait(async motion => await motion.buildMotionOrderAsync(archive, cache, ct))
-                    .ToArrayAsync()
-                ;
-            //var morders = await ds.Motions
-            //        .Select(motion => motion.buildMotionOrderAsync(archive, cache, ct))
-            //        .WhenAll();
-
-            var disposeAction = (aorder, bgorder, morders).buildDisposeAction();
-            ct.ThrowIfCancellationRequested(disposeAction);
-
-            return new()
-            {
-                Audio = aorder,
-                BackGrouds = bgorder,
-                Motions = morders,
-                DisposeAction = disposeAction,
-            };
-        }
+    //    public static ValueTask<Order> BuildDanceOrderAsync(
+    //        this DanceSetDefineData ds, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
+    //    =>
+    //        ds.BuildDanceOrderAsync(null, cache, audioSource, ct);
 
 
-        static async ValueTask<AudioOrder> buildAudioOrderAsync(
-            this AudioDefineData audio, ZipArchive archive, AudioSource audioSource, CancellationToken ct) =>
-                new()
-                {
-                    AudioSource = audioSource,
-                    AudioClip = await audio.AudioFilePath.LoadAudioClipExAsync(archive, ct),
-                    Volume = audio.Volume,
-                    DelayTime = audio.DelayTime,
-                };
+
+    //    public static async ValueTask<Order> BuildDanceOrderAsync(
+    //        this DanceSetDefineData ds, ZipArchive archive, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
+    //    {
+
+    //        var aorder =
+    //            await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct);
+
+    //        var bgorder = archive == null
+    //            ? await ds.BackGrounds
+    //                .Select(model => Task.Run(() => model.buildBackGroundOrderAsync(archive, ct)))
+    //                .WhenAll()
+    //            : await ds.BackGrounds.ToAsyncEnumerable()
+    //                .SelectAwait(async model => await model.buildBackGroundOrderAsync(archive, ct))
+    //                .ToArrayAsync()
+    //            ;
+
+    //        // どうも ziparchive はマルチスレッドに対応してないっぽいので、暫定的に非同期列挙で対応。なんとかならんか？
+    //        var morders = archive == null
+    //            ? await ds.Motions
+    //                .Select(motion => Task.Run(() => motion.buildMotionOrderAsync(archive, cache, ct)))
+    //                .WhenAll()
+    //            : await ds.Motions.ToAsyncEnumerable()
+    //                .SelectAwait(async motion => await motion.buildMotionOrderAsync(archive, cache, ct))
+    //                .ToArrayAsync()
+    //            ;
+    //        //var morders = await ds.Motions
+    //        //        .Select(motion => motion.buildMotionOrderAsync(archive, cache, ct))
+    //        //        .WhenAll();
+
+    //        var disposeAction = (aorder, bgorder, morders).buildDisposeAction();
+    //        ct.ThrowIfCancellationRequested(disposeAction);
+
+    //        return new()
+    //        {
+    //            Audio = aorder,
+    //            BackGrouds = bgorder,
+    //            Motions = morders,
+    //            DisposeAction = disposeAction,
+    //        };
+    //    }
 
 
-        static async Task<ModelOrder> buildBackGroundOrderAsync(
-            this ModelDefineData model, ZipArchive archive, CancellationToken ct)
-        =>
-            new()
-            {
-                Model = await model.ModelFilePath.LoadModelExAsync(archive, ct),
-                Position = model.Position,
-                Rotation = model.Rotation,
-                Scale = model.Scale,
-            };
+    //    static async ValueTask<AudioOrder> buildAudioOrderAsync(
+    //        this AudioDefineData audio, ZipArchive archive, AudioSource audioSource, CancellationToken ct) =>
+    //            new()
+    //            {
+    //                AudioSource = audioSource,
+    //                AudioClip = await audio.AudioFilePath.LoadAudioClipExAsync(archive, ct),
+    //                Volume = audio.Volume,
+    //                DelayTime = audio.DelayTime,
+    //            };
+
+
+    //    static async Task<ModelOrder> buildBackGroundOrderAsync(
+    //        this ModelDefineData model, ZipArchive archive, CancellationToken ct)
+    //    =>
+    //        new()
+    //        {
+    //            Model = await model.ModelFilePath.LoadModelExAsync(archive, ct),
+    //            Position = model.Position,
+    //            Rotation = model.Rotation,
+    //            Scale = model.Scale,
+    //        };
         
 
-        static async Task<MotionOrder> buildMotionOrderAsync(
-            this DanceMotionDefineData motion, ZipArchive archive, VmdStreamDataCache cache, CancellationToken ct)
-        {
-            var model = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
+    //    static async Task<MotionOrder> buildMotionOrderAsync(
+    //        this DanceMotionDefineData motion, ZipArchive archive, VmdStreamDataCache cache, CancellationToken ct)
+    //    {
+    //        var model = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
 
-            var vmdfullpath = motion.Animation.AnimationFilePath;
-            var facefullpath = motion.Animation.FaceMappingFilePath;
-            var (vmddata, facemap) = cache == null
-                ? await buildAsync_()
-                : await buildWithCacheAsync_();
+    //        var vmdpath = motion.Animation.AnimationFilePath;
+    //        var facepath = motion.Animation.FaceMappingFilePath;
+    //        var (vmddata, facemap) = cache == null
+    //            ? await buildAsync_()
+    //            : await buildWithCacheAsync_();
 
-            await Awaitable.MainThreadAsync();
-            return motion.toOrder(vmddata, facemap, model);
-
-
-            async ValueTask<(VmdStreamData, VmdFaceMapping)> buildWithCacheAsync_()
-            {
-                var res = await cache.GetOrLoadVmdStreamDataAsync(vmdfullpath, facefullpath, archive, ct);
-
-                return (res.vmddata, res.facemap);
-            }
-            async ValueTask<(VmdStreamData, VmdFaceMapping)> buildAsync_()
-            {
-                var facemap = await facefullpath.LoadFaceMapExAsync(archive, ct);
-                var vmddata = await vmdfullpath.LoadVmdStreamDataExAsync(facemap, archive, ct);
-
-                return (vmddata, facemap);
-            }
-        }
+    //        await Awaitable.MainThreadAsync();
+    //        return motion.toOrder(vmddata, facemap, model);
 
 
-        static MotionOrder toOrder(
-            this DanceMotionDefineData m, VmdStreamData vmddata, VmdFaceMapping facemap, GameObject model)
-        {
-            return new MotionOrder
-            {
-                Model = model,
-                FaceRenderer = model.FindFaceRenderer(),
+    //        async ValueTask<(VmdStreamData, VmdFaceMapping)> buildWithCacheAsync_()
+    //        {
+    //            var res = await cache.GetOrLoadVmdStreamDataAsync(vmdpath, facepath, archive, ct);
 
-                vmddata = vmddata,
-                bone = model.GetComponent<Animator>().BuildVmdPlayableJobTransformMappings(),
-                face = facemap.BuildStreamingFace(),
+    //            return (res.vmddata, res.facemap);
+    //        }
+    //        async ValueTask<(VmdStreamData, VmdFaceMapping)> buildAsync_()
+    //        {
+    //            var facemap = await facepath.LoadFaceMapExAsync(archive, ct);
+    //            var vmddata = await vmdpath.LoadVmdStreamDataExAsync(facemap, archive, ct);
 
-                DelayTime = m.Animation.DelayTime,
-                BodyScale = m.Options.BodyScaleFromHuman,
-                FootIkMode = m.Options.FootIkMode,
+    //            return (vmddata, facemap);
+    //        }
+    //    }
 
-                //OverWritePositionAndRotation = m.Model.UsePositionAndDirection,
-                Position = m.Model.Position,
-                Rotation = m.Model.Rotation,
-                Scale = m.Model.Scale,
-            };
-        }
 
-        static Action buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrder[] motions) order) =>
-            () =>
-            {
-                order.audio.AudioClip.Dispose();
+    //    static MotionOrder toOrder(
+    //        this DanceMotionDefineData m, VmdStreamData vmddata, VmdFaceMapping facemap, GameObject model)
+    //    {
+    //        return new MotionOrder
+    //        {
+    //            Model = model,
+    //            FaceRenderer = model.FindFaceRenderer(),
 
-                foreach (var bg in order.bgs)
-                {
-                    bg.Model.AsUnityNull()?.Destroy();
-                }
+    //            vmddata = vmddata,
+    //            bone = model.GetComponent<Animator>().BuildVmdPlayableJobTransformMappings(),
+    //            face = facemap.BuildStreamingFace(),
 
-                foreach (var m in order.motions)
-                {
-                    //m.face.Dispose();
-                    m.bone.Dispose();
-                    m.vmddata.Dispose();
-                    m.Model.AsUnityNull()?.Destroy();
-                }
-            };
-    }
+    //            DelayTime = m.Animation.DelayTime,
+    //            BodyScale = m.Options.BodyScaleFromHuman,
+    //            FootIkMode = m.Options.FootIkMode,
+
+    //            //OverWritePositionAndRotation = m.Model.UsePositionAndDirection,
+    //            Position = m.Model.Position,
+    //            Rotation = m.Model.Rotation,
+    //            Scale = m.Model.Scale,
+    //        };
+    //    }
+
+    //    static Action buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrder[] motions) order) =>
+    //        () =>
+    //        {
+    //            order.audio.AudioClip.Dispose();
+
+    //            foreach (var bg in order.bgs)
+    //            {
+    //                bg.Model.AsUnityNull()?.Destroy();
+    //            }
+
+    //            foreach (var m in order.motions)
+    //            {
+    //                //m.face.Dispose();
+    //                m.bone.Dispose();
+    //                m.vmddata.Dispose();
+    //                m.Model.AsUnityNull()?.Destroy();
+    //            }
+    //        };
+    //}
+
+
+
+    //public struct VrmModelLoader : ILoader<GameObject>
+    //{
+    //    public ValueTask<GameObject> LoadAsync(PathUnit path, CancellationToken ct)
+    //    {
+    //        return path.LoadModelExAsync(ct);
+    //    }
+    //}
+    //public class VrmModelLoaderWithCache : ILoader<GameObject>
+    //{
+    //    public ModelGameObjectStocker stocker;
+
+    //    public ValueTask<GameObject> LoadAsync(PathUnit path, CancellationToken ct)
+    //    {
+    //        return new ValueTask<GameObject>(this.stocker.GetOrLoadAsync(path, null, ct));
+    //    }
+    //}
+    //public class VrmModelLoaderInArchive : ILoader<GameObject>
+    //{
+    //    public ZipArchive archive;
+
+    //    public ValueTask<GameObject> LoadAsync(PathUnit path, CancellationToken ct)
+    //    {
+    //        return path.LoadModelExAsync(this.archive, ct);
+    //    }
+    //}
+    //public class VrmModelLoaderInArchiveWithCache : ILoader<GameObject>
+    //{
+    //    public ZipArchive archive;
+    //    public ModelGameObjectStocker stocker;
+
+    //    public ValueTask<GameObject> LoadAsync(PathUnit path, CancellationToken ct)
+    //    {
+    //        return new ValueTask<GameObject>(this.stocker.GetOrLoadAsync(path, this.archive, ct)); 
+    //    }
+    //}
+
 }

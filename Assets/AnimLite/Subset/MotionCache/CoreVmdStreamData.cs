@@ -24,6 +24,7 @@ namespace AnimLite.Utility
     /// <summary>
     /// データキャッシュ用のストリームデータ。
     /// ストリームキャッシュは構築しない。
+    /// 参照カウントで管理され、カウントは interlocked で行われる。
     /// </summary>
     public class CoreVmdStreamData : IDisposable
     {
@@ -34,12 +35,12 @@ namespace AnimLite.Utility
         //public VmdFaceMapping FaceMap;
 
         int refCount;
-        public CoreVmdStreamData AddRef() { this.refCount++; return this; }
+        public CoreVmdStreamData AddRef() { Interlocked.Increment(ref this.refCount); return this; }
 
         public void Dispose()
         {
-            //if (--this.refCount > 0) return;
-            if (--this.refCount > 0)
+            //if ((Interlocked.Decrement(ref this.refCount) > 0) return;
+            if (Interlocked.Decrement(ref this.refCount) > 0)
             {
                 $"VmdStreamData core : {this.refCount}".ShowDebugLog();
                 return;
@@ -64,7 +65,8 @@ namespace AnimLite.Utility
         public static async ValueTask<CoreVmdStreamData> LoadVmdCoreDataExAsync(
             this PathUnit vmdpath, VmdFaceMapping facemap, ZipArchive archive, CancellationToken ct)
         {
-            var vmddata = await VmdParser.ParseVmdExAsync(vmdpath, archive, ct);
+            var vmddata = await VmdParser.LoadVmdExAsync(vmdpath, archive, ct);
+            if (vmddata.bodyKeyStreams == null) return default;
 
             var rot_data = vmddata.bodyKeyStreams.CreateRotationData();
             var pos_data = vmddata.bodyKeyStreams.CreatePositionData();
@@ -100,6 +102,8 @@ namespace AnimLite.Utility
 
         public static VmdStreamData CloneShallowlyWithCache(this CoreVmdStreamData srcvmddata)
         {
+            if (srcvmddata == default) return default;
+
             var timer = new StreamingTimer(srcvmddata.RotationStreams.Streams.GetLastKeyTime());
 
             var dstvmddata = new VmdStreamData

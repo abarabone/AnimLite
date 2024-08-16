@@ -435,12 +435,12 @@ namespace AnimLite.experimental.a
         public static float CalculateBodyLengthAverage(this Animator anim, Dictionary<VmdBoneName, VmdBodyMotionKey[]> vmddata)
         {
             var human = new[]
-                {
-                    HumanBodyBones.LeftLowerLeg,
-                    HumanBodyBones.LeftFoot,
-                    HumanBodyBones.LeftLowerArm,
-                    HumanBodyBones.LeftHand,
-                };
+            {
+                HumanBodyBones.LeftLowerLeg,
+                HumanBodyBones.LeftFoot,
+                HumanBodyBones.LeftLowerArm,
+                HumanBodyBones.LeftHand,
+            };
             var vmd = new[]
             {
                 "ç∂Ç–Ç¥",

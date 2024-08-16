@@ -58,7 +58,8 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct)
+            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             if (!path.IsBlank() && archive != null && !path.IsFullPath())
             {
@@ -68,7 +69,7 @@ namespace AnimLite.Vrm
             }
 
             return await path.LoadFaceMapExAsync(ct);
-        }
+        });
 
         //public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
         //    this PathUnit entrypath, ZipArchive archive, CancellationToken ct)
@@ -84,8 +85,8 @@ namespace AnimLite.Vrm
         /// as resourse     … リソース
         /// その他          … ファイル or http
         /// </summary>
-        public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
-            this PathUnit path, CancellationToken ct)
+        public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(this PathUnit path, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             //if (path.IsBlank()) path = "face_map_default as resource";
             if (path.IsBlank()) return await VrmParser.DefaultFacemampAsync;
@@ -105,7 +106,7 @@ namespace AnimLite.Vrm
                 var (_, _) =>
                     await openAsync_(fullpath).UsingAsync(s => s.ParseFaceMapAsync(ct)),
             };
-        }
+        });
 
 
     }

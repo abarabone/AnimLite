@@ -191,7 +191,7 @@ namespace AnimLite.DancePlayable
 
                 foreach (var order in orders)
                 {
-                    var timer = new StreamingTimer(order.vmddata.RotationStreams.Streams.GetLastKeyTime());
+                    var timer = new StreamingTimer(order?.vmddata?.RotationStreams.Streams.GetLastKeyTime() ?? default);
 
                     createBodyMotion_(order, timer);
 
@@ -206,6 +206,10 @@ namespace AnimLite.DancePlayable
 
                 void createBodyMotion_(MotionOrder order, StreamingTimer timer)
                 {
+                    if (order == null) return;
+                    if (order.vmddata == null) return;
+                    if (order.Model.IsUnityNull()) return;
+
                     var pkf = order.vmddata.PositionStreams
                         .ToKeyFinderWith<Key4CatmulPos, Clamp>();
 
@@ -219,8 +223,8 @@ namespace AnimLite.DancePlayable
 
                 void createFaceMotion_(MotionOrder order, StreamingTimer timer)
                 {
-                    if (order.face.Expressions == default) return;
-                    if (order.FaceRenderer.AsUnityNull() == default) return;
+                    if (order.face.Expressions == null) return;
+                    if (order.FaceRenderer.IsUnityNull()) return;
 
                     var fkf = order.vmddata.FaceStreams
                         .ToKeyFinderWith<Key2NearestShift, Clamp>();
@@ -231,6 +235,7 @@ namespace AnimLite.DancePlayable
 
             static void overwritePosition_(ModelOrder order)
             {
+                if (order.Model.IsUnityNull()) return;
                 //if (!order.OverWritePositionAndRotation) return;
 
                 var tf = order.Model.transform;

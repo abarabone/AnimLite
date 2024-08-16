@@ -20,7 +20,8 @@ namespace AnimLite.Vmd
         /// <summary>
         /// 
         /// </summary>
-        public static StreamData<quaternion> CreateRotationData(this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)//, int indexBlockLength = 100)
+        public static StreamData<quaternion> CreateRotationData(
+            this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)//, int indexBlockLength = 100)
         {
             var qSrc =
                 from x in nameToStream//.Do(x => Debug.Log($"{x.Key.name}:{x.Count()}"))

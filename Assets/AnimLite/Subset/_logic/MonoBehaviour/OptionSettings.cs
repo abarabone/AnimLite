@@ -9,12 +9,16 @@ namespace AnimLite
     public class OptionSettings : MonoBehaviour
     {
 
-        public bool IsAccessWithinParentPathOnly;
+        public bool IsAccessWithinParentPathOnly = true;
+
+        public bool IsSeaquentialLoadingInZip = false;
 
 
         public void Awake()
         {
             PathUnit.IsAccessWithinParentPathOnly = this.IsAccessWithinParentPathOnly;
+
+            SceneLoadUtilitiy.IsSeaquentialLoadingInZip = this.IsSeaquentialLoadingInZip;
         }
     }
 }

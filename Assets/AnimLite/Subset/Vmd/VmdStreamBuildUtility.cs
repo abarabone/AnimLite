@@ -7,6 +7,7 @@ namespace AnimLite.Vmd
 {
     using AnimLite;
     using AnimLite.Utility;
+    using AnimLite.Utility.Linq;
 
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace AnimLite.Vmd
             this IEnumerable<IEnumerable<TKey>> streamsList, TKey defaultKey = default)
         {
             var qStreamsList = streamsList
-                .Append(new[] { defaultKey });
+                .Append(defaultKey.WrapEnumerable());
 
             var streamKeyCounts = qStreamsList//.Do((x, i) => Debug.Log($"{(MmdBodyBones)i} {x.Count()}"))
                 .Select(x => x.Count())
@@ -59,7 +60,7 @@ namespace AnimLite.Vmd
             where T : unmanaged
         {
             var qStreamsList = streamsList
-                .Append(new[] { defaultKey });
+                .Append(defaultKey.WrapEnumerable());
 
 
             var qFrameTime =

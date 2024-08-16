@@ -43,7 +43,7 @@ namespace AnimLite.DancePlayable
                 if (d.ModelInformation.IsBlank())
                 {
                     d.ModelInformation =
-                        d.Model.ToInformation(o.Model.GetComponent<UniVRM10.Vrm10Instance>());
+                        d.Model.ToInformation(o.Model?.GetComponent<UniVRM10.Vrm10Instance>());
                 }
 
                 if (d.AnimationInformation.IsBlank())
@@ -68,6 +68,8 @@ namespace AnimLite.DancePlayable
 
         public static InformationDefain ToInformation(this ModelDefineData md, UniVRM10.Vrm10Instance vrm)
         {
+            if (vrm.IsUnityNull()) return default;
+
             var info = vrm.Vrm.Meta;
 
             return new InformationDefain
@@ -81,6 +83,8 @@ namespace AnimLite.DancePlayable
 
         public static InformationDefain ToInformation(this AnimationDefineData ad, VmdStreamData vmd)
         {
+            if (vmd == null) return default;
+
             return new InformationDefain
             {
                 Caption = Path.GetFileNameWithoutExtension(ad.AnimationFilePath),
@@ -92,6 +96,8 @@ namespace AnimLite.DancePlayable
 
         public static InformationDefain ToInformation(this AudioDefineData ad, AudioClip clip)
         {
+            if (clip.IsUnityNull()) return default;
+
             return new InformationDefain
             {
                 Caption = clip.name != "" ? clip.name : Path.GetFileNameWithoutExtension(ad.AudioFilePath),

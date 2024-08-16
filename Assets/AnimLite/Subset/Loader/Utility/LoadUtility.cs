@@ -23,6 +23,35 @@ using System.Text;
 namespace AnimLite.Utility
 {
 
+    static public class LoadErr
+    {
+        public static async ValueTask<T> LoggingAsync<T>(Func<ValueTask<T>> action)
+        {
+            try
+            {
+                return await action();
+            }
+            catch (System.IO.FileNotFoundException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            catch (System.IO.DirectoryNotFoundException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            catch (System.InvalidOperationException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+        }
+    }
+
+
+
+
     static public class StreamOpenUtility
     {
 

@@ -74,7 +74,7 @@ namespace AnimLite.Samples
         async Awaitable OnEnable()
         {
             // ファイルからデータを読み下す
-            var vmdStreamData = await VmdParser.ParseVmdExAsync(this.VmdFilePath, default);
+            var vmdStreamData = await VmdParser.LoadVmdExAsync(this.VmdFilePath, default);
             var faceMapping = await VrmParser.LoadFaceMapExAsync(this.FaceMappingFilePath, default);
 
             // データを利用できる形式に変換する

@@ -83,7 +83,7 @@ namespace AnimLite.Utility
         public static async Task ReadJsonAsync(this DanceSetHolder holder, PathUnit path, CancellationToken ct)
         {
             //var ds = await ReadJsonAsync(path, holder.dance.Audio.AudioSource, ct);
-            var json = await path.ReadJsonExAsync<DanceSetJson>(ct);
+            var json = await path.LoadJsonAsync<DanceSetJson>(ct);
             var ds = await json.ToDanceSetAsync(holder.dance.Audio.AudioSource, ct);
             if (ds == default) return;
 
@@ -163,7 +163,7 @@ namespace AnimLite.Utility
                     .ToArray(),
             };
 
-        public static async Awaitable<DanceSet> ToDanceSetAsync(this DanceSetJson src, AudioSource audiosrc, CancellationToken ct) =>
+        public static async ValueTask<DanceSet> ToDanceSetAsync(this DanceSetJson src, AudioSource audiosrc, CancellationToken ct) =>
             new DanceSet
             {
                 Audio = new AudioDefine
@@ -180,7 +180,7 @@ namespace AnimLite.Utility
 
                 Motions = await src.Motions
                     .Select(x => x.ToDanceMotionDefineAsync(ct))
-                    .AwaitAllAsync(),
+                    .WhenAll(),
             };
         static AudioSource setvolume_(AudioSource src, float volume)
         {
@@ -239,7 +239,7 @@ namespace AnimLite.Utility
                 ModelInformation = src.ModelInfo,
                 AnimationInformation = src.AnimationInfo,
             };
-        public static async Awaitable<DanceMotionDefine> ToDanceMotionDefineAsync(this DanceMotionDefineJson src, CancellationToken ct) =>
+        public static async ValueTask<DanceMotionDefine> ToDanceMotionDefineAsync(this DanceMotionDefineJson src, CancellationToken ct) =>
             new DanceMotionDefine
             {
                 Model = await src.Model.ModelFilePath.ToPath().LoadModelExAsync(ct),

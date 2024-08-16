@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace AnimLite.DancePlayable
 {
-    public class DanceSetPlayerBase : MonoBehaviour
+    public abstract class DanceSceneCaptionBase : MonoBehaviour
     {
-        public virtual Awaitable<DanceSetDefineData> WaitForPlayingAsync { get; }
+        public abstract void NortifyPlaying(DanceSetDefineData ds);
     }
 }

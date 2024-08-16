@@ -41,18 +41,19 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<GameObject> LoadModelExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct)
+            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
 
             if (archive != null && !path.IsFullPath())
             {
-                var model = await archive.UnzipAsync(path, s => s.convertVrmToModelAsync(ct));
+                var model = await archive.UnzipAsync(path, s => s.convert(path, ct));
 
                 if (model != null) return model;
             }
 
             return await path.LoadModelExAsync(ct);
-        }
+        });
 
 
         //public static async ValueTask<Animator> LoadModelExAsync(
@@ -64,7 +65,8 @@ namespace AnimLite.Vrm
 
 
 
-        public static async ValueTask<GameObject> LoadModelExAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<GameObject> LoadModelExAsync(this PathUnit path, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
@@ -76,31 +78,41 @@ namespace AnimLite.Vrm
                 var (zippath, entrypath) when entrypath != "" =>
                     await openAsync_(zippath).UnzipAsync(entrypath, s => s.convert(entrypath, ct)),
                 var (zippath, _) when fullpath.IsZip() =>
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".vrm", (s, path) => s.convert(path, ct)),
+                    await openAsync_(zippath).UnzipFirstEntryAsync(".vrm;.glb", (s, path) => s.convert(path, ct)),
                 var (_, _) when fullpath.IsResource() =>
                     await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
                 var (_, _) =>
                     await openAsync_(fullpath).UsingAsync(s => s.convert(fullpath, ct)),
             };
+        });
 
-            //async ValueTask<Animator> loadResource_(PathUnit path) =>
-            //    path.ToResourceName() switch
-            //    {
-            //        var resourcepath when resourcepath.Value.EndsWith(".vrm") =>
-            //            await resourcepath
-            //                .LoadResourceToStreamAsync<BinaryAsset>(asset => asset.bytes, ct)
-            //                .UsingAsync(s => s.convertVrmToModelAsync(ct)),
-            //        var resourcepath =>
-            //            await resourcepath
-            //                .loadModelFromResourceAsync(ct),
-            //    };
-        }
+        //public static async ValueTask<GameObject> LoadModelExAsync2(this PathUnit path, CancellationToken ct)
+        //{
+        //    ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
+        //    return await LoadErr.LoggingAsync(async () =>
+        //    {
+        //        var fullpath = path.ToFullPath();
+        //        fullpath.ThrowIfAccessedOutsideOfParentFolder();
+
+        //        return fullpath.DividZipAndEntry() switch
+        //        {
+        //            var (zippath, entrypath) when entrypath != "" =>
+        //                await openAsync_(zippath).UnzipAsync(entrypath, s => s.convert(entrypath, ct)),
+        //            var (zippath, _) when fullpath.IsZip() =>
+        //                await openAsync_(zippath).UnzipFirstEntryAsync(".vrm;.glb", (s, path) => s.convert(path, ct)),
+        //            var (_, _) when fullpath.IsResource() =>
+        //                await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
+        //            var (_, _) =>
+        //                await openAsync_(fullpath).UsingAsync(s => s.convert(fullpath, ct)),
+        //        };
+        //    });
+        //}
 
 
 
         static ValueTask<GameObject> convert(this Stream s, PathUnit path, CancellationToken ct) =>
-            Path.GetExtension(path.Value).ToLower() switch
+            Path.GetExtension(path.Value).Split('?')[0].ToLower() switch
             {
                 ".vrm" => s.convertVrmToModelAsync(ct),
                 ".glb" => s.convertGlbToModelAsync(ct),
@@ -136,8 +148,7 @@ namespace AnimLite.Vrm
             await s.CopyToAsync(m, ct);
 
             await Awaitable.MainThreadAsync();
-            var vrm10 = await Vrm10.LoadBytesAsync(
-                m.ToArray(), true, ControlRigGenerationOption.None, true, null, null, null, null, ct);
+            var vrm10 = await Vrm10.LoadBytesAsync(m.ToArray(), true, ControlRigGenerationOption.None, ct: ct);
 
             await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
 

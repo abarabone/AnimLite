@@ -7,13 +7,28 @@
 - 裏スレッドでの .vmd 読み込み
 - .vmd のキャッシュ機構、データ共有機構
 - .json で音楽、モデル、アニメーション、配置、を設定する機能
-- local, web から file, zip をロード、また resource(addressable) もロードできるようにした  <- new
-- .glb を読めるようにした(BackGrounds)  <- new
 
-# やりたい
-- シーン上の game object インスタンスのキャッシュ（同じパス？のモデルを再ロードしなくてもよいように）
+# 新機能・修正
+- local, web から file, zip をロード、また resource(addressable) もロードできるようにした
+- .glb を読めるようにした(BackGrounds)
+- シーン上の game object インスタンスのキャッシュ（同じパスのモデルを再ロードしなくてもよいように）
+- ロードの並列度を高めた（同じ .json に出てくる音楽、モデル、アニメーション、表情定義、のどれもが並列になるようにした）
+- ZipArchive のロード時、ファイルストリームを使いまわさずに別個にファイルをオープンし、並列ロードできるスイッチを追加した
+- ZipArchive の時に .glb が読めていなかったのを修正
+- ZipArchive の vmd ロードで MemorryStream にコピーしていたのを解消
+- .vmd キャッシュの参照カウントがロック対応されたなかったので、interlocked を使うようにした
+- .vrm から作成したモデルゲームオブジェクトを、シーン上でキャッシュしておく機能を追加（キャッシュ最大数の目安を指定できる）
+- データロードに１つでも失敗するとエラーになっていたが、できるだけ続行するようにある程度解消（不完全）
+
+# やりたい・検討中
 - DanceSetSimpleCaption において、キャラが多いとテロップが意味不明になるので、複数回に分けるとかスクロールするとか対処したい
-- WebGL でサンプル作ってどっかに置きたい
+- ~~~WebGL でサンプル作ってどっかに置きたい~~~　<- webgl だとスレッド使えないらしいのでダメかも
+- DanceSet を DanceScene にリネームしたいかも
+- 現状 DanceSet の機構が新旧２重になっているので統合したい（エディタ上でオーサリングするタイプと .json しか考慮してないタイプ）
+- .vmd の肩、腕ねじり、手首ねじり、を再考したい
+- 体と表情が別 .vmd になっている場合に対応したいので、複数 .vmd をマージするようにしたいかも
+- アニメーションとモデルがキャッシュされるので、音楽もキャッシュされるべき
+- 顔と体の bounding box が変なので修正したい
 
 # いずれ
 - 表面的な最適化もやらねば
@@ -131,7 +146,9 @@
   - zip 内のパスを指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd
   - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt&st=hrqrzch6&dl=1 ← 末尾を dl=1 にすればよいみたい
   - unity のリソースは末尾に as resource をつける： step1 as resource
-- 現状、zip だとマルチスレッドロードが利かない（非同期ではあるが）のでなんとかしたい
+- 単体 zip に固めたデータは、同じ ZipArchive を使いまわすのでマルチスレッドロードが利かない（非同期ではあるが）
+  - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
+  - デフォルトは false
 - いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
 - 相対パスは、下記のように絶対パスに変換される
   - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd

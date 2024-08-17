@@ -15,6 +15,7 @@ namespace AnimLite.Vrm
     public struct VmdFaceMapping
     {
         public Dictionary<VmdFaceName, VrmExpressionName> VmdToVrmMaps;
+        public bool IsCreated => this.VmdToVrmMaps != null;
 
         public static implicit operator VmdFaceMapping(Dictionary<VmdFaceName, VrmExpressionName> mapdict) =>
             new VmdFaceMapping

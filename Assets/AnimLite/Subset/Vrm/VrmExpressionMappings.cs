@@ -5,6 +5,8 @@ namespace AnimLite.Vrm
         public VrmFaceReference[] FaceReferences;
         public UniVRM10.ExpressionKey[] Expressions;
         //public void Dispose() => this.BlendShapeIndexes.Dispose();
+
+        public bool IsCreated => this.FaceReferences != null && this.Expressions != null;
     }
 
     public struct VrmFaceReference

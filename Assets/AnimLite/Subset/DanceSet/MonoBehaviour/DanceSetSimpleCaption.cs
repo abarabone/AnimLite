@@ -29,7 +29,9 @@ namespace AnimLite.DancePlayable
 
 
 
-        public override void NortifyPlaying(DanceSetDefineData ds) => this.waitForPlaying.SetResult(ds);
+        public override void NortifyPlaying(DanceSetDefineData ds) =>
+            this.waitForPlaying.TrySetResult(ds)
+                .NotThen(this.waitForPlaying.SetCanceled);
 
         AwaitableCompletionSource<DanceSetDefineData> waitForPlaying = new();
 

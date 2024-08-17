@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.VisualScripting;
 
 namespace AnimLite.Vmd
 {
@@ -21,6 +22,8 @@ namespace AnimLite.Vmd
 
         public static TransformHandleMappings BuildVmdPlayableJobTransformMappings(this Animator anim)
         {
+            if (anim.IsUnityNull()) return default;
+
             var x = anim.buildVmdTfMappings<TfHandle>();
 
             return new TransformHandleMappings
@@ -33,6 +36,8 @@ namespace AnimLite.Vmd
 
         public static TransformMappings BuildVmdTransformMappings(this Animator anim)
         {
+            if (anim.IsUnityNull()) return default;
+
             var x = anim.buildVmdTfMappings<Tf>();
 
             return new TransformMappings

@@ -244,10 +244,10 @@ namespace AnimLite.Utility
             new()
             {
                 Model = model,
-                FaceRenderer = model?.FindFaceRenderer(),
+                FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
 
                 vmddata = vmddata,
-                bone = model?.GetComponent<Animator>()?.BuildVmdPlayableJobTransformMappings() ?? default,
+                bone = model.AsUnityNull()?.GetComponent<Animator>().BuildVmdPlayableJobTransformMappings() ?? default,
                 face = facemap.BuildStreamingFace(),
 
                 DelayTime = define.Animation.DelayTime,
@@ -280,7 +280,7 @@ namespace AnimLite.Utility
                 {
                     //m.face.Dispose();
                     m.bone.Dispose();
-                    m.vmddata.Dispose();
+                    m.vmddata?.Dispose();
                     m.Model.AsUnityNull(o => o?.activeSelf)?.Destroy();
                 }
             };

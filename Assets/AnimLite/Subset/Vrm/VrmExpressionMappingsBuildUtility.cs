@@ -14,6 +14,8 @@ namespace AnimLite.Vrm
         //public static VrmExpressionMappings BuildStreamingFace(this Mesh mesh, VmdFaceMapping facemap)
         public static VrmExpressionMappings BuildStreamingFace(this VmdFaceMapping facemap)
         {
+            if (!facemap.IsCreated) return default;
+
             var qGr =
                 from x in facemap.VmdToVrmMaps.Select((x, istream) => (x, istream))
                 let id = VrmFace.FaceNameToExpressionId.TryGet(x.x.Value)

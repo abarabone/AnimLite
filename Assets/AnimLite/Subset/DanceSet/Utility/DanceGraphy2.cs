@@ -166,7 +166,7 @@ namespace AnimLite.DancePlayable
 
             static void showBackGround_(ModelOrder[] orders)
             {
-                if (orders == null) return;
+                //if (orders == null) return;
 
                 foreach (var order in orders)
                 {
@@ -178,7 +178,7 @@ namespace AnimLite.DancePlayable
 
             static void createAudioPlayable_(PlayableGraph graph, AudioOrder order)
             {
-                if (order == null) return;
+                //if (order == null) return;
                 if (order.AudioSource.IsUnityNull()) return;
 
                 graph.CreateAudio(order.AudioSource, order.AudioClip, order.DelayTime);
@@ -187,7 +187,7 @@ namespace AnimLite.DancePlayable
 
             static void createMotionPlayables_(PlayableGraph graph, IEnumerable<MotionOrder> orders)
             {
-                if (orders == null) return;
+                //if (orders == null) return;
 
                 foreach (var order in orders)
                 {
@@ -206,7 +206,7 @@ namespace AnimLite.DancePlayable
 
                 void createBodyMotion_(MotionOrder order, StreamingTimer timer)
                 {
-                    if (order == null) return;
+                    //if (order == null) return;
                     if (order.vmddata == null) return;
                     if (order.Model.IsUnityNull()) return;
 
@@ -223,7 +223,7 @@ namespace AnimLite.DancePlayable
 
                 void createFaceMotion_(MotionOrder order, StreamingTimer timer)
                 {
-                    if (order.face.Expressions == null) return;
+                    if (!order.face.IsCreated) return;
                     if (order.FaceRenderer.IsUnityNull()) return;
 
                     var fkf = order.vmddata.FaceStreams
@@ -244,6 +244,7 @@ namespace AnimLite.DancePlayable
             }
             static void overwriteScale_(ModelOrder order)
             {
+                if (order.Model.IsUnityNull()) return;
                 if (order.Scale == 0.0f) return;
 
                 var tf = order.Model.transform;

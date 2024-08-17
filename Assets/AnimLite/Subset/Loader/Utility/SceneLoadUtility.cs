@@ -83,13 +83,13 @@ namespace AnimLite.Utility
             this DanceSetDefineData ds, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
         {
             var audioTask =
-                Task.Run(async () => await ds.Audio.buildAudioOrderAsync(null, audioSource, ct) as dynamic);
+                Task.Run(async () => await ds.Audio.buildAudioOrderAsync(null, audioSource, ct) as object);
 
             var bgTasks = ds.BackGrounds.Select(define =>
-                Task.Run(async () => await define.buildBackGroundModelOrderAsync(cache, null, ct) as dynamic));
+                Task.Run(async () => await define.buildBackGroundModelOrderAsync(cache, null, ct) as object));
 
             var motionTasks = ds.Motions.Select(define =>
-                Task.Run(async () => await define.buildMotionOrderAsync(cache, null, ct) as dynamic));
+                Task.Run(async () => await define.buildMotionOrderAsync(cache, null, ct) as object));
 
 
             var orders = await audioTask.WrapEnumerable().Concat(bgTasks).Concat(motionTasks)
@@ -176,16 +176,15 @@ namespace AnimLite.Utility
             var facepath = define.Animation.FaceMappingFilePath;
 
             var modelTask =
-                Task.Run(async () => await cache.loadModelAsync(modelpath, archive, ct) as dynamic);
+                Task.Run(async () => await cache.loadModelAsync(modelpath, archive, ct) as object);
             var streamdataTask =
-                Task.Run(async () => await cache.loadVmdAsync(vmdpath, facepath, archive, ct) as dynamic);
+                Task.Run(async () => await cache.loadVmdAsync(vmdpath, facepath, archive, ct) as object);
 
             var data = await Task.WhenAll(modelTask, streamdataTask);
 
 
             var model = data[0] as GameObject;
-            var vmddata = (VmdStreamData)data[1].Item1;
-            var facemap = (VmdFaceMapping)data[1].Item2;
+            var (vmddata, facemap) = ((VmdStreamData, VmdFaceMapping))data[1];
 
             await Awaitable.MainThreadAsync();
             return define.toMotionOrder(vmddata, facemap, model);

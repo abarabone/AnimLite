@@ -56,10 +56,18 @@ namespace AnimLite.DancePlayable
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
+                    //var path = "motions/神社橋配布用test.glb".ToPath();
+                    //var model = await path.LoadModelExAsync(ct);
+                    //await Awaitable.MainThreadAsync();
+                    //model.SetActive(true);
+
                     var jsonpath = this.JsonFile;
                     using var archive = await jsonpath.OpenZipAsync(ct);
                     var ds = await jsonpath.LoadDanceSceneAsync(archive, ct);
                     var order = await ds.BuildDanceGraphyOrderAsync(this.Cache, archive, this.AudioSource, ct);
+
+                    //var order = await ds.BuildDanceOrderAsync(this.Cache, this.AudioSource, ct);
+                    //order.Motions.First().Model.SetActive(true);
 
                     await Awaitable.MainThreadAsync();
                     this.graphy = DanceGraphy2.CreateGraphy(order);

@@ -61,7 +61,8 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct) =>
+            await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
@@ -79,7 +80,7 @@ namespace AnimLite.Utility
                 var (_, _) =>
                     await fullpath.LoadAudioClipAsync(ct),
             };
-        }
+        });
 
 
 
@@ -101,7 +102,7 @@ namespace AnimLite.Utility
                 ".wav" => AudioType.WAV,
                 _ => AudioType.UNKNOWN,
             };
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log($"{atype} {path.Value} {File.Exists(path)}");
 #endif
             //if (atype == AudioType.UNKNOWN || !File.Exists(path)) return default;
@@ -112,8 +113,12 @@ namespace AnimLite.Utility
 
             async ValueTask<AudioClipAsDisposable> audio_(PathUnit path, AudioType audioType)
             {
+                var schemedpath = path.IsHttp()
+                    ? path
+                    : $"file://{path.Value}".ToPath();
+
                 await Awaitable.MainThreadAsync();
-                using var req = UnityWebRequestMultimedia.GetAudioClip(path, audioType);
+                using var req = UnityWebRequestMultimedia.GetAudioClip(schemedpath, audioType);
 
                 ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;
 

@@ -108,9 +108,9 @@ namespace AnimLite.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ShowDebugLog(this string text)
         {
-            #if UNITY_EDITOR
-                Debug.Log(text);
-            #endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log(text);
+#endif
             return text;
         }
 

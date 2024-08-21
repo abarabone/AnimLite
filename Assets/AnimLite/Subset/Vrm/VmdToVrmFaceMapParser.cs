@@ -102,9 +102,9 @@ namespace AnimLite.Vrm
                 select (vmd, vrm)
                 ;
 
-            #if UNITY_EDITOR
-                string.Join(", ", q.Select((x, i) => $"{i}:{x.vmd.name}:{x.vrm.name}")).ShowDebugLog();
-            #endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            string.Join(", ", q.Select((x, i) => $"{i}:{x.vmd.name}:{x.vrm.name}")).ShowDebugLog();
+#endif
 
             return q.ToDictionary(x => x.vmd, x => x.vrm);
         }

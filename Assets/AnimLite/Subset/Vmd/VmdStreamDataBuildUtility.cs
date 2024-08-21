@@ -33,7 +33,7 @@ namespace AnimLite.Vmd
             var src = qSrc
                 //.Do(x => Debug.Log($"{x.boneid}={x.keys.Count()}"))
                 .ToArray();
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log(string.Join(", ", src.Select(x => $"{x.boneid}:{x.keys.Count()}")));
 #endif
 

@@ -179,6 +179,7 @@ namespace AnimLite.DancePlayable
             static void createAudioPlayable_(PlayableGraph graph, AudioOrder order)
             {
                 //if (order == null) return;
+                if (order.AudioClip.clip.IsUnityNull()) return;
                 if (order.AudioSource.IsUnityNull()) return;
 
                 graph.CreateAudio(order.AudioSource, order.AudioClip, order.DelayTime);

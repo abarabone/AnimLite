@@ -62,7 +62,11 @@ namespace AnimLite.Utility
         /// .ToPath() で付加される親パスを指定する。
         /// デフォルトは Application.dataPath 
         /// </summary>
+#if UNITY_ANDROID && !UNITY_EDITOR
+        static public string ParentPath { get; private set; } = Application.persistentDataPath;
+#else
         static public string ParentPath { get; private set; } = Application.dataPath;
+#endif
         /// <summary>
         /// フルパスモードをセットすると、ParentPath が変化する。
         /// </summary>
@@ -185,12 +189,21 @@ namespace AnimLite.Utility
                 ? new ResourceName(path.Value[0..^("as resource".Length)].TrimEnd())
                 : new ResourceName("");
 
-
+        /// <summary>
+        /// とりあえず http の zip entry は考えない（ ? のときにエントリ指定をどう扱うか悩み中）
+        /// </summary>
         public static bool IsZip(this PathUnit path) =>
-            path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
+            path.IsHttp()
+                ? path.Value.Split('?')[0].EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase)
+                : path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
 
+        /// <summary>
+        /// とりあえず http の zip entry は考えない（ ? のときにエントリ指定をどう扱うか悩み中）
+        /// </summary>
         public static bool IsZipEntry(this PathUnit path) =>
             path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            //||
+            //path.Value.Contains(".zip");
 
         /// <summary>
         /// パスを .zip/ で分割し、.zip までと / より後ろを返す。
@@ -233,9 +246,9 @@ namespace AnimLite.Utility
 
         static PathUnit show_(this PathUnit fullpath, PathUnit path)
         {
-//#if UNITY_EDITOR
-//            Debug.Log($"{path.Value} => {fullpath.Value}");
-//#endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"{path.Value} => {fullpath.Value}");
+#endif
             return fullpath;
         }
 

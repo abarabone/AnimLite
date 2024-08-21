@@ -64,15 +64,15 @@ namespace AnimLite.Vmd
             using var r = new BinaryReader(s);
 
             var (h, n) = header_(r);
-            #if UNITY_EDITOR
-                $"format name : {h}".ShowDebugLog();
-                $"model name : {n}".ShowDebugLog();
-            #endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"format name : {h}".ShowDebugLog();
+            $"model name : {n}".ShowDebugLog();
+#endif
 
             var bodydata = body_(r);
-            #if UNITY_EDITOR
-                string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Count()}")).ShowDebugLog();
-            #endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Count()}")).ShowDebugLog();
+#endif
 
 
             var facedata = face_(r);

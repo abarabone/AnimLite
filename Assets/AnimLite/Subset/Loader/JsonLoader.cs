@@ -123,6 +123,8 @@ namespace AnimLite.Utility
         {
             var json = await new StreamReader(s).ReadToEndAsync();
 
+            //json.ShowDebugLog();
+
             return JsonUtility.FromJson<T>(json);
         }
 

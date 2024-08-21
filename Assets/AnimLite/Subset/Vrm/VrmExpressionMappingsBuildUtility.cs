@@ -34,7 +34,7 @@ namespace AnimLite.Vrm
 
             var refs = q.ToArray();
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             string.Join(", ", refs.Select(x => $"{x.istream}=>{x.faceIndex}:{x.expid}")).ShowDebugLog();
 #endif
 

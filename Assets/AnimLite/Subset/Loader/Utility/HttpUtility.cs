@@ -64,13 +64,23 @@ namespace AnimLite.Utility
 
         public static async ValueTask<Stream> LoadFromWebAsync(this PathUnit url, CancellationToken ct)
         {
+            //ct.ThrowIfCancellationRequested();
+
+            //var content = await HttpLoader.Client.GetByteArrayAsync(url);
+
+            //ct.ThrowIfCancellationRequested();
+
+            //return new MemoryStream(content);
+
+
+            using var response = await HttpLoader.Client.GetAsync(url);
+            if (!response.IsSuccessStatusCode) throw new System.Net.Http.HttpRequestException("response is not success status code.");
+
             ct.ThrowIfCancellationRequested();
 
-            var content = await HttpLoader.Client.GetByteArrayAsync(url);
+            using var content = response.Content;
 
-            ct.ThrowIfCancellationRequested();
-
-            return new MemoryStream(content);
+            return await content.ReadAsStreamAsync();
         }
 
     }

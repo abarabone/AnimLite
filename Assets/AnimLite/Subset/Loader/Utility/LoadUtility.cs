@@ -64,9 +64,9 @@ namespace AnimLite.Utility
         // ‚¿‚á‚ñ‚Æ‚µ‚½ I/O ‚Ì”ñ“¯Šú‚É‚È‚é‚ªA‚à‚Ì‚É‚æ‚Á‚Ä‚Í‚©‚È‚è’x‚­‚È‚é‚æ‚¤‚¾
         public static Stream OpenAsyncReadFileStream(this PathUnit path)
         {
-            #if UNITY_EDITOR
-                Debug.Log($"open file with async i/o mode: {path.Value}");
-            #endif
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"open file with async i/o mode: {path.Value}");
+#endif
             return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true);
         }
 

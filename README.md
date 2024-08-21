@@ -163,7 +163,7 @@
 - 相対パスは、下記のように絶対パスに変換される
   - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
   - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
-  - デフォルトは dataPath
+  - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
 - PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできない
   - デフォルトは true
   - アクセスすると IOException がスローされる（ null が返されるとかのほうがいいだろうか）

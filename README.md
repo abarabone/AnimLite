@@ -19,8 +19,13 @@
 - .vmd キャッシュの参照カウントがロック対応されたなかったので、interlocked を使うようにした
 - .vrm から作成したモデルゲームオブジェクトを、シーン上でキャッシュしておく機能を追加（キャッシュ最大数の目安を指定できる）
 - データロードに１つでも失敗するとエラーで中断していたが、続行するようにした
+- http での .zip ロードで、クエリストリングの ? 以降がある場合、機能していなかったので修正
+  - ただし、https://.../ds.zip?dl=1/dance_scene.json のような記述はまだ無理（というか書き方どうしようか悩み中）
 
 # やりたい・検討中
+- http 時の .zip で クエリストリングの ? 以降と ZipArchive エントリの指定に対応させたい（が、http での .zip はあまり実用性ない気もする…）
+- .zip の並列スイッチは、ZipArchive のエントリの時に機能しないことに気づいたので、対応したい
+- 同じパスのモデルをキャッシュする際、同じモデルを複数体同時に表示すると最後のモデルしか表示されない
 - DanceSetSimpleCaption において、キャラが多いとテロップが意味不明になるので、複数回に分けるとかスクロールするとか対処したい
 - ~~WebGL でサンプル作ってどっかに置きたい~~　<- webgl だとスレッド使えないらしいのでダメかも
 - DanceSet を DanceScene にリネームしたいかも
@@ -83,7 +88,8 @@
           "x": 0.0,
           "y": 0.0,
           "z": 0.0
-        }
+        },
+        "Scale": 0.0
       }
     ],
     "Motions": [                                  // キャラクターのモデル、アニメーション、を配列で定義
@@ -99,7 +105,8 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
-                }
+                },
+                "Scale": 0.0
             },
             "Animation": {                        // キャラクターのアニメーション
                 "AnimationFilePath": "",
@@ -144,16 +151,19 @@
   - web から： https://github.com/abarabone/AnimLite/raw/master/Asset/ds/step1.vmd
   - zip を指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip
   - zip 内のパスを指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd
-  - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt&st=hrqrzch6&dl=1 ← 末尾を dl=1 にすればよいみたい
+  - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt\&st=hrqrzch6\&dl=1 ← 末尾を dl=1 にすればよいみたい
+    - クエリストリング中の & は、quest3(android?) だと \& のようにエスケープしないとダメだったので注意
+    - one drive とか google のマイドライブとかだとパスに拡張子が含まれないので、content の type とか見る方法にしないとダメかも…
   - unity のリソースは末尾に as resource をつける： step1 as resource
 - 単体 zip に固めたデータは、同じ ZipArchive を使いまわすのでマルチスレッドロードが利かない（非同期ではあるが）
   - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
   - デフォルトは false
+  - マルチスレッドロードは機能していないことに気づいた。ZipArchive のエントリが相対パスの場合、ローカルを見に行ってしまう…
 - いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
 - 相対パスは、下記のように絶対パスに変換される
   - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
   - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
-  - デフォルトは dataPath
+  - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
 - PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできない
   - デフォルトは true
   - アクセスすると IOException がスローされる（ null が返されるとかのほうがいいだろうか）

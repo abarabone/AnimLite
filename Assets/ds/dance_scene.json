@@ -6,7 +6,7 @@
     },
     "BackGrounds": [
       {
-        "ModelFilePath": "Resources/神社橋配布用test.glb",
+        "ModelFilePath": "Resources_moved/神社橋配布用test.glb",
         "Position": {
           "x": 0.0,
           "y": 0.0,
@@ -118,7 +118,7 @@
         },
         {
             "Model": {
-                "ModelFilePath": "Resources/AliciaSolid.vrm",
+                "ModelFilePath": "Resources_moved/AliciaSolid.vrm",
                 "Position": {
                     "x": -2.0,
                     "y": 0.0,
@@ -131,7 +131,7 @@
                 }
             },
             "Animation": {
-                "AnimationFilePath": "Resources/step2.vmd",
+                "AnimationFilePath": "Resources_moved/step2.vmd",
                 "FaceMappingFilePath": "",
                 "DelayTime": 0.0
             },

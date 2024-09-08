@@ -50,7 +50,7 @@ namespace AnimLite.Vmd
 
 
         public async Task<(VmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadVmdStreamDataAsync(
-            PathUnit vmdFilePath, PathUnit faceMapFilePath, ZipArchive archive, CancellationToken ct)
+            PathUnit vmdFilePath, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
         {
             var (_vmddata, facemap) = await this.Cache.GetOrLoadAsync(vmdFilePath, faceMapFilePath, archive, ct);
 
@@ -65,7 +65,7 @@ namespace AnimLite.Vmd
         public Task<GameObject> GetOrLoadModelAsync(PathUnit path, CancellationToken ct) =>
             this.GetOrLoadModelAsync(path, null, ct);
 
-        public Task<GameObject> GetOrLoadModelAsync(PathUnit path, ZipArchive archive, CancellationToken ct) =>
+        public Task<GameObject> GetOrLoadModelAsync(PathUnit path, IArchive archive, CancellationToken ct) =>
             this.ModelStocker.GetOrLoadAsync(path, archive, ct);
 
 

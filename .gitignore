@@ -20,6 +20,7 @@
 /Assets/AnimLite/**/*.meta
 !**/MonoBehaviour/*.meta
 !**/[Rr]esources/*.meta
+!**/[Rr]esources_moved/*.meta
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data

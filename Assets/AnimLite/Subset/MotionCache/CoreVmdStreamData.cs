@@ -63,7 +63,7 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<CoreVmdStreamData> LoadVmdCoreDataExAsync(
-            this PathUnit vmdpath, VmdFaceMapping facemap, ZipArchive archive, CancellationToken ct)
+            this PathUnit vmdpath, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
         {
             var vmddata = await VmdParser.LoadVmdExAsync(vmdpath, archive, ct);
             if (vmddata.bodyKeyStreams == null) return default;

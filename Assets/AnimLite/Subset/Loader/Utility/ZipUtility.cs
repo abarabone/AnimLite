@@ -19,49 +19,104 @@ using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
 using System.Text;
+using AnimLite.Utility;
 
 namespace AnimLite.Utility
 {
 
 
 
-    public class ZipArchiveTakeStream : ZipArchive, IDisposable
+    public class ZipDummyArchive : IArchive
     {
-        public ZipArchiveTakeStream(Stream s)
-            : base(s, ZipArchiveMode.Read, false, LocalEncoding.sjis) => this.stream = s;
-        public Stream stream;
+        public ZipDummyArchive(PathUnit archiveCachePath) => this.archiveCachePath = archiveCachePath;
 
-        public new void Dispose()
+        PathUnit archiveCachePath;
+
+
+        public void Dispose() { }
+
+
+        public T Extract<T>(PathUnit entryPath, Func<Stream, T> convertAction) =>
+            this.archiveCachePath.OpenReadStream().Unzip(entryPath, convertAction);
+        
+        public ValueTask<T> ExtractAsync<T>(PathUnit entryPath, Func<Stream, ValueTask<T>> convertAction) =>
+            this.archiveCachePath.OpenReadStream().UnzipAsync(entryPath, convertAction);
+        
+
+        public T ExtractFirstEntry<T>(string extension, Func<Stream, T> convertAction) =>
+            this.archiveCachePath.OpenReadStream().UnzipFirstEntry(extension, convertAction);
+        
+        public ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction) =>
+            this.archiveCachePath.OpenReadStream().UnzipFirstEntryAsync(extension, convertAction);
+        
+    }
+
+    public static class DummyArchiveUtility
+    {
+        public static async ValueTask<ZipDummyArchive> OpenDummyArchiveAsync(this PathUnit fullpath, CancellationToken ct)
         {
+            var cachePath = await fullpath.GetCachePathAsync(StreamOpenUtility.OpenStreamFileOrWebAsync, ct);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"dummy archive : {fullpath.Value} -> {cachePath.Value}".ShowDebugLog();
+#endif
+            return new ZipDummyArchive(cachePath);
+        }
+    }
+
+
+    public class ZipWrapArchive : IArchive
+    {
+        public ZipWrapArchive(Stream stream)
+        {
+            this.stream = stream;
+            this.zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+        }
+
+        ZipArchive zip;
+
+        Stream stream;
+
+
+        public void Dispose()
+        {
+            this.zip.Dispose();
             this.stream.Dispose();// archive Çîjä¸ÇµÇƒÇ‡îjä¸Ç≥ÇÍÇ»Ç¢ÇÃÇ≈Åiï¬Ç∂ÇÁÇÍÇÈÇÁÇµÇ¢ÇÃÇ…Åj
-            base.Dispose();
         }
+
+
+        public T Extract<T>(PathUnit entryPath, Func<Stream, T> convertAction) =>
+            this.zip.Unzip(entryPath, convertAction);
+
+        public ValueTask<T> ExtractAsync<T>(PathUnit entryPath, Func<Stream, ValueTask<T>> convertAction) =>
+            this.zip.UnzipAsync(entryPath, convertAction);
+
+
+        public T ExtractFirstEntry<T>(string extension, Func<Stream, T> convertAction) =>
+            this.zip.UnzipFirstEntry(extension, convertAction);
+
+        public ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction) =>
+            this.zip.UnzipFirstEntryAsync(extension, convertAction);
     }
 
-    public static class ZipOpenUtility
+    public static class ZipWrapArchiveUtility
     {
+        public static ZipWrapArchive OpenZipArchive(this Stream stream) =>
+            new ZipWrapArchive(stream);
 
-        public static async ValueTask<ZipArchive> OpenZipAsync(this ValueTask<Stream> stream)
-        {
-            return new ZipArchiveTakeStream(await stream);
-        }
-
-        public static ZipArchive OpenZip(this Stream stream)
-        {
-            return new ZipArchiveTakeStream(stream);
-        }
-
+        public static async ValueTask<ZipWrapArchive> OpenZipArchiveAwait(this ValueTask<Stream> stream) =>
+            new ZipWrapArchive(await stream);
     }
+
 
 
 
     public static class ZipUtility
     {
 
+        // Archive ÇÃÇŸÇ§Ç…Ç‡Ç¡ÇƒÇ¢ÇØÇ»Ç¢ÇæÇÎÇ§Ç©
 
 
-
-        public static async ValueTask<T> UnzipAsync<T>(
+        public static async ValueTask<T> UnzipAwait<T>(
             this ValueTask<Stream> stream, PathUnit entryPath, Func<Stream, T> createAction)
         =>
             (await stream).Unzip(entryPath, createAction);
@@ -80,7 +135,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<T> UnzipAsync<T>(
+        public static async ValueTask<T> UnzipAwait<T>(
             this ValueTask<Stream> stream, PathUnit entryPath, Func<Stream, ValueTask<T>> createAction)
         =>
             await (await stream).UnzipAsync(entryPath, createAction);
@@ -98,7 +153,7 @@ namespace AnimLite.Utility
         }
 
 
-        public static async ValueTask<T> UnzipFirstEntryAsync<T>(
+        public static async ValueTask<T> UnzipFirstEntryAwait<T>(
             this ValueTask<Stream> stream, string extension, Func<Stream, string, T> createAction)
         =>
             (await stream).UnzipFirstEntry(extension, createAction);
@@ -115,7 +170,7 @@ namespace AnimLite.Utility
         }
 
 
-        public static async ValueTask<T> UnzipFirstEntryAsync<T>(
+        public static async ValueTask<T> UnzipFirstEntryAwait<T>(
             this ValueTask<Stream> stream, string extension, Func<Stream, string, ValueTask<T>> createAction)
         =>
             await (await stream).UnzipFirstEntryAsync(extension, createAction);
@@ -137,15 +192,15 @@ namespace AnimLite.Utility
         // this Stream Ç∆ this ValueTask<Stream> Ç™ÇﬂÇÒÇ«Ç§ÇæÇµÅAÇÌÇ©ÇËÇ√ÇÁÇ¢
 
 
-        public static ValueTask<T> UnzipFirstEntryAsync<T>(this ValueTask<Stream> stream, string extension, Func<Stream, T> createAction) =>
-            stream.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));
+        public static ValueTask<T> UnzipFirstEntryAwait<T>(this ValueTask<Stream> stream, string extension, Func<Stream, T> createAction) =>
+            stream.UnzipFirstEntryAwait(extension, (s, _) => createAction(s));
 
         public static T UnzipFirstEntry<T>(this Stream stream, string extension, Func<Stream, T> createAction) =>
             stream.UnzipFirstEntry(extension, (s, _) => createAction(s));
 
 
-        public static ValueTask<T> UnzipFirstEntryAsync<T>(this ValueTask<Stream> stream, string extension, Func<Stream, ValueTask<T>> createAction) =>
-            stream.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));
+        public static ValueTask<T> UnzipFirstEntryAwait<T>(this ValueTask<Stream> stream, string extension, Func<Stream, ValueTask<T>> createAction) =>
+            stream.UnzipFirstEntryAwait(extension, (s, _) => createAction(s));
 
         public static ValueTask<T> UnzipFirstEntryAsync<T>(this Stream stream, string extension, Func<Stream, ValueTask<T>> createAction) =>
             stream.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));
@@ -155,11 +210,12 @@ namespace AnimLite.Utility
 
 
 
+
     public static class ZipArchiveUtility
     {
 
 
-        public static async ValueTask<T> UnzipAsync<T>(
+        public static async ValueTask<T> UnzipAwait<T>(
             this ValueTask<ZipArchive> zip, PathUnit entryPath, Func<Stream, T> createAction)
         =>
             (await zip).Unzip(entryPath, createAction);
@@ -168,8 +224,11 @@ namespace AnimLite.Utility
         public static T Unzip<T>(
             this ZipArchive zip, PathUnit entryPath, Func<Stream, T> createAction)
         {
-            //zip.Entries.ForEach(x => Debug.Log(x.FullName));
-            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"zip entry : {entryPath.Value}".ShowDebugLog();
+            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} in zip"));
+            zip.Entries.ForEach(x => $"{x.FullName} {x.FullName.ToUtf8()} in zip".ShowDebugLog());
+#endif
             var entry = zip.GetEntry(entryPath);
             if (entry == null) return default;
 
@@ -180,7 +239,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<T> UnzipAsync<T>(
+        public static async ValueTask<T> UnzipAwait<T>(
             this ValueTask<ZipArchive> zip, PathUnit entryPath, Func<Stream, ValueTask<T>> createAction)
         =>
             await (await zip).UnzipAsync(entryPath, createAction);
@@ -189,8 +248,11 @@ namespace AnimLite.Utility
         public static async ValueTask<T> UnzipAsync<T>(
             this ZipArchive zip, PathUnit entryPath, Func<Stream, ValueTask<T>> createAction)
         {
-            //return await zip.Unzip(entryPath, createAction);
-            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} {x.FullName.ToUtf8()}"));
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"zip entry : {entryPath.Value}".ShowDebugLog();
+            //zip.Entries.ForEach(x => Debug.Log($"{x.FullName} in zip"));
+            zip.Entries.ForEach(x => $"{x.FullName} {x.FullName.ToUtf8()} in zip".ShowDebugLog());
+#endif
             var entry = zip.GetEntry(entryPath);
             if (entry == null) return default;
 
@@ -225,7 +287,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<T> UnzipFirstEntryAsync<T>(
+        public static async ValueTask<T> UnzipFirstEntryAwait<T>(
             this ValueTask<ZipArchive> zip, string extension, Func<Stream, string, T> createAction)
         =>
             (await zip).UnzipFirstEntry(extension, createAction);
@@ -243,7 +305,7 @@ namespace AnimLite.Utility
         }
 
 
-        public static async ValueTask<T> UnzipFirstEntryAsync<T>(
+        public static async ValueTask<T> UnzipFirstEntryAwait<T>(
             this ValueTask<ZipArchive> zip, string extension, Func<Stream, string, ValueTask<T>> createAction)
         =>
             await (await zip).UnzipFirstEntryAsync(extension, createAction);
@@ -256,7 +318,6 @@ namespace AnimLite.Utility
             var entry = zip.Entries.FirstOrDefault(x => extlist.Where(ext => x.Name.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase)).Any());
             if (entry == null) return default;
 
-            //Debug.Log(entry.Name);
             using var s = entry.Open();
 
             return await createAction(s, entry.Name);
@@ -264,15 +325,15 @@ namespace AnimLite.Utility
 
 
 
-        public static ValueTask<T> UnzipFirstEntryAsync<T>(this ValueTask<ZipArchive> zip, string extension, Func<Stream, T> createAction) =>
-            zip.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));
+        public static ValueTask<T> UnzipFirstEntryAwait<T>(this ValueTask<ZipArchive> zip, string extension, Func<Stream, T> createAction) =>
+            zip.UnzipFirstEntryAwait(extension, (s, _) => createAction(s));
 
         public static T UnzipFirstEntry<T>(this ZipArchive zip, string extension, Func<Stream, T> createAction) =>
             zip.UnzipFirstEntry(extension, (s, _) => createAction(s));
 
 
-        public static ValueTask<T> UnzipFirstEntryAsync<T>(this ValueTask<ZipArchive> zip, string extension, Func<Stream, ValueTask<T>> createAction) =>
-            zip.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));
+        public static ValueTask<T> UnzipFirstEntryAwait<T>(this ValueTask<ZipArchive> zip, string extension, Func<Stream, ValueTask<T>> createAction) =>
+            zip.UnzipFirstEntryAwait(extension, (s, _) => createAction(s));
 
         public static ValueTask<T> UnzipFirstEntryAsync<T>(this ZipArchive zip, string extension, Func<Stream, ValueTask<T>> createAction) =>
             zip.UnzipFirstEntryAsync(extension, (s, _) => createAction(s));

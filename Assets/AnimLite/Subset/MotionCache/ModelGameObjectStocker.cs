@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -32,7 +31,7 @@ namespace AnimLite.Vmd
         /// すでにロード済みのモデルであれば、その複製を返す。
         /// 初回であればモデルをロードして返す。
         /// </summary>
-        public async Task<GameObject> GetOrLoadAsync(PathUnit path, ZipArchive archive, CancellationToken ct)
+        public async Task<GameObject> GetOrLoadAsync(PathUnit path, IArchive archive, CancellationToken ct)
         {
             var holder = await this.stocker.GetOrAddLazyAaync(path, async () =>
             {

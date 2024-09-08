@@ -186,7 +186,7 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<Order> BuildDanceOrderAsync(
-            this DanceSetDefineData ds, ZipArchive archive, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
+            this DanceSetDefineData ds, IArchive archive, VmdStreamDataCache cache, AudioSource audioSource, CancellationToken ct)
         {
 
             var aorder =
@@ -228,7 +228,7 @@ namespace AnimLite.Utility
 
 
         static async ValueTask<AudioOrder> buildAudioOrderAsync(
-            this AudioDefineData audio, ZipArchive archive, AudioSource audioSource, CancellationToken ct) =>
+            this AudioDefineData audio, IArchive archive, AudioSource audioSource, CancellationToken ct) =>
                 new()
                 {
                     AudioSource = audioSource,
@@ -239,7 +239,7 @@ namespace AnimLite.Utility
 
 
         static async Task<ModelOrder> buildBackGroundOrderAsync(
-            this ModelDefineData model, ZipArchive archive, CancellationToken ct)
+            this ModelDefineData model, IArchive archive, CancellationToken ct)
         =>
             new()
             {
@@ -251,7 +251,7 @@ namespace AnimLite.Utility
 
 
         static async Task<MotionOrder> buildMotionOrderAsync(
-            this DanceMotionDefineData motion, ZipArchive archive, VmdStreamDataCache cache, CancellationToken ct)
+            this DanceMotionDefineData motion, IArchive archive, VmdStreamDataCache cache, CancellationToken ct)
         {
             var model = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
 

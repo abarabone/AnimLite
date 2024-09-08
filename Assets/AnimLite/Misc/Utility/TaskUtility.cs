@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Runtime.CompilerServices;
@@ -32,6 +33,8 @@ namespace AnimLite.Utility
     public static class TaskUtility
     {
 
+
+
         public static async Awaitable<T> ToAwaitable<T>(this Task<T> t) =>
             await t;
 
@@ -48,6 +51,15 @@ namespace AnimLite.Utility
         //    return dst.ToArray();
         //}
 
+
+
+
+        public static ValueTask<T> AsValueTask<T>(this Task<T> src) => new ValueTask<T>(src);
+
+
+
+
+
         public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> src) =>
             Task.WhenAll(src);
         //public static Awaitable<T[]> WhenAll<T>(this IEnumerable<Awaitable<T>> src) =>
@@ -63,10 +75,31 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<T> AwaitAsync<T>(
-            this ValueTask<Stream> stream, Func<Stream, ValueTask<T>> act)
+
+
+
+        public static async ValueTask<Tdst> Await<Tsrc, Tdst>(
+            this Task<Tsrc> src, Func<Tsrc, CancellationToken, ValueTask<Tdst>> act, CancellationToken ct)
         =>
-            await act(await stream);
+            await act(await src, ct);
+
+        public static async ValueTask<Tdst> Await<Tsrc, Tdst>(
+            this ValueTask<Tsrc> src, Func<Tsrc, CancellationToken, ValueTask<Tdst>> act, CancellationToken ct)
+        =>
+            await act(await src, ct);
+
+
+        public static async ValueTask<Tdst> Await<Tsrc, Tdst>(
+            this Task<Tsrc> src, Func<Tsrc, Tdst> act)
+        =>
+            act(await src);
+
+        public static async ValueTask<Tdst> Await<Tsrc, Tdst>(
+            this ValueTask<Tsrc> src, Func<Tsrc, Tdst> act)
+        =>
+            act(await src);
+
+
 
 
 

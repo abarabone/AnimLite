@@ -36,19 +36,19 @@ namespace AnimLite.Vmd
 
 
         public static async ValueTask<VmdMotionData> LoadVmdExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            this PathUnit path, IArchive archive, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
-        {
-
-            if (archive != null && !path.IsFullPath())
             {
-                var data = archive.Unzip(path, VmdParser.ParseVmd);
 
-                if (data.bodyKeyStreams != null) return data;
-            }
+                if (archive != null && !path.IsFullPath())
+                {
+                    var data = archive.Extract(path, VmdParser.ParseVmd);
 
-            return await path.LoadVmdExAsync(ct);
-        });
+                    if (data.bodyKeyStreams != null) return data;
+                }
+
+                return await path.LoadVmdExAsync(ct);
+            });
 
 
 
@@ -59,33 +59,20 @@ namespace AnimLite.Vmd
             ValueTask<Stream> openAsync_(PathUnit path) =>
                 path.OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct);
 
-            var fullpath = path.ToFullPath();
+            var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();
 
-            return fullpath.DividZipAndEntry() switch
+            return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath).UnzipAsync(entrypath, VmdParser.ParseVmd),
-                var (zippath, _) when fullpath.IsZip() =>
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".vmd", VmdParser.ParseVmd),
+                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, VmdParser.ParseVmd),
+                var (zippath, _) when fullpath.IsZipArchive() =>
+                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vmd", VmdParser.ParseVmd),
                 _ =>
-                    await openAsync_(fullpath).UsingAsync(VmdParser.ParseVmd),
+                    await openAsync_(fullpath + queryString).UsingAwait(VmdParser.ParseVmd),
             };
         });
 
-
-
-
-        /////// <summary>
-        /////// zip などのストリームをシーク可能にするために、メモリーストリームを介してパースする
-        /////// </summary>
-        //static async ValueTask<VmdMotionData> parseVmdViaMemoryStreamAsync_(Stream s)
-        //{
-        //    using var m = new MemoryStream();
-        //    await s.CopyToAsync(m);
-
-        //    return VmdParser.ParseVmd(m);
-        //}
 
     }
 }

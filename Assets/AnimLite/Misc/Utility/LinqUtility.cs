@@ -98,6 +98,14 @@ namespace AnimLite.Utility.Linq
         public static IEnumerable<(T1, T2)> Zip<T1, T2>(this (IEnumerable<T1> src1, IEnumerable<T2> src2) x) =>
             (x.src1, x.src2).Zip((x, y) => (x, y));
 
+
+        public static IAsyncEnumerable<T> Zip<T1, T2, T>(this (IAsyncEnumerable<T1> src1, IAsyncEnumerable<T2> src2) x, Func<T1, T2, T> f) =>
+            AsyncEnumerable.Zip(x.src1, x.src2, f);
+
+        public static IAsyncEnumerable<(T1, T2)> Zip<T1, T2>(this (IAsyncEnumerable<T1> src1, IAsyncEnumerable<T2> src2) x) =>
+            (x.src1, x.src2).Zip((x, y) => (x, y));
+
+
     }
 
 }

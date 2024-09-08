@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using System.Data.Common;
 using UnityEngine;
+using UnityEditor;
+#if UNITY_EDITOR
+using UnityEditor.Build.Reporting;
+using UnityEditor.Build;
+#endif
 
 namespace AnimLite.Utility
 {
@@ -49,6 +54,12 @@ namespace AnimLite.Utility
     [Serializable]
     public struct PathUnit : IEquatable<PathUnit>
     {
+        /// <summary>
+        /// true にすると、ParentPath 以下にしかアクセスできない。デフォルトは true
+        /// </summary>
+        static public bool IsAccessWithinParentPathOnly = true;
+
+
 
         public string Value;// { get; private set; }
 
@@ -56,17 +67,50 @@ namespace AnimLite.Utility
         public PathUnit(string path) => this.Value = path;
 
         public static implicit operator string(PathUnit path) => path.Value;
-        public static implicit operator PathUnit(string path) => new PathUnit(path);
+        public static implicit operator PathUnit(string path) => new PathUnit(path);// 楽だけどやめたほうがいいかも…
+
+
+
+
+        // パスのキャッシュ。Application.xxxPath はメインスレッドからしかよべないというイミフさなので持っておく
+        public static string CacheFolderPath { get; private set; }
+        public static string DataFolderPath { get; private set; }
+        public static string PersistentFolderPath { get; private set; }
+
+        public static void InitPath()
+        {
+            PathUnit.CacheFolderPath = Application.temporaryCachePath;
+            PathUnit.DataFolderPath = Application.dataPath;
+            PathUnit.PersistentFolderPath = Application.persistentDataPath;
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            PathUnit.ParentPath = Application.persistentDataPath;
+#else
+            PathUnit.ParentPath = Application.dataPath;
+#endif
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"CacheFolderPath : {PathUnit.CacheFolderPath}".ShowDebugLog();
+            $"DataFolderPath : {PathUnit.DataFolderPath}".ShowDebugLog();
+            $"PersistentFolderPath : {PathUnit.PersistentFolderPath}".ShowDebugLog();
+            $"ParentPath : {PathUnit.ParentPath}".ShowDebugLog();
+#endif
+        }
+
+        //static PathUnit()
+        //{
+        //    PathUnit.InitPath();
+        //}
+
 
         /// <summary>
         /// .ToPath() で付加される親パスを指定する。
         /// デフォルトは Application.dataPath 
         /// </summary>
-#if UNITY_ANDROID && !UNITY_EDITOR
-        static public string ParentPath { get; private set; } = Application.persistentDataPath;
-#else
-        static public string ParentPath { get; private set; } = Application.dataPath;
-#endif
+        static public string ParentPath { get; private set; }
+
+
+
         /// <summary>
         /// フルパスモードをセットすると、ParentPath が変化する。
         /// </summary>
@@ -76,17 +120,16 @@ namespace AnimLite.Utility
             {
                 PathUnit.ParentPath = value switch
                 {
-                    FullPathMode.PersistentDataPath => Application.persistentDataPath,
-                    FullPathMode.DataPath => Application.dataPath,
+                    FullPathMode.PersistentDataPath => PathUnit.PersistentFolderPath,
+                    FullPathMode.DataPath => PathUnit.DataFolderPath,
                     _ => "",
                 };
             }
         }
 
-        /// <summary>
-        /// true にすると、ParentPath 以下にしかアクセスできない。デフォルトは true
-        /// </summary>
-        static public bool IsAccessWithinParentPathOnly = true;
+
+
+
 
 
 
@@ -108,6 +151,11 @@ namespace AnimLite.Utility
         // dictionary 用 boxing 回避 ------------------------------------
     }
 
+
+
+
+
+
     public struct ResourceName
     {
         public string Value { get; private set; }
@@ -117,15 +165,42 @@ namespace AnimLite.Utility
         public static implicit operator string(ResourceName res) => res.Value;
     }
 
+    public struct QueryString
+    {
+        public string Value { get; private set; }
+
+        public QueryString(string name) => this.Value = name;
+
+
+        public static implicit operator string(QueryString res) => res.Value;
+
+        public static PathUnit operator +(PathUnit path, QueryString queryString) =>
+            (queryString.Value ?? "") != ""
+                ? $"{path.Value}?{queryString.Value}"
+                : path;
+    }
+
+
+
+
 
     public static class PathUtilityExtension
     {
+
+
 
         /// <summary>
         /// 単純に文字列を PathUnit で包んで返す。
         /// </summary>
         public static PathUnit ToPath(this string path) =>
             new PathUnit(path);
+
+
+        //public static PathUnit Add(this PathUnit path, string str) =>
+        //    (str ?? "") != ""
+        //        ? $"{path.Value}/{str}"
+        //        : "";
+
 
 
 
@@ -146,7 +221,7 @@ namespace AnimLite.Utility
             .show_(path)
             ;
 
-        //public static PathUnit ToFullPath(this PathUnit path, ZipArchive archive) =>
+        //public static PathUnit ToFullPath(this PathUnit path, IArchive archive) =>
         //    archive == null
         //        ? path.ToFullPath(PathUnit.ParentPath)
         //        : path
@@ -159,14 +234,15 @@ namespace AnimLite.Utility
         /// フルパスは ドライブレター/ＵＲＬスキームから始まる（１～７文字目までに : を含む）, / から始まる, as resource で終わる
         /// </summary>
         public static bool IsFullPath(this PathUnit path) =>
-            //path.IsBlank()
-            //||
-            path.Value[1..6].Contains(':')// ドライブレター、ＵＲＩスキーム
-            ||
-            path.Value[0] == '/'
-            ||
-            path.IsResource()
-            ;
+            !path.IsBlank()
+            &&
+            (
+                path.Value[1..6].Contains(':')// ドライブレター、ＵＲＩスキーム
+                ||
+                path.Value[0] == '/'
+                ||
+                path.IsResource()
+            );
 
 
 
@@ -175,6 +251,41 @@ namespace AnimLite.Utility
             path.Value.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase)
             ||
             path.Value.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase);
+
+
+        /// <summary>
+        /// .../xxx.xxx? のように、「?」で終わるものにも対応
+        /// </summary>
+        public static PathUnit TrimQueryString(this PathUnit weburl)
+        {
+            var ist = weburl.Value.IndexOf('?');
+            if (ist == -1) return weburl;
+
+            var ied = weburl.Value.IndexOf('/', ist);
+            if (ied == -1) return weburl.Value[..ist];
+
+            var st = weburl.Value[..ist];
+            var ed = weburl.Value[ied..];
+            return (st + ed).ToPath();
+        }
+
+        /// <summary>
+        /// .../xxx.xxx? のように、「?」で終わるものにも対応
+        /// </summary>
+        public static (PathUnit path, QueryString querystring) DividToPathAndQueryString(this PathUnit weburl)
+        {
+            var ist = weburl.Value.IndexOf('?');
+            if (ist == -1) return (weburl, new QueryString(""));
+
+            var ied = weburl.Value.IndexOf('/', ist);
+            if (ied == -1) return (weburl.Value[..ist], new QueryString(weburl.Value[(ist+1)..]));
+
+            var st = weburl.Value[..ist];
+            var ed = weburl.Value[ied..];
+            var queryString = weburl.Value[(ist+1)..ied];
+            return ((st + ed).ToPath(), new QueryString(queryString));
+        }
+
 
 
 
@@ -189,16 +300,21 @@ namespace AnimLite.Utility
                 ? new ResourceName(path.Value[0..^("as resource".Length)].TrimEnd())
                 : new ResourceName("");
 
-        /// <summary>
-        /// とりあえず http の zip entry は考えない（ ? のときにエントリ指定をどう扱うか悩み中）
-        /// </summary>
-        public static bool IsZip(this PathUnit path) =>
-            path.IsHttp()
-                ? path.Value.Split('?')[0].EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase)
-                : path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
+
+
+
+
 
         /// <summary>
-        /// とりあえず http の zip entry は考えない（ ? のときにエントリ指定をどう扱うか悩み中）
+        /// .zip で終わるなら true を返す
+        /// </summary>
+        public static bool IsZipArchive(this PathUnit path) =>
+            path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
+
+
+
+        /// <summary>
+        /// 
         /// </summary>
         public static bool IsZipEntry(this PathUnit path) =>
             path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase);
@@ -209,14 +325,14 @@ namespace AnimLite.Utility
         /// パスを .zip/ で分割し、.zip までと / より後ろを返す。
         /// zip でなければ ("", "") を返す。
         /// </summary>
-        public static (PathUnit zipPath, PathUnit entryPath) DividZipAndEntry(this PathUnit path)
+        public static (PathUnit zipPath, PathUnit entryPath) DividZipToArchiveAndEntry(this PathUnit path)
         {
             var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
             return (i >= 0) switch
             {
                 true =>
                     divpath(),
-                false when path.IsZip() => 
+                false when path.IsZipArchive() => 
                     (path, ""),
                 false =>
                     ("", ""),
@@ -224,7 +340,7 @@ namespace AnimLite.Utility
             
             (PathUnit, PathUnit) divpath()
             {
-                var zippath = path.Value[0..(i + 4)];
+                var zippath = path.Value[..(i + 4)];
                 var entrypath = path.Value[(i + 5)..];
                 return (zippath, entrypath);
             }
@@ -241,6 +357,23 @@ namespace AnimLite.Utility
 
             return path.Value[(i + 5)..];
         }
+
+
+
+
+
+
+        public static string GetExt(this PathUnit path) =>
+            Path.GetExtension(path);
+
+        //public static PathUnit GetExtEx(this PathUnit path) =>
+        //    Path.GetExtension(path)
+        //        .Split("?", StringSplitOptions.RemoveEmptyEntries)[0]
+        //        .ToPath();
+
+
+
+
 
 
 
@@ -296,6 +429,39 @@ namespace AnimLite.Utility
 
     }
 
+
+
+    //public class PathUnit_Initializer
+    //{
+
+    //    static PathUnit_Initializer()
+    //    {
+    //        PathUnit.InitPath();
+    //    }
+
+
+    //}
+
+#if UNITY_EDITOR
+    [InitializeOnLoad]
+    public class PathUnit_EditorInitializer
+    {
+        static PathUnit_EditorInitializer()
+        {
+            PathUnit.InitPath();
+        }
+    }
+
+    //public class PathUnit_BuildProcessor : IPreprocessBuildWithReport
+    //{
+    //    public int callbackOrder => 0;
+
+    //    public void OnPreprocessBuild(BuildReport report)
+    //    {
+    //        PathUnit.InitPath();
+    //    }
+    //}
+#endif
 
 
 }

@@ -62,7 +62,7 @@ namespace AnimLite.Vmd
 
 
         public static async ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, PathUnit faceMapFilePath, ZipArchive archive, CancellationToken ct)
+            this PathUnit vmdFilePath, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
         {
             var vmddata = await VmdParser.LoadVmdExAsync(vmdFilePath, archive, ct);
             var facemap = await VrmParser.LoadFaceMapExAsync(faceMapFilePath, ct);
@@ -83,7 +83,7 @@ namespace AnimLite.Vmd
 
 
         public static async ValueTask<VmdStreamData> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, VmdFaceMapping facemap, ZipArchive archive, CancellationToken ct)
+            this PathUnit vmdFilePath, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
         {
             var vmddata = await VmdParser.LoadVmdExAsync(vmdFilePath, archive, ct);
 

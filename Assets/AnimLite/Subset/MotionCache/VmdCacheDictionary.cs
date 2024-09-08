@@ -49,7 +49,7 @@ namespace AnimLite.Vmd
 
 
         public async Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
-            PathUnit vmdpath, PathUnit facemappath, ZipArchive archive, CancellationToken ct)
+            PathUnit vmdpath, PathUnit facemappath, IArchive archive, CancellationToken ct)
         {
 
             var outercache = this;

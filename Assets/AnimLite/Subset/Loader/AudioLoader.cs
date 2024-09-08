@@ -22,6 +22,7 @@ namespace AnimLite.Utility
     using AnimLite.Vmd;
     using AnimLite.Vrm;
     using AnimLite.Utility;
+    using System.Runtime.InteropServices.ComTypes;
 
     static public class AudioLoader
     {
@@ -43,19 +44,24 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            this PathUnit path, IArchive archive, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
-        {
-
-            if (archive != null && !path.IsFullPath())
             {
-                var clip = await archive.UnzipAsync(path, s => s.LoadAudioClipViaTmpFileAsync(path, ct));
 
-                if (clip.clip != null) return clip;
-            }
+                if (archive != null && !path.IsFullPath())
+                {
+                    var clip = await archive.ExtractAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct));
 
-            return await path.LoadAudioClipExAsync(ct);
-        });
+                    if (!clip.clip.IsUnityNull()) return clip;
+                }
+
+                return await path.LoadAudioClipExAsync(ct);
+            });
+
+        static ValueTask<AudioClipAsDisposable> loadAudioClipViaTmpFileAsync(
+            this Stream stream, PathUnit path, CancellationToken ct)
+        =>
+            path.GetCachePathAsync(stream, ct).Await(LoadAudioClipAsync, ct);
 
 
 
@@ -66,19 +72,19 @@ namespace AnimLite.Utility
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
-            var fullpath = path.ToFullPath();
+            var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();
 
-            return fullpath.DividZipAndEntry() switch
+            return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath).UnzipAsync(entrypath, s => s.LoadAudioClipViaTmpFileAsync(entrypath, ct)),
+                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.loadAudioClipViaTmpFileAsync(entrypath, ct)),
                 var (zippath, _) when zippath != "" =>
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".mp3;.ogg;.acc;.wav", (s, n) => s.LoadAudioClipViaTmpFileAsync(n, ct)),
+                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".mp3;.ogg;.acc;.wav", (s, n) => s.loadAudioClipViaTmpFileAsync(n, ct)),
                 var (_, _) when fullpath.IsResource() =>
                     await fullpath.ToResourceName().LoadAudioClipFromResourceAsync(ct),
                 var (_, _) =>
-                    await fullpath.LoadAudioClipAsync(ct),
+                    await (fullpath + queryString).LoadAudioClipAsync(ct),
             };
         });
 
@@ -94,7 +100,11 @@ namespace AnimLite.Utility
         {
             ct.ThrowIfCancellationRequested();
 
-            var atype = Path.GetExtension(path).Split('?')[0].ToLower() switch
+            var atype = path
+                .GetExt().ToPath()
+                .TrimQueryString().Value
+                .ToLower()
+            switch
             {
                 ".mp3" => AudioType.MPEG,
                 ".ogg" => AudioType.OGGVORBIS,
@@ -138,34 +148,6 @@ namespace AnimLite.Utility
 
                 return clip;
             }
-            //AudioClip getAudioClip_(UnityWebRequest req)
-            //{
-            //    try
-            //    {
-            //        return DownloadHandlerAudioClip.GetContent(req);
-            //    }
-            //    catch (System.InvalidOperationException e)
-            //    {
-            //        Debug.LogWarning(e);
-            //        return null;
-            //    }
-            //}
-        }
-
-        public static async ValueTask<AudioClipAsDisposable> LoadAudioClipViaTmpFileAsync(
-            this Stream s, string name, CancellationToken ct)
-        {
-            await Awaitable.MainThreadAsync();
-            var tmppath = $"{Application.temporaryCachePath}/{Path.GetFileName(name)}".ToPath();
-            using var fileCleaner = new Disposable(() => File.Delete(tmppath));
-            tmppath.Value.ShowDebugLog();
-
-            {
-                using var writer = new StreamWriter(tmppath, append: false);
-                await s.CopyToAsync(writer.BaseStream);
-            }
-
-            return await tmppath.LoadAudioClipAsync(ct);
         }
 
 
@@ -191,6 +173,8 @@ namespace AnimLite.Utility
 
     }
 
+
+
     [Serializable]
     public struct AudioClipAsDisposable : IDisposable
     {
@@ -200,7 +184,9 @@ namespace AnimLite.Utility
         public void Dispose()
         {
             this.disposeAction?.Invoke();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"dispose audio : {this.clip?.name}".ShowDebugLog();
+#endif
         }
 
         public static implicit operator AudioClip(AudioClipAsDisposable src) => src.clip;

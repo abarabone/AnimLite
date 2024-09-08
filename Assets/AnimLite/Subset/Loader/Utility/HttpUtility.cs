@@ -45,7 +45,7 @@ namespace AnimLite.Utility
 
         static HttpLoader()
         {
-            Debug.Log("http client created");
+            "http client created".ShowDebugLog();
 
             Client = new HttpClient();
             isCreated = true;
@@ -55,7 +55,7 @@ namespace AnimLite.Utility
         {
             if (isCreated) Client.Dispose();
 
-            Debug.Log("http client disposed");
+            "http client disposed".ShowDebugLog();
         }
     }
 
@@ -74,7 +74,7 @@ namespace AnimLite.Utility
 
 
             using var response = await HttpLoader.Client.GetAsync(url);
-            if (!response.IsSuccessStatusCode) throw new System.Net.Http.HttpRequestException("response is not success status code.");
+            if (!response.IsSuccessStatusCode) throw new System.Net.Http.HttpRequestException($"response is not success status code. {url.Value}");
 
             ct.ThrowIfCancellationRequested();
 

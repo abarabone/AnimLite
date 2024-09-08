@@ -41,13 +41,13 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<GameObject> LoadModelExAsync(
-            this PathUnit path, ZipArchive archive, CancellationToken ct) =>
+            this PathUnit path, IArchive archive, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
 
             if (archive != null && !path.IsFullPath())
             {
-                var model = await archive.UnzipAsync(path, s => s.convert(path, ct));
+                var model = await archive.ExtractAsync(path, s => s.convertAsync(path, ct));
 
                 if (model != null) return model;
             }
@@ -70,49 +70,30 @@ namespace AnimLite.Vrm
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
-            var fullpath = path.ToFullPath();
+            var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();
 
-            return fullpath.DividZipAndEntry() switch
+            return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath).UnzipAsync(entrypath, s => s.convert(entrypath, ct)),
-                var (zippath, _) when fullpath.IsZip() =>
-                    await openAsync_(zippath).UnzipFirstEntryAsync(".vrm;.glb", (s, path) => s.convert(path, ct)),
+                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.convertAsync(entrypath, ct)),
+                var (zippath, _) when fullpath.IsZipArchive() =>
+                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vrm;.glb", (s, path) => s.convertAsync(path, ct)),
                 var (_, _) when fullpath.IsResource() =>
                     await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
                 var (_, _) =>
-                    await openAsync_(fullpath).UsingAsync(s => s.convert(fullpath, ct)),
+                    await openAsync_(fullpath + queryString).UsingAwait(s => s.convertAsync(fullpath, ct)),
             };
         });
 
-        //public static async ValueTask<GameObject> LoadModelExAsync2(this PathUnit path, CancellationToken ct)
-        //{
-        //    ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
-
-        //    return await LoadErr.LoggingAsync(async () =>
-        //    {
-        //        var fullpath = path.ToFullPath();
-        //        fullpath.ThrowIfAccessedOutsideOfParentFolder();
-
-        //        return fullpath.DividZipAndEntry() switch
-        //        {
-        //            var (zippath, entrypath) when entrypath != "" =>
-        //                await openAsync_(zippath).UnzipAsync(entrypath, s => s.convert(entrypath, ct)),
-        //            var (zippath, _) when fullpath.IsZip() =>
-        //                await openAsync_(zippath).UnzipFirstEntryAsync(".vrm;.glb", (s, path) => s.convert(path, ct)),
-        //            var (_, _) when fullpath.IsResource() =>
-        //                await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
-        //            var (_, _) =>
-        //                await openAsync_(fullpath).UsingAsync(s => s.convert(fullpath, ct)),
-        //        };
-        //    });
-        //}
 
 
 
-        static ValueTask<GameObject> convert(this Stream s, PathUnit path, CancellationToken ct) =>
-            Path.GetExtension(path.Value).Split('?')[0].ToLower() switch
+        static ValueTask<GameObject> convertAsync(this Stream s, PathUnit path, CancellationToken ct) =>
+            path.TrimQueryString()
+                .GetExt()
+                .ToLower()
+            switch
             {
                 ".vrm" => s.convertVrmToModelAsync(ct),
                 ".glb" => s.convertGlbToModelAsync(ct),

@@ -5,7 +5,7 @@
 - burst, playable にも対応した
 - 名前空間 AnimLite.Vrm 関係は、UniVRM 1.x が必要です
 - 裏スレッドでの .vmd 読み込み
-- .vmd のキャッシュ機構、データ共有機構
+- .vmd, model, web loading のキャッシュ機構、データ共有機構
 - .json で音楽、モデル、アニメーション、配置、を設定する機能
 
 # 新機能・修正
@@ -20,11 +20,18 @@
 - .vrm から作成したモデルゲームオブジェクトを、シーン上でキャッシュしておく機能を追加（キャッシュ最大数の目安を指定できる）
 - データロードに１つでも失敗するとエラーで中断していたが、続行するようにした
 - http での .zip ロードで、クエリストリングの ? 以降がある場合、機能していなかったので修正
-  - ただし、https://.../ds.zip?dl=1/dance_scene.json のような記述はまだ無理（というか書き方どうしようか悩み中）
+  ~~- ただし、https://.../ds.zip?dl=1/dance_scene.json のような記述はまだ無理（というか書き方どうしようか悩み中）~~
+- http のクエリストリング + .zip entry の記述を可能にした
+  - xxx/xxx.zip?xxx=xxx&xxx=xxx/xxx/xxx.xxx 形式
+- http ロードしたファイルをキャッシュするようにした。
+  - キャッシュファイルは Application.CashDataPath/loadcach フォルダ
+  - 任意のタイミングでクリアできるが、必ずプログラム開始時にクリアされる
 
 # やりたい・検討中
 - http 時の .zip で クエリストリングの ? 以降と ZipArchive エントリの指定に対応させたい（が、http での .zip はあまり実用性ない気もする…）
+  → xxx/xxx.zip?xxx=xxx&xxx=xxx/xxx/xxx.xxx の形式で記載できるようにした
 - .zip の並列スイッチは、ZipArchive のエントリの時に機能しないことに気づいたので、対応したい
+  → 対応した、別のファイルとして扱って並列ロード可能とした
 - 同じパスのモデルをキャッシュする際、同じモデルを複数体同時に表示すると最後のモデルしか表示されない
 - DanceSetSimpleCaption において、キャラが多いとテロップが意味不明になるので、複数回に分けるとかスクロールするとか対処したい
 - ~~WebGL でサンプル作ってどっかに置きたい~~　<- webgl だとスレッド使えないらしいのでダメかも
@@ -54,7 +61,7 @@
      （並列化は Task.Run() や Awaitable.MainThreadAsync() などでやる）
 
 # その他
-- unity 2023.1.19f1, VRM1.20
+- unity ~~2023.1.19f1~~ 6 prevew にしちゃった… + VRM1.20
 - テストコードは書いてない（よくわからない）、サンプルシーンが動けばとりあえずいいかみたいな
 - とりあえず ~~quest2~~ quest3（買った！！）で遊びながら修正していきたい
 
@@ -154,17 +161,18 @@
   - drop box： https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt\&st=hrqrzch6\&dl=1 ← 末尾を dl=1 にすればよいみたい
     - クエリストリング中の & は、quest3(android?) だと \& のようにエスケープしないとダメだったので注意
     - one drive とか google のマイドライブとかだとパスに拡張子が含まれないので、content の type とか見る方法にしないとダメかも…
+    - https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt\&st=hrqrzch6\&dl=1/ds/step2.vmd のような記述（クエリストリングの後に zip 内のパス指定）もOK
   - unity のリソースは末尾に as resource をつける： step1 as resource
 - 単体 zip に固めたデータは、同じ ZipArchive を使いまわすのでマルチスレッドロードが利かない（非同期ではあるが）
   - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
   - デフォルトは false
-  - マルチスレッドロードは機能していないことに気づいた。ZipArchive のエントリが相対パスの場合、ローカルを見に行ってしまう…
+  - ~~マルチスレッドロードは機能していないことに気づいた。ZipArchive のエントリが相対パスの場合、ローカルを見に行ってしまう…~~ ← 修正対応した（つもり）
 - いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
-- 相対パスは、下記のように絶対パスに変換される
+- 相対パスは、下記のように絶対パスに変換してロードする
   - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
   - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
   - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
-- PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできない
+- PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできないようにした
   - デフォルトは true
   - アクセスすると IOException がスローされる（ null が返されるとかのほうがいいだろうか）
 - json なのでいろいろ省略しても読める
@@ -177,4 +185,6 @@
   - チェックをオンにするか、Resources の中の vrm を reimport すると動くようです
   - vrm 0 は自動でプレハブを新規作成するようで、その時データとなるフォルダ？っぽいのが大量にできてしまう。それが嫌なのでオフにしてます
   - vrm ファイル自体がモデルのプレハブとして機能するようなので、新規作成されたプレハブとデータのフォルダは消してしまっても動きます
+- unity 6 preview から addressables での Resources フォルダが使えなくなったようす…（ひどい）
+  → Resources_moved に移動されてしまう
 

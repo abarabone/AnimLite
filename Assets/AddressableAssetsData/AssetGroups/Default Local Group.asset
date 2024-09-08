@@ -13,13 +13,41 @@ MonoBehaviour:
   m_Name: Default Local Group
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
-  m_Data:
-    m_SerializedData: []
   m_GUID: eae038f8f87b0fa4bb6369d012e9678d
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 635a1afdc1208b64f96659de7b784c6f
+    m_Address: 5239679709811772970
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6ce4b903ae163c54b90d48f8488f57cc
+    m_Address: PronamaChan_shorts
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 724284d6bf8b45f44a43dd56b836285b
+    m_Address: default_facemap
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 757d1c40a0fc60041975ba14eb4a915c
+    m_Address: step2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 877fbe30b9471334b909f070d1ca22b1
+    m_Address: "\u795E\u793E\u6A4B\u914D\u5E03\u7528test"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1491baa4e56fdd4b91dcce686da4420
+    m_Address: AliciaSolid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: e42b86016f7b2f3469020d227030810b, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: c455bf14c0493164293a4f9b08bab419, type: 2}
     - {fileID: 11400000, guid: c9632dd1cbaf0fe4ca1442f52bbba23b, type: 2}
+    - {fileID: 11400000, guid: c455bf14c0493164293a4f9b08bab419, type: 2}

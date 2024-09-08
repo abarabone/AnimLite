@@ -94,7 +94,7 @@
         },
         {
             "Model": {
-                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources/PronamaChan_shorts.vrm",
+                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources_moved/PronamaChan_shorts.vrm",
                 "Position": {
                     "x": 2.0,
                     "y": 0.0,
@@ -107,7 +107,7 @@
                 }
             },
             "Animation": {
-                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources/step2.vmd",
+                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources_moved/step2.vmd",
                 "FaceMappingFilePath": "",
                 "DelayTime": 0.0
             },

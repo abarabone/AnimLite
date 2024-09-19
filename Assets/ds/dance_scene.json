@@ -4,9 +4,9 @@
         "Volume": 0.487,
         "DelayTime": 0.0
     },
-    "BackGrounds": [
-      {
-        "ModelFilePath": "Resources_moved/神社橋配布用test.glb",
+    "BackGrounds": {
+      "main": {
+        "ModelFilePath": "Resources_moved/神社橋配布用test.glb?",
         "Position": {
           "x": 0.0,
           "y": 0.0,
@@ -18,9 +18,9 @@
           "z": 0.0
         }
       }
-    ],
-    "Motions": [
-        {
+    },
+    "Motions": {
+        "center": {
             "Model": {
                 "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
                 "Position": {
@@ -44,7 +44,7 @@
                 "FootIkMode": "auto"
             }
         },
-        {
+        "right": {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/ぶいけっとにゃん.vrm",
                 "Position": {
@@ -68,7 +68,7 @@
                 "FootIkMode": "auto"
             }
         },
-        {
+        "left": {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/ぶいけっとにゃん.vrm",
                 "Position": {
@@ -92,7 +92,7 @@
                 "FootIkMode": "auto"
             }
         },
-        {
+        "right-back": {
             "Model": {
                 "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources_moved/PronamaChan_shorts.vrm",
                 "Position": {
@@ -116,7 +116,7 @@
                 "FootIkMode": "auto"
             }
         },
-        {
+        "left-back": {
             "Model": {
                 "ModelFilePath": "Resources_moved/AliciaSolid.vrm",
                 "Position": {
@@ -140,7 +140,7 @@
                 "FootIkMode": "auto"
             }
         },
-        {
+        "center-back": {
             "Model": {
                 "ModelFilePath": "5239679709811772970 as resource",
                 "Position": {
@@ -164,5 +164,5 @@
                 "FootIkMode": "auto"
             }
         }
-    ]
+    }
 }

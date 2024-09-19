@@ -86,7 +86,7 @@ namespace AnimLite.Samples
 
             var job = this.anim.create(bone, posKeyFinder, rotKeyFinder, timer);
 
-            graph.CreateVmdAnimationJobWithSyncScript(this.anim, job, delay: 1);
+            graph.CreateVmdAnimationJobWithSyncScript(this.anim, job, timer, delay: 1);
 
             graph.CreateVmdFaceAnimation(anim.gameObject, faceKeyFinder, face, timer, delay: 1);
 

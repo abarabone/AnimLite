@@ -22,7 +22,7 @@ namespace AnimLite.Utility
     using static AnimLite.DancePlayable.DanceGraphy2;
 
 
-
+#nullable enable
 
     public class DanceSetDefineData
     {
@@ -33,8 +33,8 @@ namespace AnimLite.Utility
         public DanceMotionDefineData[] Motions;
 
         public string CaptionMode;
-        public InformationDefain AudioInformation;
-        public InformationDefain AnimationInformation;
+        public InformationDefine AudioInformation;
+        public InformationDefine AnimationInformation;
     }
     public class DanceMotionDefineData
     {
@@ -42,8 +42,8 @@ namespace AnimLite.Utility
         public AnimationDefineData Animation;
         public MotionOptionsData Options;
 
-        public InformationDefain ModelInformation;
-        public InformationDefain AnimationInformation;
+        public InformationDefine ModelInformation;
+        public InformationDefine AnimationInformation;
     }
 
     public class AnimationDefineData
@@ -88,7 +88,7 @@ namespace AnimLite.Utility
     public static class JsonConverter
     {
 
-        // json を data 化する。冗長なのでなんとかできないかなぁ…
+        // json を data 化する。冗長なのでなんとかできないかなぁ… →　廃止する
         public static DanceSetDefineData ToData(this DanceSetJson json) =>
             new()
             {
@@ -107,10 +107,10 @@ namespace AnimLite.Utility
                 },
 
                 BackGrounds = Enumerable.ToArray(
-                    from model in json.BackGrounds ?? json.BackGrounds.EmptyEnumerable().Box()
+                    from model in json.BackGrounds.Values ?? json.BackGrounds.Values.EmptyEnumerable().Box()
                     select new ModelDefineData
                     {
-                        ModelFilePath = model.ModelFilePath ?? "",
+                        ModelFilePath = model.ModelFilePath.Value ?? "",
                         Position = model.Position,
                         Rotation = Quaternion.Euler(model.EulerAngles),
                         Scale = model.Scale,
@@ -118,12 +118,12 @@ namespace AnimLite.Utility
                 ),
 
                 Motions = Enumerable.ToArray(
-                    from motion in json.Motions ?? json.Motions.EmptyEnumerable().Box()
+                    from motion in json.Motions.Values ?? json.Motions.Values.EmptyEnumerable().Box()
                     select new DanceMotionDefineData
                     {
                         Model = new()
                         {
-                            ModelFilePath = motion.Model.ModelFilePath ?? "",
+                            ModelFilePath = motion.Model.ModelFilePath.Value ?? "",
                             Position = motion.Model.Position,
                             Rotation = Quaternion.Euler(motion.Model.EulerAngles),
                             Scale = motion.Model.Scale,
@@ -138,27 +138,22 @@ namespace AnimLite.Utility
 
                         Options = new()
                         {
-                            FootIkMode = (motion.Options?.FootIkMode ?? "") switch
-                            {
-                                "on" => VmdFootIkMode.@on,
-                                "off" => VmdFootIkMode.off,
-                                _ => VmdFootIkMode.auto,
-                            },
+                            FootIkMode = motion.Options?.FootIkMode ?? VmdFootIkMode.auto,
                             BodyScaleFromHuman = motion.Options?.BodyScaleFromHuman ?? default,
                         },
 
-                        ModelInformation = motion.ModelInformation ?? default,
-                        AnimationInformation = motion.AnimationInformation ?? default,
+                        ModelInformation = motion.ModelInformation,
+                        AnimationInformation = motion.AnimationInformation,
                     }
                 ),
 
-                AudioInformation = json.AudioInformation ?? default,
-                AnimationInformation = json.AnimationInformation ?? default,
+                AudioInformation = json.AudioInformation,
+                AnimationInformation = json.AnimationInformation,
                 CaptionMode = json.CaptionMode ?? "",
             };
     }
 
-
+#nullable disable
 
     public static class DanceSetBuildUtility
     {

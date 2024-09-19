@@ -11,7 +11,7 @@ namespace AnimLite.DancePlayable
             var playable = ScriptPlayable<SyncJobTimerPlayable>.Create(graph);
 
             playable.GetBehaviour().UpdateTimer = updateTimerAction;
-
+            
             return playable;
         }
 
@@ -21,9 +21,10 @@ namespace AnimLite.DancePlayable
         //public override void OnGraphStart(Playable playable)
         //{
         //    var cur = playable;
+        //    var src = cur.GetInput(0);
         //    var dst = cur.GetOutput(0);
 
-        //    cur.SetDuration(dst.GetDuration());
+        //    cur.SetDuration(src.GetDuration());
         //}
 
         public override void PrepareFrame(Playable playable, FrameData info)// ‚±‚ê‚¾‚Æ—ˆ‚éAoutput ‚Ìí—Ş‚É‚æ‚éH

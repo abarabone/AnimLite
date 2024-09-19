@@ -26,11 +26,13 @@ namespace AnimLite.DancePlayable
 
         [FilePath]
         public PathUnit JsonFile;
+        [FilePath]
+        public PathUnit JsonFileOverwrite;
 
 
         DanceGraphy2 graphy;
 
-        public PlayableGraph Graph => this.graphy.graph;
+        public PlayableGraph? Graph => this.graphy?.graph;
 
 
         [SerializeField]
@@ -56,9 +58,9 @@ namespace AnimLite.DancePlayable
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
-                    var jsonpath = this.JsonFile;
-                    using var archive = await jsonpath.OpenWhenZipAsync(ct);
-                    var ds = await jsonpath.LoadDanceSceneAsync(archive, ct);
+                    using var archive = await this.JsonFile.OpenWhenZipAsync(ct);
+                    var ds_= await this.JsonFile.LoadJsonAsync<DanceSetJson>(archive, ct);
+                    var ds = await this.JsonFileOverwrite.LoadJsonAsync<DanceSetJson>(ds_, ct);
                     var order = await ds.BuildDanceGraphyOrderAsync(this.Cache, archive, this.AudioSource, ct);
 
                     await Awaitable.MainThreadAsync();

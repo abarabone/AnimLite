@@ -431,16 +431,14 @@ namespace AnimLite.Utility
 
 
 
-    //public class PathUnit_Initializer
-    //{
-
-    //    static PathUnit_Initializer()
-    //    {
-    //        PathUnit.InitPath();
-    //    }
-
-
-    //}
+    public class PathUnit_Initializer
+    {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Initialize()
+        {
+            PathUnit.InitPath();
+        }
+    }
 
 #if UNITY_EDITOR
     [InitializeOnLoad]

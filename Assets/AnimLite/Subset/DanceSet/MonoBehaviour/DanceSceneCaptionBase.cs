@@ -7,6 +7,6 @@ namespace AnimLite.DancePlayable
 {
     public abstract class DanceSceneCaptionBase : MonoBehaviour
     {
-        public abstract void NortifyPlaying(DanceSetDefineData ds);
+        public abstract void NortifyPlaying(DanceSetJson ds);
     }
 }

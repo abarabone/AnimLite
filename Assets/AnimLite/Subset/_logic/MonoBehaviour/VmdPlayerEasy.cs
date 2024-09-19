@@ -67,7 +67,8 @@ namespace AnimLite.Samples
                     .ToKeyFinderWith<Key4CatmulPos, Clamp, Forward>(timer);
 
                 var faceKeyFinder = vmd.vmddata.FaceStreams
-                    .ToKeyFinderWith<Key2NearestShift, Clamp, Forward>(timer);
+                    //.ToKeyFinderWith<Key2NearestShift, Clamp, Forward>(timer);
+                    .ToKeyFinderWith<Key4Catmul, Clamp, Forward>(timer);
 
 
                 // ＶＭＤを再生する（キーを検索し、計算して Transform に書き出す）

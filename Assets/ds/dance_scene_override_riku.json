@@ -1,0 +1,33 @@
+{
+    "Motions": {
+        "center": {
+            "Model": {
+                "ModelFilePath": "riku as resource"
+            }
+        },
+        "center-option": {
+            "Model": {
+                "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
+                "Position": {
+                    "x": 0.5,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "EulerAngles": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            "Animation": {
+                "AnimationFilePath": "ds/step1.vmd",
+                "FaceMappingFilePath": "",
+                "DelayTime": 0.0
+            },
+            "Options": {
+                "BodyScaleFromHuman": 0.0,
+                "FootIkMode": "auto"
+            }
+        }
+    }
+}

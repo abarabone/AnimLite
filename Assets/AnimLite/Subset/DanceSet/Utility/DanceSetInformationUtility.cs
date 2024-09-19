@@ -19,13 +19,14 @@ namespace AnimLite.DancePlayable
     using static AnimLite.DancePlayable.DanceGraphy;
     //using static UnityEditor.Progress;
 
+#nullable enable
 
     public static class DanceSetInformationUtility
     {
 
 
         public static async ValueTask OrverrideInformationIfBlankAsync(
-            this DanceSetDefineData ds, DanceGraphy2.Order order)
+            this DanceSetJson ds, DanceGraphy2.Order order)
         {
             await Awaitable.MainThreadAsync();
 
@@ -35,11 +36,9 @@ namespace AnimLite.DancePlayable
                     ds.Audio.ToInformation(order.Audio.AudioClip.clip);
             }
 
-            for (var i = 0; i < ds.Motions.Length; i++)
+            var q = (ds.Motions.Values, order.Motions).Zip();
+            foreach (var (d, o) in q)
             {
-                var o = order.Motions[i];
-                var d = ds.Motions[i];
-
                 if (d.ModelInformation.IsBlank())
                 {
                     d.ModelInformation =
@@ -56,7 +55,7 @@ namespace AnimLite.DancePlayable
 
 
 
-        public static bool IsBlank(this InformationDefain i) =>
+        public static bool IsBlank(this InformationDefine i) =>
             (i.Author ?? "") == ""
             &&
             (i.Caption ?? "") == ""
@@ -66,13 +65,17 @@ namespace AnimLite.DancePlayable
             (i.Url ?? "") == ""
             ;
 
-        public static InformationDefain ToInformation(this ModelDefineData md, UniVRM10.Vrm10Instance vrm)
+        public static InformationDefine ToInformation(this ModelDefineJson md, UniVRM10.Vrm10Instance? vrm)
         {
-            if (vrm.IsUnityNull()) return default;
+            if (vrm.IsUnityNull()) return new InformationDefine
+            {
+                Caption = "不明",
+                Author = "不明",
+            };
 
             var info = vrm.Vrm.Meta;
 
-            return new InformationDefain
+            return new InformationDefine
             {
                 Caption = info.Name != "" ? info.Name : Path.GetFileNameWithoutExtension(md.ModelFilePath),
                 Author = string.Join("/", info.Authors.FirstOrDefault() ?? "作者不明"),
@@ -81,11 +84,15 @@ namespace AnimLite.DancePlayable
             };
         }
 
-        public static InformationDefain ToInformation(this AnimationDefineData ad, VmdStreamData vmd)
+        public static InformationDefine ToInformation(this AnimationDefineJson ad, VmdStreamData vmd)
         {
-            if (vmd == null) return default;
+            if (vmd == null) return new InformationDefine
+            {
+                Caption = "不明",
+                Author = "作者不明",
+            };
 
-            return new InformationDefain
+            return new InformationDefine
             {
                 Caption = Path.GetFileNameWithoutExtension(ad.AnimationFilePath),
                 Author = "作者不明",
@@ -94,11 +101,15 @@ namespace AnimLite.DancePlayable
             };
         }
 
-        public static InformationDefain ToInformation(this AudioDefineData ad, AudioClip clip)
+        public static InformationDefine ToInformation(this AudioDefineJson ad, AudioClip clip)
         {
-            if (clip.IsUnityNull()) return default;
+            if (clip.IsUnityNull()) return new InformationDefine
+            {
+                Caption = "不明",
+                Author = "作者不明",
+            };
 
-            return new InformationDefain
+            return new InformationDefine
             {
                 Caption = clip.name != "" ? clip.name : Path.GetFileNameWithoutExtension(ad.AudioFilePath),
                 Author = "作者不明",

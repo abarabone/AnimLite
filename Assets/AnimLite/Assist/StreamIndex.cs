@@ -94,6 +94,7 @@ namespace AnimLite
                 .Select(section => frameTimes
                     .Slice(section.start, section.length)[section.length - 1])
                 //.Last())
+                .DefaultIfEmpty(0)
                 .Max();
         }
 

@@ -195,6 +195,14 @@ namespace AnimLite
             return v1 + 0.5f * t * ((v2 - v0) + ((2.0f * v0 - 5.0f * v1 + 4.0f * v2 - v3) + (-v0 + 3.0f * v1 - 3.0f * v2 + v3) * t) * t);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static float CatmullRom(float v0, float v1, float v2, float v3, float t)
+        {
+            //if (t > 1) Debug.Log(t);
+            return v1 + 0.5f * t * ((v2 - v0) + ((2.0f * v0 - 5.0f * v1 + 4.0f * v2 - v3) + (-v0 + 3.0f * v1 - 3.0f * v2 + v3) * t) * t);
+        }
 
     }
 

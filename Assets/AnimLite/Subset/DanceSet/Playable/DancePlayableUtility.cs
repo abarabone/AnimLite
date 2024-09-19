@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Audio;
 using UnityEngine.Playables;
+using Unity.VisualScripting;
 //using SimpleDance.FacialAnimation;
 //using SimpleDance;
 
@@ -22,10 +23,11 @@ namespace AnimLite.DancePlayable
         /// </summary>
         public static void CreateVmdAnimationJobWithSyncScript<TJob>(
             this PlayableGraph graph,
-            Animator anim, TJob job, float delay = 0, VmdFootIkMode footIkMode = VmdFootIkMode.auto)
+            Animator anim, TJob job, StreamingTimer timer, float delay = 0, VmdFootIkMode footIkMode = VmdFootIkMode.auto)
                 where TJob : struct, IAnimationJob, IVmdAnimationJob
             // 変数で渡された job は、ジェネリクスの場合 burst コンパイルに失敗するとか書いてあった気がしたけど、大丈夫だった
         {
+            if (anim.IsUnityNull()) return;
             var name_anim = $"{anim.name} Body Animator";
             var name_script = $"{anim.name} Body Script";
 
@@ -49,6 +51,8 @@ namespace AnimLite.DancePlayable
 
 
             playable_job.SetTime(-delay);
+            playable_job.SetDuration(timer.TotalTime);
+            playable_sync.SetDuration(timer.TotalTime);
 
             graph.Connect(playable_job, 0, playable_sync, 0);
             output_anim.SetSourcePlayable(playable_sync);
@@ -61,6 +65,7 @@ namespace AnimLite.DancePlayable
             this PlayableGraph graph,
             GameObject model, IKeyFinderWithoutProcedure<float> kf, VrmExpressionMappings face, StreamingTimer timer, float delay = 0)
         {
+            if (model.IsUnityNull()) return;
             var name = $"{model.name} Facial";
 
 
@@ -74,6 +79,7 @@ namespace AnimLite.DancePlayable
 
 
             playable_face.SetTime(-delay);
+            playable_face.SetDuration(timer.TotalTime);
 
             output.SetSourcePlayable(playable_face);
         }
@@ -85,6 +91,8 @@ namespace AnimLite.DancePlayable
             this PlayableGraph graph,
             Animator anim, AnimationClip clip, float delay = 0)
         {
+            if (anim.IsUnityNull()) return;
+            if (clip.IsUnityNull()) return;
             var name = $"{anim.name} Animation";
 
 
@@ -110,11 +118,14 @@ namespace AnimLite.DancePlayable
             this PlayableGraph graph,
             AudioSource audio, AudioClip clip, float delay = 0)
         {
+            if (audio.IsUnityNull()) return;
+            if (clip.IsUnityNull()) return;
             var name = $"{audio.name} Audio";
             var name_script = $"{audio.name} Audio Script";
 
 
             var output = AudioPlayableOutput.Create(graph, name, audio);
+            //output.SetEvaluateOnSeek(false);
 
 
             var playable_audio = AudioClipPlayable.Create(graph, clip, looping: false);
@@ -129,11 +140,12 @@ namespace AnimLite.DancePlayable
 
 
             playable_audio.SetTime(-delay);
+            playable_reseter.SetDuration(clip.length);
 
             graph.Connect(playable_audio, 0, playable_reseter, 0);
             output.SetSourcePlayable(playable_reseter, 0);
 
-            output.SetEvaluateOnSeek(true);// なんだろうこれ
+            //output.SetEvaluateOnSeek(true);// なんだろうこれ
         }
     }
 }

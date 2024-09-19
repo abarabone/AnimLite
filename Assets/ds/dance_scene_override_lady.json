@@ -1,0 +1,14 @@
+{
+    "Motions": {
+        "center": {
+            "Model": {
+                "ModelFilePath": "5239679709811772970 as resource"
+            }
+        },
+        "center-back": {
+            "Model": {
+                "ModelFilePath": "ds/ぶいけっとにゃん.vrm"
+            }
+        }
+    }
+}

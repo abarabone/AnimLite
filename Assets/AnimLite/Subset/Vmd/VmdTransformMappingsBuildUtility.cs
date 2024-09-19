@@ -68,7 +68,8 @@ namespace AnimLite.Vmd
 
                 new OptionalBoneChecker
                 {
-                    HasChest = anim.GetBoneTransform(HumanBodyBones.Chest) != null,
+                    //HasChest = anim.GetBoneTransform(HumanBodyBones.Chest) != null,
+                    HasChest = anim.GetBoneTransform(HumanBodyBones.UpperChest) != null,
                     HasLeftSholder = anim.GetBoneTransform(HumanBodyBones.LeftShoulder) != null,
                     HasRightSholder = anim.GetBoneTransform(HumanBodyBones.RightShoulder) != null,
                 }
@@ -116,25 +117,46 @@ namespace AnimLite.Vmd
             BoneRotationInitialPose[] buildInitialPoses_(IEnumerable<HumanBoneReference<TTf>> refs)
             {
                 var default_rotation = (world: quaternion.identity, local: quaternion.identity);
+                //var default_boneid = (primary: HumanBodyBones.LastBone, secondary: HumanBodyBones.LastBone, forward: Vector3.zero);
 
                 var q =
                     from x in refs
-                    let tf = x.HumanBoneId == HumanBodyBones.LastBone
-                        ? anim.GetBoneTransform(HumanBodyBones.Hips).parent
-                        //? anim.avatarRoot
-                        : anim.GetBoneTransform(x.HumanBoneId)
+
+                        //let tf = x.HumanBoneId == HumanBodyBones.LastBone
+                        //    ? anim.GetBoneTransform(HumanBodyBones.Hips).parent
+                        //    //? anim.avatarRoot
+                        //    : anim.GetBoneTransform(x.HumanBoneId)
+                    //let nextid = VmdBone.ParentToChildDictionary.TryGetOrDefault(x.HumanBoneId, default_boneid)
+                    //let tfThis = getbone_(x.HumanBoneId)
+                    //let tfNext = getbone_(nextid.primary) ?? getbone_(nextid.secondary)
+
+                    //let arot = tfThis == null || tfNext == null
+                    //    ? Quaternion.identity
+                    //    : Quaternion.Euler(0, 180, 0)
+                    //    //: Quaternion.FromToRotation((tfNext.position - tfThis.position).normalized, nextid.forward)
+                    //let arot = x.HumanBoneId == HumanBodyBones.LeftShoulder  ? Quaternion.Euler(0, -30, 0) : Quaternion.identity
+                    //let brot = x.HumanBoneId == HumanBodyBones.RightShoulder ? Quaternion.Euler(0, +30, 0) : Quaternion.identity
 
                     let rot = VmdBone.HumanBodyToAdjustRotation.TryGetOrDefault(x.HumanBoneId, default_rotation)
 
                     select new BoneRotationInitialPose
                     {
                         RotLocalize = rot.local * Quaternion.Inverse(rot.world),    // ¶‚©‚ç‚©‚¯‚é
+                        //RotGlobalize = arot*brot * rot.world,                                   // ‰E‚©‚ç‚©‚¯‚é
                         RotGlobalize = rot.world,                                   // ‰E‚©‚ç‚©‚¯‚é
                     };
 
                 return q
                     //.Do(x => Debug.Log($"{x.RotGlobalize}"))
                     .ToArray();
+
+
+                Transform getbone_(HumanBodyBones boneid)
+                {
+                    if (boneid == HumanBodyBones.LastBone) return null;
+
+                    return anim.GetBoneTransform(boneid);
+                }
             }
         }
 

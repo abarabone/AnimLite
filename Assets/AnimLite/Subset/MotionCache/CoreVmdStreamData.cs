@@ -127,7 +127,8 @@ namespace AnimLite.Utility
                     Streams = srcvmddata.FaceStreams.Streams,
                     Index = srcvmddata.FaceStreams.Index,
                     Cache = srcvmddata.FaceStreams.Streams
-                        .ToKey2CacheFactory().CreateCacheWithInitialize<Clamp, Key2NearestShift>(timer),
+                        //.ToKey2CacheFactory().CreateCacheWithInitialize<Clamp, Key2NearestShift>(timer),
+                        .ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4Catmul>(timer),
                 },
             };
 

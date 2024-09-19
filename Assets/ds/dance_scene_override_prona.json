@@ -1,0 +1,14 @@
+{
+    "Motions": {
+        "center": {
+            "Model": {
+                "ModelFilePath": "PronamaChan_shorts as resource"
+            }
+        },
+        "right-back": {
+            "Model": {
+                "ModelFilePath": "ds/ぶいけっとにゃん.vrm"
+            }
+        }
+    }
+}

@@ -29,11 +29,11 @@ namespace AnimLite.DancePlayable
 
 
 
-        public override void NortifyPlaying(DanceSetDefineData ds) =>
+        public override void NortifyPlaying(DanceSetJson ds) =>
             this.waitForPlaying.TrySetResult(ds)
                 .NotThen(this.waitForPlaying.SetCanceled);
 
-        AwaitableCompletionSource<DanceSetDefineData> waitForPlaying = new();
+        AwaitableCompletionSource<DanceSetJson> waitForPlaying = new();
 
 
 
@@ -66,9 +66,13 @@ namespace AnimLite.DancePlayable
 
                 await Awaitable.WaitForSecondsAsync(this.DisplayedTimeSec, ct);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-
+                Debug.LogWarning(e.ToString());
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
             }
             finally
             {
@@ -86,7 +90,7 @@ namespace AnimLite.DancePlayable
                 this.InfoGroup.gameObject.SetActive(isVisible);
             }
 
-            void setAudioCaption_(DanceSetDefineData ds)
+            void setAudioCaption_(DanceSetJson ds)
             {
                 var title = ds.AudioInformation.Caption;
                 var author = ds.AudioInformation.Author != ""
@@ -96,10 +100,10 @@ namespace AnimLite.DancePlayable
                 this.AudioInfo.text = $"{title}\r\n<indent=1em><size=10%>\r\n<size=50%>{author}";
             }
 
-            void setModelCaptions_(DanceSetDefineData ds)
+            void setModelCaptions_(DanceSetJson ds)
             {
                 this.ModelInfo.text = string.Join("\r\n<size=30%>\r\n",
-                    ds.Motions
+                    ds.Motions.Values
                         .Select(x =>
                         {
                             var caption = "<size=100%><indent=0>" +
@@ -125,7 +129,7 @@ namespace AnimLite.DancePlayable
                 );
             }
 
-            void adjustModelCaptionPosition_(DanceSetDefineData ds)
+            void adjustModelCaptionPosition_(DanceSetJson ds)
             {
                 var rtf = this.ModelInfo.rectTransform;
                 var pw = this.ModelInfo.preferredWidth;
@@ -133,7 +137,7 @@ namespace AnimLite.DancePlayable
                 var dx = pw - rw;
                 rtf.offsetMin = new Vector2(rtf.offsetMin.x - dx, rtf.offsetMin.y);
 
-                var _scale = 1.0f - Mathf.Max(ds.Motions.Length - 2, 0) * 0.1f;
+                var _scale = 1.0f - Mathf.Max(ds.Motions.Count - 2, 0) * 0.1f;
                 var scale = Mathf.Max(_scale, 0.3f);
                 rtf.localScale = new Vector3(scale, scale, 1.0f);
             }

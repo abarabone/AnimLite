@@ -183,10 +183,14 @@ namespace AnimLite.Vmd
                 //kh.(MmdBodyBones.下半身2)
                 ),
                 HumanBodyBones.Spine => accumulate(
-                    mul(math.inverse(rkf.getrot(MmdBodyBones.下半身)), rkf.getrot(MmdBodyBones.上半身))
+                    //mul(math.inverse(rkf.getrot(MmdBodyBones.下半身)), rkf.getrot(MmdBodyBones.上半身))
                 //rkf.getrot(MmdBodyBones.下半身2),
-                //rkf.getrot(MmdBodyBones.上半身)
+                    rkf.getrot(MmdBodyBones.上半身),
+                    math.inverse(rkf.getrot(MmdBodyBones.下半身))
                 ),
+
+
+                // 単一ボーンは switch の _ => で処理するのでコメントアウト
 
                 //HumanBodyBones.Chest =>
                 //    MmdBodyBones.上半身2,
@@ -195,106 +199,81 @@ namespace AnimLite.Vmd
                 //HumanBodyBones.Neck =>
                 //    MmdBodyBones.首,
 
+
                 HumanBodyBones.LeftShoulder => accumulate(
-                    rkf.getrotIfOptout(opt, HumanBodyBones.Chest, !opt.HasChest),
-                    //rkf.getrot(MmdBodyBones.左肩P),
+                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
                     rkf.getrot(MmdBodyBones.左肩)
-                //rkf.getrot(MmdBodyBones.左肩C)
-                //rkf.getInverse(MmdBodyBones.左肩C)
                 ),
 
                 HumanBodyBones.RightShoulder => accumulate(
-                    rkf.getrotIfOptout(opt, HumanBodyBones.Chest, !opt.HasChest),
-                    //rkf.getrot(MmdBodyBones.右肩P),
+                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
                     rkf.getrot(MmdBodyBones.右肩)
-                //rkf.getrot(MmdBodyBones.右肩C)
-                //rkf.getInverse(MmdBodyBones.右肩C)
                 ),
 
+                // 肩ボーンはいろいろあるみたいだけど、関係性がわからないからとりあえず無視
 
+                //HumanBodyBones.LeftShoulder => accumulate(
+                //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
+                //    rkf.getrot(MmdBodyBones.左肩P),
+                //    rkf.getrot(MmdBodyBones.左肩),
+                //    math.inverse(rkf.getrot(MmdBodyBones.左肩C))
+                //),
 
-                // 結果のポーズがちがうっぽい ---------------------------------------
-                // なんでいっしょにならんの？？
-                ////HumanBodyBones.LeftUpperArm => accumulate(
-                ////    rkf.getIfOptout(HumanBodyBones.LeftShoulder, !rkf.OptionalBones.HasLeftSholder),
-                ////    downArmL(),
-                ////    rkf.getrot(MmdBodyBones.左腕),
-                ////    rkf.getrot(MmdBodyBones.左腕捩)
-                //////rkf.getrot(MmdBodyBones.左腕捩1),
-                //////rkf.getrot(MmdBodyBones.左腕捩2),
-                //////rkf.getrot(MmdBodyBones.左腕捩3)
-                ////),
+                //HumanBodyBones.RightShoulder => accumulate(
+                //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
+                //    rkf.getrot(MmdBodyBones.右肩P),
+                //    rkf.getrot(MmdBodyBones.右肩),
+                //    math.inverse(rkf.getrot(MmdBodyBones.右肩C))
+                //),
 
-                ////HumanBodyBones.RightUpperArm => accumulate(
-                ////    rkf.getIfOptout(HumanBodyBones.LeftShoulder, !rkf.OptionalBones.HasRightSholder),
-                ////    downArmR(),
-                ////    rkf.getrot(MmdBodyBones.右腕),
-                ////    rkf.getrot(MmdBodyBones.右腕捩)
-                //////rkf.getrot(MmdBodyBones.右腕捩1),
-                //////rkf.getrot(MmdBodyBones.右腕捩2),
-                //////rkf.getrot(MmdBodyBones.右腕捩3)
-                ////),
-
-                ////HumanBodyBones.LeftLowerArm => accumulate(
-                ////    rkf.getrot(MmdBodyBones.左ひじ),
-                ////rkf.getrot(MmdBodyBones.左手捩)
-                ////),
-
-                ////HumanBodyBones.RightLowerArm => accumulate(
-                ////    rkf.getrot(MmdBodyBones.右ひじ),
-                ////rkf.getrot(MmdBodyBones.右手捩)
-                ////),
-
-                ////HumanBodyBones.LeftHand => accumulate(
-                ////    rkf.getrot(MmdBodyBones.左手首)
-                ////),
-
-                ////HumanBodyBones.RightHand => accumulate(
-                ////    rkf.getrot(MmdBodyBones.右手首)
-                ////),
-                ///// ----------------------------------------------------
 
                 HumanBodyBones.LeftUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasLeftSholder),
                     //downArmL(),
-                    rkf.getrot(MmdBodyBones.左腕)
+                    rkf.getrot(MmdBodyBones.左腕)//,
+                    //rkf.getrot(MmdBodyBones.左腕捩)
                 ),
 
                 HumanBodyBones.RightUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasRightSholder),
                     //downArmR(),
-                    rkf.getrot(MmdBodyBones.右腕)
+                    rkf.getrot(MmdBodyBones.右腕)//,
+                    //rkf.getrot(MmdBodyBones.右腕捩)
                 ),
+
+                // 腕のねじりは、１～３はメッシュ用にねじりを分散させた補間値っぽい
+                // 捩ボーンだけ考えればいいと思うんだけどどうなんだろ？
+                // （腕付け根に捩りを入れてしまうと、肩付近から回転してしまうし、肘に仕込むと前腕の捩りになってしまうので、腕と捩りは分割せざるを得ない、んだと思う）
 
                 HumanBodyBones.LeftLowerArm => accumulate(
                     ////rkf.getrot(MmdBodyBones.左腕捩1),
                     ////rkf.getrot(MmdBodyBones.左腕捩2),
                     ////rkf.getrot(MmdBodyBones.左腕捩3),
-                    //rkf.getrot(MmdBodyBones.左腕捩),
+                    rkf.getrot(MmdBodyBones.左腕捩),
                     rkf.getrot(MmdBodyBones.左ひじ)
-                //rkf.getrot(MmdBodyBones.左ひじ),
-                //rkf.getrot(MmdBodyBones.左腕捩)
+                    //rkf.getrot(MmdBodyBones.左ひじ),
+                    //rkf.getrot(MmdBodyBones.左腕捩)
                 ),
 
                 HumanBodyBones.RightLowerArm => accumulate(
                     ////rkf.getrot(MmdBodyBones.右腕捩1),
                     ////rkf.getrot(MmdBodyBones.右腕捩2),
                     ////rkf.getrot(MmdBodyBones.右腕捩3),
-                    //rkf.getrot(MmdBodyBones.右腕捩),
+                    rkf.getrot(MmdBodyBones.右腕捩),
                     rkf.getrot(MmdBodyBones.右ひじ)
-                //rkf.getrot(MmdBodyBones.右ひじ),
-                //rkf.getrot(MmdBodyBones.右腕捩)
+                    //rkf.getrot(MmdBodyBones.右ひじ),
+                    //rkf.getrot(MmdBodyBones.右腕捩)
                 ),
 
                 HumanBodyBones.LeftHand => accumulate(
-                    //rkf.getrot(MmdBodyBones.左手捩),
+                    rkf.getrot(MmdBodyBones.左手捩),
                     rkf.getrot(MmdBodyBones.左手首)
                 //rkf.getrot(MmdBodyBones.左手首),
                 //rkf.getrot(MmdBodyBones.左手捩)
                 ),
 
                 HumanBodyBones.RightHand => accumulate(
-                    //rkf.getrot(MmdBodyBones.右手捩),
+                    rkf.getrot(MmdBodyBones.右手捩),
                     rkf.getrot(MmdBodyBones.右手首)
                 //rkf.getrot(MmdBodyBones.右手首),
                 //rkf.getrot(MmdBodyBones.右手捩)

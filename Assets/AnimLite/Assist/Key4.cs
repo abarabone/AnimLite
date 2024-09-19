@@ -79,6 +79,51 @@ namespace AnimLite
     //    }
     //}
 
+    public struct Key4Catmul : IKey4<float>
+    {
+
+        public Key4Cursor cursor { get; set; }
+        public Key4Value<float> value { get; set; }
+
+        public float Interpolate(float time)
+        {
+            var _t = (time - this.cursor.TimeFrom) * this.cursor.FromToTimeRate;
+            var t = math.clamp(_t, 0, 1);
+
+            var v0 = this.value.Prev;
+            var v1 = this.value.From;
+            var v2 = this.value.To;
+            var v3 = this.value.Next;
+            return Interpolation.CatmullRom(v0, v1, v2, v3, t);
+        }
+
+        public float AdjustNext(float v0, float v1)
+        {
+            return v1;
+        }
+        // -------------------------------------------------------
+        public float TimeFrom => this.cursor.TimeFrom;
+        public float TimeTo => this.cursor.TimeTo;
+
+        public void LoadFromCache(Key4StreamCache<float> p, int istream) =>
+            p.loadFromCache(istream, out this);
+
+        public void StoreToCache(Key4StreamCache<float> p, int istream) =>
+            p.storeToCache(istream, this);
+
+
+        public void MakeKeyAbsolute<TClip>(StreamPairManipulator<float> s, int ikey, TClip clip)
+            where TClip : IKeyClipper
+        =>
+            s.makeKeyAbsolute(ikey, out this, clip);
+
+        public void MakeKeyNext<TClip>(StreamPairManipulator<float> s, TClip clip)
+            where TClip : IKeyClipper
+        =>
+            s.makeKeyNext(ref this, clip);
+        // -------------------------------------------------------
+    }
+
     public struct Key4CatmulPos : IKey4<float4>
     {
 

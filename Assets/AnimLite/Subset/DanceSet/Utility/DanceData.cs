@@ -22,8 +22,8 @@ namespace AnimLite.DancePlayable
         public AudioDefine Audio;
         public DefaultDanceMotionDefine DefaultAnimation;
 
-        public InformationDefain AudioInfo;
-        public InformationDefain AnimationInfo;
+        public InformationDefine AudioInfo;
+        public InformationDefine AnimationInfo;
 
         public DanceMotionDefine[] Motions;
     }
@@ -58,8 +58,8 @@ namespace AnimLite.DancePlayable
         public Quaternion Rotation;
         public float Scale;
 
-        public InformationDefain ModelInfo;
-        public InformationDefain AnimationInfo;
+        public InformationDefine ModelInfo;
+        public InformationDefine AnimationInfo;
     }
     [System.Serializable]
     public class DefaultDanceMotionDefine

@@ -58,10 +58,16 @@ namespace AnimLite.Utility
                 return await path.LoadAudioClipExAsync(ct);
             });
 
-        static ValueTask<AudioClipAsDisposable> loadAudioClipViaTmpFileAsync(
+        static async ValueTask<AudioClipAsDisposable> loadAudioClipViaTmpFileAsync(
             this Stream stream, PathUnit path, CancellationToken ct)
-        =>
-            path.GetCachePathAsync(stream, ct).Await(LoadAudioClipAsync, ct);
+        {
+            var clip = await path.GetCachePathAsync(stream, ct).Await(LoadAudioClipAsync, ct);
+
+            await Awaitable.MainThreadAsync();
+            clip.clip.name = Path.GetFileNameWithoutExtension(path);
+
+            return clip;
+        }
 
 
 

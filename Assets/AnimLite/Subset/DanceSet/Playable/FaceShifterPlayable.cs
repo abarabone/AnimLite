@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Playables;
+using Unity.Mathematics;
 
 namespace AnimLite.DancePlayable
 {
@@ -54,7 +55,8 @@ namespace AnimLite.DancePlayable
             this.timer.UpdateTime(currentTime);
 
 
-            if (currentTime >= previousTime - this.indexBlockTime)
+            //if (currentTime >= previousTime - this.indexBlockTime)
+            if (previousTime <= currentTime && currentTime <= previousTime + this.indexBlockTime)
             {
                 var kf = this.kf.With<float, IKeyFinderWithoutProcedure<float>, Forward>(this.timer);
 

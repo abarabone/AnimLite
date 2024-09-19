@@ -91,6 +91,7 @@ namespace AnimLite.DancePlayable
         {
             public SkinnedMeshRenderer FaceRenderer;
 
+            //public VmdStreamData vmddata;
             public VmdStreamData vmddata;
 
             public TransformHandleMappings bone;
@@ -219,7 +220,7 @@ namespace AnimLite.DancePlayable
 
                     var anim = order.Model.GetComponent<Animator>();
                     var job = anim.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
-                    graph.CreateVmdAnimationJobWithSyncScript(anim, job, order.DelayTime);
+                    graph.CreateVmdAnimationJobWithSyncScript(anim, job, timer, order.DelayTime);
                 }
 
                 void createFaceMotion_(MotionOrder order, StreamingTimer timer)
@@ -228,7 +229,8 @@ namespace AnimLite.DancePlayable
                     if (order.FaceRenderer.IsUnityNull()) return;
 
                     var fkf = order.vmddata.FaceStreams
-                        .ToKeyFinderWith<Key2NearestShift, Clamp>();
+                        //.ToKeyFinderWith<Key2NearestShift, Clamp>();
+                        .ToKeyFinderWith<Key4Catmul, Clamp>();
 
                     graph.CreateVmdFaceAnimation(order.Model, fkf, order.face, timer, order.DelayTime);
                 }

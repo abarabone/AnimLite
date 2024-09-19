@@ -16,11 +16,30 @@ namespace AnimLite.Vmd
     /// <summary>
     /// 
     /// </summary>
-    public class VmdStreamData : IDisposable
+    public class VmdStreamData2 : IDisposable
     {
         public StreamDataHolder<quaternion, Key4StreamCache<quaternion>, StreamIndex> RotationStreams;
         public StreamDataHolder<float4, Key4StreamCache<float4>, StreamIndex> PositionStreams;
         public StreamDataHolder<float, Key2StreamCache<float>, StreamIndex> FaceStreams;
+
+        public bool IsCreated => this.RotationStreams.Streams.KeyStreams.Values.IsCreated;
+
+
+        public Action DisposeAction;
+
+        public void Dispose()
+        {
+            this.DisposeAction();
+        }
+    }
+    /// <summary>
+    /// Žb’è
+    /// </summary>
+    public class VmdStreamData : IDisposable
+    {
+        public StreamDataHolder<quaternion, Key4StreamCache<quaternion>, StreamIndex> RotationStreams;
+        public StreamDataHolder<float4, Key4StreamCache<float4>, StreamIndex> PositionStreams;
+        public StreamDataHolder<float, Key4StreamCache<float>, StreamIndex> FaceStreams;
 
         public bool IsCreated => this.RotationStreams.Streams.KeyStreams.Values.IsCreated;
 
@@ -119,7 +138,8 @@ namespace AnimLite.Vmd
 
             var rot_cache = rot_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulRot>(timer);
             var pos_cache = pos_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulPos>(timer);
-            var face_cache = face_data.ToKey2CacheFactory().CreateCacheWithInitialize<Clamp, Key2NearestShift>(timer);
+            //var face_cache = face_data.ToKey2CacheFactory().CreateCacheWithInitialize<Clamp, Key2NearestShift>(timer);
+            var face_cache = face_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4Catmul>(timer);
 
             var dstvmddata = new VmdStreamData
             {

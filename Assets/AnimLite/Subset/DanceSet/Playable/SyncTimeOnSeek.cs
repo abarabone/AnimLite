@@ -1,4 +1,5 @@
 using UnityEngine.Playables;
+using UnityEngine;
 
 namespace AnimLite.DancePlayable
 {
@@ -34,7 +35,9 @@ namespace AnimLite.DancePlayable
         {
             playable.SetInputWeight(0, 0.0f);
 
-            this.preFrameTime = playable.GetInput(0).GetTime();
+            var src = playable.GetInput(0);
+            this.preFrameTime = src.GetTime();
+            //playable.SetDuration(src.GetDuration());
         }
 
         public override void PrepareFrame(Playable playable, FrameData info)
@@ -48,11 +51,16 @@ namespace AnimLite.DancePlayable
             var isBackFromEnd = currentTime < endTime && endTime <= this.preFrameTime;
             var isEvaluted = info.evaluationType == FrameData.EvaluationType.Evaluate;
 
-            if (isEvaluted | isOverZero | isBackFromEnd)
+            //Debug.Log($"{preFrameTime} : {currentTime} / {endTime} - {info.evaluationType}");
+            if (isEvaluted || isOverZero || isBackFromEnd)
             {
-                playable.SetInputWeight(0, 1.0f);
+                src.Pause();
                 src.SetTime(currentTime);// これやると音が出る（もっとちゃんとしたやり方知りたい）
+                src.Play();
                 //src.Play();// これだとダメ
+                //playable.SetDuration(endTime);
+                //Debug.Log("set time");
+                playable.SetInputWeight(0, 1.0f);
             }
 
             this.preFrameTime = currentTime;

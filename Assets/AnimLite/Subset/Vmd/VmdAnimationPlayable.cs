@@ -111,7 +111,8 @@ namespace AnimLite.Vmd
         //[BurstCompile(FloatPrecision.Medium, FloatMode.Fast)]
         public void ProcessAnimation(AnimationStream stream)
         {
-            if (this.timer.CurrentTime >= this.previousTime - this.indexBlockTime)
+            //if (this.timer.CurrentTime >= this.previousTime - this.indexBlockTime)
+            if (previousTime <= this.timer.CurrentTime && this.timer.CurrentTime <= previousTime + this.indexBlockTime)
             {
                 var pkf = this.pkf.With<float4, TPFinder, Forward>(this.timer);
                 var rkf = this.rkf.With<quaternion, TRFinder, Forward>(this.timer);

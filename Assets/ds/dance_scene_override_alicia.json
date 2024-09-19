@@ -1,0 +1,14 @@
+{
+    "Motions": {
+        "center": {
+            "Model": {
+                "ModelFilePath": "AliciaSolid as resource"
+            }
+        },
+        "left-back": {
+            "Model": {
+                "ModelFilePath": "ds/ぶいけっとにゃん.vrm"
+            }
+        }
+    }
+}

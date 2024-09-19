@@ -9,8 +9,11 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UniVRM10;
 using Unity.VisualScripting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
-namespace AnimLite.Utility
+namespace AnimLite.Utility.old
 {
     using AnimLite.DancePlayable;
     using AnimLite.Vmd;
@@ -209,7 +212,7 @@ namespace AnimLite.Utility
                 Options = new MotionOptionsJson
                 {
                     BodyScaleFromHuman = src.BodyScale,
-                    FootIkMode = src.FootIkMode.ToString(),
+                    FootIkMode = src.FootIkMode,
                 },
                 ModelInformation = src.ModelInfo,
                 AnimationInformation = src.AnimationInfo,
@@ -234,7 +237,7 @@ namespace AnimLite.Utility
                 Options = new MotionOptionsJson
                 {
                     BodyScaleFromHuman = src.BodyScale,
-                    FootIkMode = src.FootIkMode.ToString(),
+                    FootIkMode = src.FootIkMode,
                 },
                 ModelInformation = src.ModelInfo,
                 AnimationInformation = src.AnimationInfo,
@@ -248,12 +251,7 @@ namespace AnimLite.Utility
                 FaceRenderer = null,
 
                 DelayTime = src.Animation.DelayTime,
-                FootIkMode = src.Options.FootIkMode switch
-                {
-                    "on" => VmdFootIkMode.on,
-                    "off" => VmdFootIkMode.off,
-                    _ => VmdFootIkMode.auto,
-                },
+                FootIkMode = src.Options.FootIkMode,
                 BodyScale = src.Options.BodyScaleFromHuman,
 
                 //OverWritePositionAndRotation = src.Model.UsePositionAndDirection,
@@ -279,8 +277,8 @@ namespace AnimLite.Utility
         public DanceMotionDefineJson[] Motions;
 
         public string CaptionMode;
-        public InformationDefain AudioInformation;
-        public InformationDefain AnimationInformation;
+        public InformationDefine AudioInformation;
+        public InformationDefine AnimationInformation;
     }
     [System.Serializable]
     public struct DanceMotionDefineJson
@@ -289,8 +287,8 @@ namespace AnimLite.Utility
         public AnimationDefineJson Animation;
         public MotionOptionsJson Options;
 
-        public InformationDefain ModelInformation;
-        public InformationDefain AnimationInformation;
+        public InformationDefine ModelInformation;
+        public InformationDefine AnimationInformation;
     }
 
     [System.Serializable]
@@ -319,20 +317,20 @@ namespace AnimLite.Utility
         public Vector3 EulerAngles;
         public float Scale;
     }
-    [System.Serializable]
-    public class MotionOptionsJson
-    {
-        public float BodyScaleFromHuman;
-        public string FootIkMode;
-    }
+    //[System.Serializable]
+    //public class MotionOptionsJson
+    //{
+    //    public float BodyScaleFromHuman;
+    //    public string FootIkMode;
+    //}
 
-    [System.Serializable]
-    public class InformationDefain
-    {
-        public string Caption;
-        public string Author;
-        public string Url;
-        public string Description;
-    }
+    //[System.Serializable]
+    //public class InformationDefain
+    //{
+    //    public string Caption;
+    //    public string Author;
+    //    public string Url;
+    //    public string Description;
+    //}
 
 }

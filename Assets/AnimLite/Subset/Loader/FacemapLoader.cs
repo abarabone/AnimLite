@@ -61,14 +61,18 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
+            this IArchive archive, PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
             {
-                if (!path.IsBlank() && archive != null && !path.IsFullPath())
+                if (!path.IsBlank() && archive is not null && !path.IsFullPath())
                 {
                     var facemap = await archive.ExtractAsync(path, s => s.ParseFaceMapAsync(ct));
 
-                    if (facemap.VmdToVrmMaps != null) return facemap;
+                    if (facemap.VmdToVrmMaps is not null)
+                        return facemap;
+
+                    if (archive.FallbackArchive is not null)
+                        return await archive.FallbackArchive.LoadFaceMapExAsync(path, ct);
                 }
 
                 return await path.LoadFaceMapExAsync(ct);

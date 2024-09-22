@@ -227,7 +227,7 @@ namespace AnimLite.Utility
                 new()
                 {
                     AudioSource = audioSource,
-                    AudioClip = await audio.AudioFilePath.LoadAudioClipExAsync(archive, ct),
+                    AudioClip = await archive.LoadAudioClipExAsync(audio.AudioFilePath, ct),
                     Volume = audio.Volume,
                     DelayTime = audio.DelayTime,
                 };
@@ -238,7 +238,7 @@ namespace AnimLite.Utility
         =>
             new()
             {
-                Model = await model.ModelFilePath.LoadModelExAsync(archive, ct),
+                Model = await archive.LoadModelExAsync(model.ModelFilePath, ct),
                 Position = model.Position,
                 Rotation = model.Rotation,
                 Scale = model.Scale,
@@ -248,7 +248,7 @@ namespace AnimLite.Utility
         static async Task<MotionOrder> buildMotionOrderAsync(
             this DanceMotionDefineData motion, IArchive archive, VmdStreamDataCache cache, CancellationToken ct)
         {
-            var model = await motion.Model.ModelFilePath.LoadModelExAsync(archive, ct);
+            var model = await archive.LoadModelExAsync(motion.Model.ModelFilePath, ct);
 
             var vmdpath = motion.Animation.AnimationFilePath;
             var facepath = motion.Animation.FaceMappingFilePath;
@@ -268,7 +268,7 @@ namespace AnimLite.Utility
             }
             async ValueTask<(VmdStreamData, VmdFaceMapping)> buildAsync_()
             {
-                var facemap = await facepath.LoadFaceMapExAsync(archive, ct);
+                var facemap = await archive.LoadFaceMapExAsync(facepath, ct);
                 var vmddata = await vmdpath.LoadVmdStreamDataExAsync(facemap, archive, ct);
 
                 return (vmddata, facemap);

@@ -65,7 +65,7 @@ namespace AnimLite.Utility
         public static async ValueTask<CoreVmdStreamData> LoadVmdCoreDataExAsync(
             this PathUnit vmdpath, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
         {
-            var vmddata = await VmdParser.LoadVmdExAsync(vmdpath, archive, ct);
+            var vmddata = await VmdParser.LoadVmdExAsync(archive, vmdpath, ct);
             if (vmddata.bodyKeyStreams == null) return default;
 
             var rot_data = vmddata.bodyKeyStreams.CreateRotationData();

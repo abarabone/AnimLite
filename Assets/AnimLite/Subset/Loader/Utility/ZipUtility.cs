@@ -31,7 +31,10 @@ namespace AnimLite.Utility
         public ZipDummyArchive(PathUnit archiveCachePath) => this.archiveCachePath = archiveCachePath;
 
         PathUnit archiveCachePath;
+        public IArchive fallbackArchive { private get; set; }
 
+
+        public IArchive FallbackArchive => this.fallbackArchive;
 
         public void Dispose() { }
 
@@ -48,18 +51,20 @@ namespace AnimLite.Utility
         
         public ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction) =>
             this.archiveCachePath.OpenReadStream().UnzipFirstEntryAsync(extension, convertAction);
-        
     }
 
     public static class DummyArchiveUtility
     {
-        public static async ValueTask<ZipDummyArchive> OpenDummyArchiveAsync(this PathUnit fullpath, CancellationToken ct)
+        public static async ValueTask<ZipDummyArchive> OpenDummyArchiveAsync(this PathUnit fullpath, IArchive fallback, CancellationToken ct)
         {
             var cachePath = await fullpath.GetCachePathAsync(StreamOpenUtility.OpenStreamFileOrWebAsync, ct);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"dummy archive : {fullpath.Value} -> {cachePath.Value}".ShowDebugLog();
 #endif
-            return new ZipDummyArchive(cachePath);
+            return new ZipDummyArchive(cachePath)
+            {
+                fallbackArchive = fallback,
+            };
         }
     }
 
@@ -73,9 +78,12 @@ namespace AnimLite.Utility
         }
 
         ZipArchive zip;
+        public IArchive fallbackArchive { private get; set; }
 
         Stream stream;
 
+
+        public IArchive FallbackArchive => this.fallbackArchive;
 
         public void Dispose()
         {
@@ -100,11 +108,17 @@ namespace AnimLite.Utility
 
     public static class ZipWrapArchiveUtility
     {
-        public static ZipWrapArchive OpenZipArchive(this Stream stream) =>
-            new ZipWrapArchive(stream);
+        public static ZipWrapArchive OpenZipArchive(this Stream stream, IArchive fallback) =>
+            new ZipWrapArchive(stream)
+            {
+                fallbackArchive = fallback,
+            };
 
-        public static async ValueTask<ZipWrapArchive> OpenZipArchiveAwait(this ValueTask<Stream> stream) =>
-            new ZipWrapArchive(await stream);
+        public static async ValueTask<ZipWrapArchive> OpenZipArchiveAwait(this ValueTask<Stream> stream, IArchive fallback) =>
+            new ZipWrapArchive(await stream)
+            {
+                fallbackArchive = fallback,
+            };
     }
 
 

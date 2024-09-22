@@ -47,7 +47,7 @@ namespace AnimLite.Utility
         /// パスが zip であれば、ZipArchive を返す。それ以外は null を返す。
         /// IsSeaquentialLoadingInZip が false であれば、常に null を返す。
         /// </summary>
-        public static async ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, IArchive fallback, CancellationToken ct)
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
 
@@ -58,20 +58,23 @@ namespace AnimLite.Utility
             {
                 var (zippath, _) when zippath != "" =>
                     DanceSceneLoader.IsSeaquentialLoadingInZip
-                        ? await openAsync_(zippath + queryString).OpenZipArchiveAwait()
-                        : await (zippath + queryString).OpenDummyArchiveAsync(ct),
+                        ? await openAsync_(zippath + queryString).OpenZipArchiveAwait(fallback)
+                        : await (zippath + queryString).OpenDummyArchiveAsync(fallback, ct),
                 _ =>
                     null,
             };
         }
-        
+        public static ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, CancellationToken ct) =>
+            path.OpenWhenZipAsync(null, ct);
+
+
 
 
         public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(
             this PathUnit path, IArchive archive, CancellationToken ct)
         {
 
-            var json = await path.LoadJsonAsync<DanceSetJson>(archive, ct);
+            var json = await archive.LoadJsonAsync<DanceSetJson>(path, ct);
 
             return json.ToData();
 
@@ -214,7 +217,7 @@ namespace AnimLite.Utility
         {
             var audiopath = define.AudioFilePath;
 
-            var clip = await audiopath.LoadAudioClipExAsync(archive, ct);
+            var clip = await archive.LoadAudioClipExAsync(audiopath, ct);
 
             return define.toAudioOrder(clip, audioSource);
         }
@@ -290,7 +293,7 @@ namespace AnimLite.Utility
         =>
             (modelpath.IsResource() ? null : stocker)?.GetOrLoadModelAsync(modelpath, archive, ct).AsValueTask()
             ??
-            modelpath.LoadModelExAsync(archive, ct);
+            archive.LoadModelExAsync(modelpath, ct);
 
 
         static ValueTask<(VmdStreamData, VmdFaceMapping)> loadVmdAsync(

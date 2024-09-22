@@ -41,15 +41,19 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<GameObject> LoadModelExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
+            this IArchive archive, PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
 
-            if (archive != null && !path.IsFullPath())
+            if (archive is not null && !path.IsFullPath())
             {
                 var model = await archive.ExtractAsync(path, s => s.convertAsync(path, ct));
 
-                if (model != null) return model;
+                if (model is not null)
+                    return model;
+
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadModelExAsync(path, ct);
             }
 
             return await path.LoadModelExAsync(ct);

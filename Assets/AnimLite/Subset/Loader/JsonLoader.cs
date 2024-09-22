@@ -33,7 +33,7 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<T> LoadJsonAsync<T>(
-            this PathUnit path, IArchive archive, T jsondata, CancellationToken ct) =>
+            this IArchive archive, PathUnit path, T jsondata, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
             if (path.IsBlank()) return jsondata;
@@ -50,14 +50,18 @@ namespace AnimLite.Utility
                     // 他のメディアでは .json に記されたパスを entry path と解釈する。
                 };
 
-                if (json is not null) return json;
+                if (json is not null)
+                    return json;
+
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadJsonAsync(path, jsondata, ct);
             }
 
             return await path.LoadJsonAsync<T>(jsondata, ct);
         });
 
-        public static ValueTask<T> LoadJsonAsync<T>(this PathUnit path, IArchive archive, CancellationToken ct) where T:new() =>
-            path.LoadJsonAsync(archive, new T(), ct);
+        public static ValueTask<T> LoadJsonAsync<T>(this IArchive archive, PathUnit path, CancellationToken ct) where T:new() =>
+            archive.LoadJsonAsync(path, new T(), ct);
 
 
 

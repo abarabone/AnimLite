@@ -44,15 +44,18 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
+            this IArchive archive, PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
             {
 
-                if (archive != null && !path.IsFullPath())
+                if (archive is not null && !path.IsFullPath())
                 {
                     var clip = await archive.ExtractAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct));
 
                     if (!clip.clip.IsUnityNull()) return clip;
+
+                    if (archive.FallbackArchive is not null)
+                        return await archive.FallbackArchive.LoadAudioClipExAsync(path, ct);
                 }
 
                 return await path.LoadAudioClipExAsync(ct);

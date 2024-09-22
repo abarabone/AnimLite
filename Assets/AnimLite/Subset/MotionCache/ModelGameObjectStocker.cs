@@ -37,7 +37,7 @@ namespace AnimLite.Vmd
             {
                 return new ModelStockerHolder
                 {
-                    Template = await path.LoadModelExAsync(archive, ct),
+                    Template = await archive.LoadModelExAsync(path, ct),
                     LastAccessFrame = await TaskUtility.OnMainThreadAsync(() => Time.frameCount),
                 };
             });

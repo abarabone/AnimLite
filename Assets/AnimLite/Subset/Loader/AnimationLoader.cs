@@ -36,15 +36,19 @@ namespace AnimLite.Vmd
 
 
         public static async ValueTask<VmdMotionData> LoadVmdExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
+            this IArchive archive, PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
             {
 
-                if (archive != null && !path.IsFullPath())
+                if (archive is not null && !path.IsFullPath())
                 {
                     var data = archive.Extract(path, VmdParser.ParseVmd);
 
-                    if (data.bodyKeyStreams != null) return data;
+                    if (data.bodyKeyStreams is not null)
+                        return data;
+
+                    if (archive.FallbackArchive is not null)
+                        return await archive.FallbackArchive.LoadVmdExAsync(path, ct);
                 }
 
                 return await path.LoadVmdExAsync(ct);

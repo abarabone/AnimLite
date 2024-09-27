@@ -88,7 +88,7 @@ namespace AnimLite.Utility
     public static class JsonConverter
     {
 
-        // json ‚ð data ‰»‚·‚éBç’·‚È‚Ì‚Å‚È‚ñ‚Æ‚©‚Å‚«‚È‚¢‚©‚È‚Ÿc ¨@”pŽ~‚·‚é
+        // json ï¿½ï¿½ data ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½ç’·ï¿½È‚Ì‚Å‚È‚ï¿½Æ‚ï¿½ï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½c ï¿½ï¿½ï¿½@ï¿½pï¿½~ï¿½ï¿½ï¿½ï¿½
         public static DanceSetDefineData ToData(this DanceSetJson json) =>
             new()
             {
@@ -196,7 +196,7 @@ namespace AnimLite.Utility
                     .ToArrayAsync()
                 ;
 
-            // ‚Ç‚¤‚à ziparchive ‚Íƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‚É‘Î‰ž‚µ‚Ä‚È‚¢‚Á‚Û‚¢‚Ì‚ÅAŽb’è“I‚É”ñ“¯Šú—ñ‹“‚Å‘Î‰žB‚È‚ñ‚Æ‚©‚È‚ç‚ñ‚©H
+            // ï¿½Ç‚ï¿½ï¿½ï¿½ ziparchive ï¿½Íƒ}ï¿½ï¿½ï¿½`ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½É‘Î‰ï¿½ï¿½ï¿½ï¿½Ä‚È‚ï¿½ï¿½ï¿½ï¿½Û‚ï¿½ï¿½Ì‚ÅAï¿½bï¿½ï¿½Iï¿½É”ñ“¯Šï¿½ï¿½ñ‹“‚Å‘Î‰ï¿½ï¿½Bï¿½È‚ï¿½Æ‚ï¿½ï¿½È‚ï¿½ñ‚©H
             var morders = archive == null
                 ? await ds.Motions
                     .Select(motion => Task.Run(() => motion.buildMotionOrderAsync(archive, cache, ct)))

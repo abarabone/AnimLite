@@ -31,7 +31,7 @@ namespace AnimLite.Vrm
     using UniGLTF;
 
     // todo
-    // ƒŠƒ\[ƒXAgameobject ‚Åƒ[ƒh‚Å‚«‚È‚©‚Á‚½‚ç .vrm ‚Åƒ[ƒh‚·‚é
+    // ï¿½ï¿½ï¿½\ï¿½[ï¿½Xï¿½ï¿½ï¿½Agameobject ï¿½Åƒï¿½ï¿½[ï¿½hï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ .vrm ï¿½Åƒï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½
 
 
     public static partial class VrmLoader

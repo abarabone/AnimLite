@@ -34,7 +34,7 @@ namespace AnimLite.Vmd
         }
     }
     /// <summary>
-    /// Žb’è
+    /// ï¿½bï¿½ï¿½
     /// </summary>
     public class VmdStreamData : IDisposable
     {

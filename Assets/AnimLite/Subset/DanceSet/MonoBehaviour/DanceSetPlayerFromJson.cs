@@ -124,7 +124,7 @@ namespace AnimLite.DancePlayable
                 this.cts?.Cancel();
 
                 "disable start".ShowDebugLog();
-                using (await this.DanceSemapho.WaitAsyncDisposable(default))// ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½Ø‚ï¿½ï¿½Ä‚Ù‚ï¿½ï¿½ï¿½ï¿½Ì‚ï¿½ Token ï¿½ï¿½ default
+                using (await this.DanceSemapho.WaitAsyncDisposable(default))// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ª”jŠü‚³‚ê‚Ä‚àA‰ğ•ú‚Í‚â‚èØ‚Á‚Ä‚Ù‚µ‚¢‚Ì‚Å Token ‚Í default
                 {
                     await (this.Cache?.HideAndDestroyModelAsync() ?? default);
 

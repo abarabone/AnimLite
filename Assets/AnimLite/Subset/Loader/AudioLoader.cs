@@ -27,9 +27,9 @@ namespace AnimLite.Utility
     static public class AudioLoader
     {
 
-        // ï¿½Iï¿½[ï¿½fï¿½Bï¿½Iï¿½ÍƒXï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ç‚¾ï¿½ï¿½ audio clip ï¿½É‚Å‚ï¿½ï¿½È‚ï¿½ï¿½iï¿½fï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½jï¿½Ì‚ÅAï¿½ï¿½ï¿½Ìƒï¿½ï¿½fï¿½Bï¿½Aï¿½Æˆá‚¤ï¿½ï¿½ï¿½ï¿½
-        // unity ï¿½ï¿½ UnityWebRequestMultimedia ï¿½ï¿½ addressables ï¿½ï¿½ï¿½Aï¿½Ì‚Qï¿½Ê‚ï¿½
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ zip ï¿½ï¿½ stream ï¿½ï¿½ï¿½ï¿½Ì•ï¿½ï¿½@ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ßAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ tmp file ï¿½É‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ UnityWebRequestMultimedia ï¿½Å“Ç‚Ü‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
+        // ƒI[ƒfƒBƒI‚ÍƒXƒgƒŠ[ƒ€‚©‚ç‚¾‚Æ audio clip ‚É‚Å‚«‚È‚¢iƒfƒR[ƒhˆ—‚Æ‚©‚©‚©‚È‚¢‚Æ‚¢‚¯‚È‚¢j‚Ì‚ÅA‘¼‚ÌƒƒfƒBƒA‚Æˆá‚¤‚â‚è•û
+        // unity ‚Ì UnityWebRequestMultimedia ‚© addressables ‚©A‚Ì‚Q’Ê‚è
+        // ‚½‚¾‚µ zip ‚Í stream ‚©‚ç‚Ì•û–@‚ğ‚Æ‚Á‚½‚½‚ßA‚¢‚Á‚½‚ñ tmp file ‚É‚µ‚Ä‚©‚ç UnityWebRequestMultimedia ‚Å“Ç‚Ü‚¹‚Ä‚¢‚é
 
 
 

@@ -29,23 +29,23 @@ namespace AnimLite.Utility
     {
 
         /// <summary>
-        /// true ï¿½Å‚ï¿½ï¿½ï¿½ÎAï¿½ï¿½ï¿½ï¿½ zip ï¿½ï¿½ï¿½Ìƒfï¿½[ï¿½^ï¿½ï¿½ï¿½[ï¿½hï¿½É‚Í‚Pï¿½Â‚ï¿½ ZipArchive ï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
-        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìê‡ï¿½Aï¿½ï¿½ï¿½ï¿½Iï¿½Èƒï¿½ï¿½[ï¿½hï¿½Ísï¿½ï¿½ï¿½È‚ï¿½ï¿½B
-        /// false ï¿½Å‚ï¿½ï¿½ï¿½Îï¿½É•ï¿½ï¿½ï¿½Iï¿½Èƒï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ê‚¼ï¿½ï¿½ÊŒÂ‚ï¿½ ZipArchive ï¿½ï¿½ï¿½Iï¿½[ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+        /// true ‚Å‚ ‚ê‚ÎA“¯‚¶ zip “à‚Ìƒf[ƒ^ƒ[ƒh‚É‚Í‚P‚Â‚Ì ZipArchive ‚µ‚©ƒI[ƒvƒ“‚µ‚È‚¢B
+        /// ‚½‚¾‚µ‚»‚Ìê‡A•À—ñ“I‚Èƒ[ƒh‚Ís‚í‚ê‚È‚¢B
+        /// false ‚Å‚ ‚ê‚Îí‚É•À—ñ“I‚Èƒ[ƒh‚ðs‚¤‚ªA‚»‚ê‚¼‚ê•ÊŒÂ‚É ZipArchive ‚ðƒI[ƒvƒ“‚·‚éB
         /// </summary>
         public static bool IsSeaquentialLoadingInZip = false;
 
 
         /// <summary>
-        /// FileStream ï¿½ÅŠï¿½ï¿½Sï¿½È”ñ“¯Šï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Tï¿½Cï¿½Yï¿½ï¿½ 3MB ï¿½Èï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½Ì‚ÝB
+        /// FileStream ‚ÅŠ®‘S‚È”ñ“¯Šúƒ‚[ƒh‚ðŽg—p‚·‚éB‚½‚¾‚µƒTƒCƒY‚ª 3MB ˆÈã‚Ìƒtƒ@ƒCƒ‹‚Ì‚ÝB
         /// </summary>
         public static bool UseAsyncModeForFileStreamApi = false;
 
 
 
         /// <summary>
-        /// ï¿½pï¿½Xï¿½ï¿½ zip ï¿½Å‚ï¿½ï¿½ï¿½ÎAZipArchive ï¿½ï¿½Ô‚ï¿½ï¿½Bï¿½ï¿½ï¿½ï¿½ÈŠOï¿½ï¿½ null ï¿½ï¿½Ô‚ï¿½ï¿½B
-        /// IsSeaquentialLoadingInZip ï¿½ï¿½ false ï¿½Å‚ï¿½ï¿½ï¿½ÎAï¿½ï¿½ï¿½ null ï¿½ï¿½Ô‚ï¿½ï¿½B
+        /// ƒpƒX‚ª zip ‚Å‚ ‚ê‚ÎAZipArchive ‚ð•Ô‚·B‚»‚êˆÈŠO‚Í null ‚ð•Ô‚·B
+        /// IsSeaquentialLoadingInZip ‚ª false ‚Å‚ ‚ê‚ÎAí‚É null ‚ð•Ô‚·B
         /// </summary>
         public static async ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, IArchive fallback, CancellationToken ct)
         {
@@ -382,10 +382,10 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ï¿½Iï¿½[ï¿½fï¿½Bï¿½Iï¿½Nï¿½ï¿½ï¿½bï¿½vï¿½Aï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Qï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½Aï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Aï¿½{ï¿½[ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½Aï¿½jï¿½ï¿½ï¿½ï¿½ï¿½Kï¿½vï¿½Èƒï¿½ï¿½\ï¿½[ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
-        /// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½ÉŠÖ‚ï¿½ï¿½Ä‚ÍAï¿½ï¿½ï¿½ÝƒAï¿½Nï¿½eï¿½Bï¿½uï¿½ÈƒQï¿½[ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ Destroy() ï¿½ï¿½ï¿½ï¿½B
-        /// ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½Xï¿½gï¿½bï¿½Nï¿½É‚ï¿½ï¿½ï¿½Ä”ï¿½Aï¿½Nï¿½eï¿½Bï¿½uï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ê‡ï¿½ÍADestroy() ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
-        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ADestroy() ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ï¿½ï¿½ï¿½^ï¿½Cï¿½~ï¿½ï¿½ï¿½Oï¿½É‚Í’ï¿½ï¿½Ó‚ï¿½ï¿½é‚±ï¿½ÆBï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ç‚­ Destory() ï¿½ÌŽï¿½ï¿½Ìƒtï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½j
+        /// ƒI[ƒfƒBƒIƒNƒŠƒbƒvAƒ‚ƒfƒ‹ƒQ[ƒ€ƒIƒuƒWƒFƒNƒgAƒAƒjƒ[ƒVƒ‡ƒ“ƒXƒgƒŠ[ƒ€ƒf[ƒ^Aƒ{[ƒ“ƒf[ƒ^‚Ì‚¤‚¿A”jŠü‚ª•K—v‚ÈƒŠƒ\[ƒX‚¾‚¯”jŠü‚·‚éB
+        /// ƒ‚ƒfƒ‹‚ÉŠÖ‚µ‚Ä‚ÍAŒ»ÝƒAƒNƒeƒBƒu‚ÈƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚¾‚¯ Destroy() ‚·‚éB
+        /// ƒ‚ƒfƒ‹ƒXƒgƒbƒN‚É‚æ‚Á‚Ä”ñƒAƒNƒeƒBƒu‚É‚È‚Á‚Ä‚¢‚éê‡‚ÍADestroy() ‚³‚ê‚È‚¢B
+        /// ‚½‚¾‚µADestroy() ‚ª”½‰f‚³‚ê‚éƒ^ƒCƒ~ƒ“ƒO‚É‚Í’ˆÓ‚·‚é‚±‚ÆBi‚¨‚»‚ç‚­ Destory() ‚ÌŽŸ‚ÌƒtƒŒ[ƒ€‚©‚çj
         /// </summary>
         static Action buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrder[] motions) order) =>
             () =>

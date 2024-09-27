@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ï¿½Ì‚ï¿½ï¿½ï¿½
+using UnityEngine.Scripting;// [Preserve] ‚Ì‚½‚ß
 using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
@@ -72,7 +72,6 @@ namespace AnimLite.Utility
         }
 
         PathUnit archiveCachePath;
-        public IArchive fallbackArchive { private get; set; }
 
 
         public IArchive FallbackArchive { get; private set; }
@@ -118,8 +117,8 @@ namespace AnimLite.Utility
 
 
     /// <summary>
-    /// ï¿½eï¿½ï¿½ .Dispose() ï¿½ï¿½ï¿½ï¿½ÆAFallbackArchive ï¿½ï¿½ .Dispose() ï¿½ï¿½ï¿½ï¿½ï¿½B
-    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Fallback ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½é‘¤ï¿½ï¿½ .Dispose() ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
+    /// e‚ğ .Dispose() ‚·‚é‚ÆAFallbackArchive ‚à .Dispose() ‚³‚ê‚éB
+    /// ‚½‚¾‚µ Fallback ‚³‚ê‚Ä‚¢‚é‘¤‚Å .Dispose() ‚µ‚Ä‚à–â‘è‚È‚¢B
     /// </summary>
     public class ZipWrapArchive : IArchive
     {
@@ -142,7 +141,7 @@ namespace AnimLite.Utility
             Debug.Log("zip disposing");
 
             this.zip.Dispose();
-            this.stream.Dispose();// archive ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Ì‚Åiï¿½Â‚ï¿½ï¿½ï¿½ï¿½ï¿½ç‚µï¿½ï¿½ï¿½Ì‚Éj
+            this.stream.Dispose();// archive ‚ğ”jŠü‚µ‚Ä‚à”jŠü‚³‚ê‚È‚¢‚Ì‚Åi•Â‚¶‚ç‚ê‚é‚ç‚µ‚¢‚Ì‚Éj
             this.zip = null;
             this.stream = null;
 
@@ -179,7 +178,7 @@ namespace AnimLite.Utility
     public static class ZipUtility
     {
 
-        // Archive ï¿½Ì‚Ù‚ï¿½ï¿½É‚ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ë‚¤ï¿½ï¿½
+        // Archive ‚Ì‚Ù‚¤‚É‚à‚Á‚Ä‚¢‚¯‚È‚¢‚¾‚ë‚¤‚©
 
 
         public static async ValueTask<T> UnzipAwait<T>(
@@ -254,8 +253,8 @@ namespace AnimLite.Utility
         }
 
 
-        // ï¿½oï¿½ï¿½ï¿½Gï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Ì‚Í‚ï¿½ï¿½Â‚Èc
-        // this Stream ï¿½ï¿½ this ValueTask<Stream> ï¿½ï¿½ï¿½ß‚ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½í‚©ï¿½ï¿½Ã‚ç‚¢
+        // ƒoƒŠƒG[ƒVƒ‡ƒ“‘‚©‚È‚¢‚Æ‚¢‚¯‚È‚¢‚Ì‚Í‚«‚Â‚Èc
+        // this Stream ‚Æ this ValueTask<Stream> ‚ª‚ß‚ñ‚Ç‚¤‚¾‚µA‚í‚©‚è‚Ã‚ç‚¢
 
 
         public static ValueTask<T> UnzipFirstEntryAwait<T>(this ValueTask<Stream> stream, string extension, Func<Stream, T> createAction) =>

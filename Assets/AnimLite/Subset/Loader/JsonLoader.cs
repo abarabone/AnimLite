@@ -46,8 +46,8 @@ namespace AnimLite.Utility
                             await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, jsondata)),
                         _ =>
                             await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, jsondata)),
-                        // .json ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ .zip ï¿½ï¿½ï¿½Ì‚ï¿½ entry path ï¿½ï¿½ï¿½Qï¿½Æ‚ï¿½ï¿½ï¿½B
-                        // ï¿½ï¿½ï¿½Ìƒï¿½ï¿½fï¿½Bï¿½Aï¿½Å‚ï¿½ .json ï¿½É‹Lï¿½ï¿½ï¿½ê‚½ï¿½pï¿½Xï¿½ï¿½ entry path ï¿½Æ‰ï¿½ï¿½ß‚ï¿½ï¿½ï¿½B
+                        // .json ‚¾‚¯‚Í .zip Ž©‘Ì‚Ì entry path ‚ðŽQÆ‚·‚éB
+                        // ‘¼‚ÌƒƒfƒBƒA‚Å‚Í .json ‚É‹L‚³‚ê‚½ƒpƒX‚ð entry path ‚Æ‰ðŽß‚·‚éB
                     });
 
                 if (json is not null)
@@ -107,7 +107,7 @@ namespace AnimLite.Utility
         }
 
 
-        // System.Text.Json ï¿½ï¿½ï¿½ï¿½Ê“Iï¿½É‚È‚ï¿½ï¿½ï¿½ï¿½ï¿½ÏXï¿½ï¿½ï¿½æ‚¤ï¿½Aï¿½Rï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Æ‚ï¿½ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½lï¿½Æ‚ï¿½
+        // System.Text.Json ‚ªˆê”Ê“I‚É‚È‚Á‚½‚ç•ÏX‚µ‚æ‚¤AƒRƒƒ“ƒg‚Æ‚©ƒfƒtƒHƒ‹ƒg’l‚Æ‚©
         //static JsonSerializerOptions jsonOptions;
         //JsonLoader()
         //{
@@ -132,18 +132,18 @@ namespace AnimLite.Utility
     }
 
 
-    // ï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½oï¿½[ï¿½^ï¿½[ï¿½oï¿½ï¿½ï¿½ï¿½
-    // reader ï¿½Íƒgï¿½[ï¿½Nï¿½ï¿½ï¿½ï¿½Ç‚Ý‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    // ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ { } ï¿½É‚ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½ÌAï¿½zï¿½ï¿½ï¿½ [ ] ï¿½É‚ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½ÌiJsonToken ï¿½ñ‹“’lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î‚ï¿½ï¿½ë‚¢ï¿½ï¿½í‚©ï¿½ï¿½j
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½~ï¿½eï¿½Bï¿½u
-    // ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É‰ß‚ï¿½ï¿½È‚ï¿½
-    // .Read() ï¿½ÍƒJï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½iï¿½ß‚ï¿½
-    // .Value ï¿½ÍŒï¿½ï¿½Ý‚Ìƒgï¿½[ï¿½Nï¿½ï¿½ï¿½ð“¾‚ï¿½
-    // serializer.Deserialize(reader) ï¿½ï¿½ reader ï¿½ÅƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½vï¿½ï¿½ï¿½~ï¿½eï¿½Bï¿½uï¿½ï¿½Ç‚Ý‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìiï¿½ï¿½ï¿½Rï¿½Jï¿½[ï¿½\ï¿½ï¿½ï¿½Íiï¿½Þj
-    // ï¿½fï¿½Vï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Cï¿½Yï¿½ÍƒJï¿½[ï¿½\ï¿½ï¿½ï¿½ï¿½ { ï¿½ÌˆÊ’uï¿½É‚ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ } ï¿½ÌˆÊ’uï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
-    // ï¿½Öï¿½ï¿½É“ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ { ï¿½ÌˆÊ’uï¿½É‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
+    // ƒƒRƒ“ƒo[ƒ^[Šo‚¦„
+    // reader ‚Íƒg[ƒNƒ“‚ð“Ç‚Ý‰º‚·‚à‚Ì
+    // ƒIƒuƒWƒFƒNƒg‚Í { } ‚É‚­‚­‚ç‚ê‚½‚à‚ÌA”z—ñ‚Í [ ] ‚É‚­‚­‚ç‚ê‚½‚à‚ÌiJsonToken —ñ‹“’l‚ðŒ©‚ê‚Î‚¢‚ë‚¢‚ë‚í‚©‚éj
+    // •¶Žš—ñ‚àƒvƒŠƒ~ƒeƒBƒu
+    // ƒIƒuƒWƒFƒNƒg–¼‚à•¶Žš—ñ‚É‰ß‚¬‚È‚¢
+    // .Read() ‚ÍƒJ[ƒ\ƒ‹‚ði‚ß‚é
+    // .Value ‚ÍŒ»Ý‚Ìƒg[ƒNƒ“‚ð“¾‚é
+    // serializer.Deserialize(reader) ‚Í reader ‚ÅƒIƒuƒWƒFƒNƒg‚âƒvƒŠƒ~ƒeƒBƒu‚ð“Ç‚Ý‰º‚·ˆ—‚ðŽ©“®‰»‚·‚é‚à‚Ìi“–‘RƒJ[ƒ\ƒ‹‚Íi‚Þj
+    // ƒfƒVƒŠƒAƒ‰ƒCƒY‚ÍƒJ[ƒ\ƒ‹‚ª { ‚ÌˆÊ’u‚É‚ ‚é•K—v‚ª‚ ‚èAŠ®—¹Žž‚Í } ‚ÌˆÊ’u‚É‚È‚Á‚Ä‚¢‚é
+    // ŠÖ”‚É“ü‚Á‚Ä‚«‚½‚Æ‚«‚Í { ‚ÌˆÊ’u‚É‚È‚Á‚Ä‚¢‚é
 
-    // ï¿½fï¿½Bï¿½Nï¿½Vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ PopulateObject() ï¿½Î‰ï¿½ï¿½É‚ï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½oï¿½[ï¿½^ï¿½[
+    // ƒfƒBƒNƒVƒ‡ƒiƒŠ“¯ƒL[‚Å PopulateObject() ‘Î‰ž‚É‚·‚éƒRƒ“ƒo[ƒ^[
     class DictionaryPopulativeConverter<TValue> : JsonConverter<Dictionary<string, TValue>>
         where TValue : class
     {
@@ -233,10 +233,10 @@ namespace AnimLite.Utility
     }
 
 
-    // ï¿½ï¿½ï¿½Oï¿½tï¿½ï¿½ï¿½zï¿½ñ‚ª‚Ù‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ÉAï¿½í‚´ï¿½í‚´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ì‚ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½È‚ÆŽvï¿½ï¿½ï¿½A
-    // ï¿½Lï¿½[ï¿½oï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½yï¿½Aï¿½Ì”zï¿½ñ‚©‚çŽ«ï¿½ï¿½ï¿½Æ“ï¿½ï¿½ï¿½ json ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½oï¿½[ï¿½^ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A
-    // ï¿½ï¿½ï¿½ï¿½ JObject ï¿½È‚Ç‚Ì“ï¿½ï¿½ï¿½ï¿½Iï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ÅŽï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‚É‹Cï¿½Ã‚ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½Æ‚È‚ï¿½ï¿½ï¿½
-    // ï¿½nï¿½bï¿½Vï¿½ï¿½ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½Iï¿½É‚ÍAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½Ì”{ï¿½ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½mï¿½Û‚ï¿½ï¿½ÄÕ“Ë‚ï¿½hï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½æ‚¤ï¿½È‚Ì‚ÅAï¿½ï¿½ï¿½ï¿½È‚É–ï¿½ï¿½Ê‚É‚ÍŠmï¿½Û‚ï¿½ï¿½È‚ï¿½ï¿½Í‚ï¿½
+    // –¼‘O•t‚«”z—ñ‚ª‚Ù‚µ‚¢‚½‚ß‚ÉA‚í‚´‚í‚´Ž«‘‚ðŽg‚¤‚Ì‚à–³‘Ê‚¾‚È‚ÆŽv‚¢A
+    // ƒL[ƒoƒŠƒ…[ƒyƒA‚Ì”z—ñ‚©‚çŽ«‘‚Æ“¯‚¶ json ‚ð‘‚«o‚·ƒRƒ“ƒo[ƒ^‚àl‚¦‚½‚ªA
+    // Œ‹‹Ç JObject ‚È‚Ç‚Ì“à•”ƒIƒuƒWƒFƒNƒg‚ÅŽ«‘‚ðŽg‚Á‚Ä‚»‚¤‚È‚±‚Æ‚É‹C‚Ã‚«AŽ«‘‚Å‚¢‚¢‚âc‚Æ‚È‚Á‚½
+    // ƒnƒbƒVƒ…ƒe[ƒuƒ‹ƒAƒ‹ƒSƒŠƒYƒ€“I‚É‚ÍA‚¾‚¢‚½‚¢ƒL[‚Ì”{‚ÌƒGƒ“ƒgƒŠ‚ðŠm•Û‚µ‚ÄÕ“Ë‚ð–h‚¢‚Å‚¢‚é‚æ‚¤‚È‚Ì‚ÅA‚»‚ñ‚È‚É–³‘Ê‚É‚ÍŠm•Û‚µ‚È‚¢‚Í‚¸
     //public class KeyValuePairConverter<TKey, TValue> : JsonConverter<KeyValuePair<TKey, TValue>[]>
     //{
     //    public override void WriteJson(
@@ -273,7 +273,7 @@ namespace AnimLite.Utility
     //            }
     //        }
 
-    //        // existingValue ï¿½É‘ï¿½ï¿½Ý‚ï¿½ï¿½é‚ª keyValuePairs ï¿½É‚Í‘ï¿½ï¿½Ý‚ï¿½ï¿½È‚ï¿½ï¿½Lï¿½[ï¿½ï¿½Ç‰ï¿½
+    //        // existingValue ‚É‘¶Ý‚·‚é‚ª keyValuePairs ‚É‚Í‘¶Ý‚µ‚È‚¢ƒL[‚ð’Ç‰Á
     //        foreach (var kvp in existingValue!)
     //        {
     //            if (!keyValuePairs.Exists(pair => pair.Key!.Equals(kvp.Key)))
@@ -287,7 +287,7 @@ namespace AnimLite.Utility
     //}
 
 
-    // ï¿½È‚ï¿½ï¿½Ô‚ÌƒGï¿½ï¿½ï¿½gï¿½ï¿½ï¿½mï¿½Fï¿½Öï¿½
+    // ‚È‚¢‚Ô‚ÌƒGƒ“ƒgƒŠŠm”FŠÖ”
     //static int GetCapacity<TKey, TValue>(this Dictionary<TKey, TValue> dictionary)
     //{
     //    FieldInfo fieldInfo = typeof(Dictionary<TKey, TValue>).GetField("entries", BindingFlags.NonPublic | BindingFlags.Instance);

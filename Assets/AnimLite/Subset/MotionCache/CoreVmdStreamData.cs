@@ -22,9 +22,9 @@ namespace AnimLite.Utility
 
 
     /// <summary>
-    /// ï¿½fï¿½[ï¿½^ï¿½Lï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½pï¿½ÌƒXï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½B
-    /// ï¿½Xï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Lï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½Í\ï¿½zï¿½ï¿½ï¿½È‚ï¿½ï¿½B
-    /// ï¿½Qï¿½ÆƒJï¿½Eï¿½ï¿½ï¿½gï¿½ÅŠÇ—ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Jï¿½Eï¿½ï¿½ï¿½gï¿½ï¿½ interlocked ï¿½Åsï¿½ï¿½ï¿½ï¿½B
+    /// ƒf[ƒ^ƒLƒƒƒbƒVƒ…—p‚ÌƒXƒgƒŠ[ƒ€ƒf[ƒ^B
+    /// ƒXƒgƒŠ[ƒ€ƒLƒƒƒbƒVƒ…‚Í\’z‚µ‚È‚¢B
+    /// QÆƒJƒEƒ“ƒg‚ÅŠÇ—‚³‚êAƒJƒEƒ“ƒg‚Í interlocked ‚Ås‚í‚ê‚éB
     /// </summary>
     public class CoreVmdStreamData : IDisposable
     {
@@ -132,7 +132,7 @@ namespace AnimLite.Utility
             {
                 "VmdStreamData cache only disposed".ShowDebugLog();
 
-                // ï¿½Lï¿½[ï¿½Lï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½Ù‚ï¿½ï¿½Íƒfï¿½[ï¿½^ï¿½Lï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½É’uï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Å”jï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
+                // ƒL[ƒLƒƒƒbƒVƒ…‚¾‚¯”jŠü‚·‚éB‚Ù‚©‚Íƒf[ƒ^ƒLƒƒƒbƒVƒ…‚É’u‚©‚ê‚é‚Ì‚Å”jŠü‚µ‚È‚¢B
                 dstvmddata.PositionStreams.Cache.Dispose();
                 dstvmddata.RotationStreams.Cache.Dispose();
                 dstvmddata.FaceStreams.Cache.Dispose();

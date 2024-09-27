@@ -4,11 +4,17 @@
 - 表情はとりあえず VRM 1.0 の expression に依存
 - burst, playable にも対応した
 - 名前空間 AnimLite.Vrm 関係は、UniVRM 1.x が必要です
-- 裏スレッドでの .vmd 読み込み
-- .vmd, model, web loading のキャッシュ機構、データ共有機構
-- .json で音楽、モデル、アニメーション、配置、を設定する機能
+- 非同期での .vmd 読み込み
+- .vmd, model, web loading のキャッシュ機能
+- 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2024.9.27
+- 複数の .vmd を読めるようにした
+  - .json で "AnimationFilePath" に 配列も書ける  
+      "AnimationFilePath": ["body.vmd", "face.vmd"]
+  - 動作としては、複数の .vmd 辞書を１つの辞書にマージするかんじ。同じキーは後読みで上書き
+
 2024.9.19
 - .json 読込をオーバーライドできるようにした（Sample6）
   - オーバーライド分の .json に記述のある項目だけ上書きされ、あとはベースの値が残る
@@ -18,8 +24,8 @@
   - 目がちゃんと閉じないときがあるなぁ
     
 それ以前の修正
-- local, web から file, zip をロード、また resource(addressable) もロードできるようにした
-- .glb を読めるようにした(BackGrounds)
+- local/web から file, zip をロード、また addressable resource もロードできるようにした
+- .glb を読めるようにした(BackGrounds として)
 - シーン上の game object インスタンスのキャッシュ（同じパスのモデルを再ロードしなくてもよいように）
 - ロードの並列度を高めた（同じ .json に出てくる音楽、モデル、アニメーション、表情定義、のどれもが並列になるようにした）
 - ZipArchive のロード時、ファイルストリームを使いまわさずに別個にファイルをオープンし、並列ロードできるスイッチを追加した
@@ -52,8 +58,7 @@
 - DanceSet を DanceScene にリネームしたいかも
 - 現状 DanceSet の機構が新旧２重になっているので統合したい（エディタ上でオーサリングするタイプと .json しか考慮してないタイプ）
 - .vmd の肩、腕ねじり、手首ねじり、を再考したい
-- 体と表情が別 .vmd になっている場合に対応したいので、複数 .vmd をマージするようにしたいかも
-- アニメーションとモデルがキャッシュされるので、音楽もキャッシュされるべき
+- ~~アニメーションとモデルがキャッシュされるので、音楽もキャッシュされるべき~~　すぐ読めるしいらんか
 - 顔と体の bounding box が変なので修正したい
 
 # いずれ
@@ -78,7 +83,7 @@
 - unity ~~2023.1.19f1~~ 6 prevew にしちゃった… + VRM1.20
 - テストコードは書いてない（よくわからない）、サンプルシーンが動けばとりあえずいいかみたいな
 - とりあえず ~~quest2~~ quest3（買った！！）で遊びながら修正していきたい
-  → けっこう機能が充実してきたので quest3 ライフがよきよき. deep link でブラウザから起動できるようにしたいがわからぬ
+  → ほしい機能がそろってきたので quest3 ライフが向上. deep link でブラウザから起動できるようにしたいがわからぬ
 
 # .json について
 - Sample5 load from json シーンにサンプルがある
@@ -132,7 +137,7 @@
                 "Scale": 0.0
             },
             "Animation": {                        // キャラクターのアニメーション
-                "AnimationFilePath": "",
+                "AnimationFilePath": "",          // ["", ..., ""], とすれば複数 .vmd のマージ読込となる
                 "FaceMappingFilePath": "",        // .vrm と .vmd の表情名対応表へのパス。"" ならデフォルトの対応表が使用される
                 "DelayTime": 0.0
             },
@@ -179,6 +184,9 @@
     - one drive とか google のマイドライブとかだとパスに拡張子が含まれないので、content の type とか見る方法にしないとダメかも…
     - https://www.dropbox.com/xxxx/step1.vmd?rlkey=kfga3v1soo6sple638gk326qt\&st=hrqrzch6\&dl=1/ds/step2.vmd のような記述（クエリストリングの後に zip 内のパス指定）もOK
   - unity のリソースは末尾に as resource をつける： step1 as resource
+  - AnimationFilePath に限り、単体でも配列でも記述できる  
+    "AnimationFilePath": "body.vmd"  
+    "AnimationFilePath": ["body.vmd", "face.vmd"]
 - 単体 zip に固めたデータは、同じ ZipArchive を使いまわすのでマルチスレッドロードが利かない（非同期ではあるが）
   - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
   - デフォルトは false
@@ -190,7 +198,7 @@
   - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
 - PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできないようにした
   - デフォルトは true
-  - アクセスすると IOException がスローされる（ null が返されるとかのほうがいいだろうか）
+  - アクセスすると IOException をスローする（ null が返されるとかのほうがいいだろうか）
 - json なのでいろいろ省略しても読める
   - ただしまだエラー処理とかテストとかしてないので、いろいろエラーも出ると思う
   - 各種データのパスとキャラ位置さえ指定しておけば、あとは省略（初期値となる）でもなんとなくOkだと思う

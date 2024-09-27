@@ -146,9 +146,11 @@ namespace AnimLite.Vmd
 
     public enum VmdFootIkMode
     {
-        auto,
-        on,
-        off,
+        auto        = -1,
+        off         = 0,
+        leg_only    = 1,
+        foot_only   = 2,
+        on          = 3,
     }
 
     public static class VmdJobExtension
@@ -163,8 +165,10 @@ namespace AnimLite.Vmd
 
             var useIk = footIkMode switch
             {
-                VmdFootIkMode.on => (pos: true, rot: true),
                 VmdFootIkMode.off => (pos: false, rot: false),
+                VmdFootIkMode.leg_only => (pos: true, rot: false),
+                VmdFootIkMode.foot_only => (pos: false, rot: true),
+                VmdFootIkMode.on => (pos: true, rot: true),
                 _ => getUseIk_(),
             };
 

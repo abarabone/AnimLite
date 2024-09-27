@@ -47,7 +47,31 @@ namespace AnimLite.Utility
                 return default;
             }
         }
+        public static T Logging<T>(Func<T> action)
+        {
+            try
+            {
+                return action();
+            }
+            catch (System.IO.FileNotFoundException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            catch (System.IO.DirectoryNotFoundException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            catch (System.InvalidOperationException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+        }
     }
+
+
 
 
 
@@ -61,11 +85,11 @@ namespace AnimLite.Utility
 
 
 
-    // ReadAsync() などの非同期メソッドは、Task.Run() の非同期と同じらしい（ＧＵＩスレッドをブロックさせないなどの意味しかない）
-    // だがこちらの方が圧倒的にはやい、なぜだろう…（ドキュメントには小さいファイルでは不利とはあったが）
-    public static Stream OpenReadFileStream(this PathUnit fullpath) =>
-            //new FileStream(path, FileMode.Open, FileAccess.Read);
-            new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: false);
+        // ReadAsync() などの非同期メソッドは、Task.Run() の非同期と同じらしい（ＧＵＩスレッドをブロックさせないなどの意味しかない）
+        // だがこちらの方が圧倒的にはやい、なぜだろう…（ドキュメントには小さいファイルでは不利とはあったが）
+        public static Stream OpenReadFileStream(this PathUnit fullpath) =>
+                //new FileStream(path, FileMode.Open, FileAccess.Read);
+                new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: false);
 
 
         // ちゃんとした I/O の非同期になるが、ものによってはかなり遅くなるようだ
@@ -84,7 +108,7 @@ namespace AnimLite.Utility
             new FileInfo(path).Length >= 3 * 1024 * 1024// サイズに根拠はないが 3MB とした
                 ? path.OpenAsyncReadFileStream()
                 : path.OpenReadFileStream();
-            //やっぱり非同期読み込みにすると超重くなる気がする
+        //やっぱり非同期読み込みにすると超重くなる気がする
 
 
 
@@ -115,7 +139,7 @@ namespace AnimLite.Utility
                     fullpath.OpenReadStream(),
             };
 
-}
+    }
 
 
     static public class DisposeUtility

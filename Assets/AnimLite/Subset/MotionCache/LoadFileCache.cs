@@ -23,8 +23,10 @@ namespace AnimLite.Vmd
     public class LoadFileCache
     {
 
-        public readonly static LoadFileCache Instance;
-        static LoadFileCache()
+        public static LoadFileCache Instance { get; private set; }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void _LoadFileCache()
         {
             Instance = new LoadFileCache();
             Instance.CleanupTmpFiles();
@@ -32,6 +34,14 @@ namespace AnimLite.Vmd
             "created load file cache".ShowDebugLog();
         }
 
+        //public readonly static LoadFileCache Instance;
+        //static LoadFileCache()
+        //{
+        //    Instance = new LoadFileCache();
+        //    Instance.CleanupTmpFiles();
+
+        //    "created load file cache".ShowDebugLog();
+        //}
 
 
 

@@ -94,7 +94,7 @@ namespace AnimLite.DancePlayable
 
             return new InformationDefine
             {
-                Caption = Path.GetFileNameWithoutExtension(ad.AnimationFilePath),
+                Caption = Path.GetFileNameWithoutExtension(ad.AnimationFilePath.Paths.First()),
                 Author = "çÏé“ïsñæ",
                 Description = "",
                 Url = "",

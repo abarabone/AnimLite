@@ -57,16 +57,12 @@ namespace AnimLite.Utility
     public static class CoreVmdStreamDataExtension
     {
 
-        public static ValueTask<CoreVmdStreamData> LoadVmdCoreDataExAsync(
-            this PathUnit vmdpath, VmdFaceMapping facemap, CancellationToken ct) =>
-                vmdpath.LoadVmdCoreDataExAsync(facemap, null, ct);
 
-
-        public static async ValueTask<CoreVmdStreamData> LoadVmdCoreDataExAsync(
-            this PathUnit vmdpath, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
+        public static CoreVmdStreamData BuildStreamCoreData(
+            this VmdMotionData vmddata, VmdFaceMapping facemap, CancellationToken ct)
         {
-            var vmddata = await VmdParser.LoadVmdExAsync(vmdpath, archive, ct);
-            if (vmddata.bodyKeyStreams == null) return default;
+            if (vmddata.IsBlank()) return null;
+            ct.ThrowIfCancellationRequested();
 
             var rot_data = vmddata.bodyKeyStreams.CreateRotationData();
             var pos_data = vmddata.bodyKeyStreams.CreatePositionData();

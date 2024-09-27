@@ -44,19 +44,23 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+            this IArchive archive, PathUnit path, CancellationToken ct)
+        {
+            if (path.IsBlank()) return default;
+
+            if (archive is not null && !path.IsFullPath())
             {
+                var clip = await LoadErr.LoggingAsync(() =>
+                    archive.ExtractAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct)));
 
-                if (archive != null && !path.IsFullPath())
-                {
-                    var clip = await archive.ExtractAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct));
+                if (!clip.clip.IsUnityNull()) return clip;
 
-                    if (!clip.clip.IsUnityNull()) return clip;
-                }
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadAudioClipExAsync(path, ct);
+            }
 
-                return await path.LoadAudioClipExAsync(ct);
-            });
+            return await path.LoadAudioClipExAsync(ct);
+        }
 
         static async ValueTask<AudioClipAsDisposable> loadAudioClipViaTmpFileAsync(
             this Stream stream, PathUnit path, CancellationToken ct)
@@ -76,7 +80,11 @@ namespace AnimLite.Utility
         public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
+
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
+
+
+            if (path.IsBlank()) return default;
 
             var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();

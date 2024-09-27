@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,19 +76,16 @@ namespace AnimLite.Vmd
 
 
         public static ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct)
+            this PathList vmdFilePaths, PathUnit faceMapFilePath, CancellationToken ct)
         =>
-            VmdData.LoadVmdStreamDataExAsync(vmdFilePath, faceMapFilePath, null, ct);
+            VmdData.LoadVmdStreamDataExAsync(vmdFilePaths, faceMapFilePath, null, ct);
 
 
         public static async ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
+            this PathList vmdFilePaths, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
         {
-            var vmddata = await VmdParser.LoadVmdExAsync(vmdFilePath, archive, ct);
-            var facemap = await VrmParser.LoadFaceMapExAsync(faceMapFilePath, ct);
-
-            var streamdata = vmddata.BuildVmdStreamData(facemap);
-            ct.ThrowIfCancellationRequested(streamdata.Dispose);
+            var facemap = await VrmLoader.LoadFaceMapExAsync(faceMapFilePath, ct);
+            var streamdata = await vmdFilePaths.LoadVmdStreamDataExAsync(facemap, archive, ct);
 
             return (streamdata, facemap);
         }
@@ -96,15 +94,20 @@ namespace AnimLite.Vmd
 
 
         public static ValueTask<VmdStreamData> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, Vrm.VmdFaceMapping facemap, CancellationToken ct)
+            this PathList vmdFilePaths, Vrm.VmdFaceMapping facemap, CancellationToken ct)
         =>
-            VmdData.LoadVmdStreamDataExAsync(vmdFilePath, facemap, null, ct);
+            VmdData.LoadVmdStreamDataExAsync(vmdFilePaths, facemap, null, ct);
 
 
         public static async ValueTask<VmdStreamData> LoadVmdStreamDataExAsync(
-            this PathUnit vmdFilePath, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
+            this PathList vmdFilePaths, VmdFaceMapping facemap, IArchive archive, CancellationToken ct)
         {
-            var vmddata = await VmdParser.LoadVmdExAsync(vmdFilePath, archive, ct);
+            var vmddata = await vmdFilePaths.Paths
+                .ToAsyncEnumerable()
+                .SelectAwait(x => archive.LoadVmdExAsync(x, ct))
+                .Where(x => !x.IsBlank())
+                .DefaultIfEmpty()
+                .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
 
             var streamdata = vmddata.BuildVmdStreamData(facemap);
             ct.ThrowIfCancellationRequested(streamdata.Dispose);
@@ -112,15 +115,6 @@ namespace AnimLite.Vmd
             return streamdata;
         }
 
-        //public static VmdStreamData LoadVmdStreamData(
-        //    this PathUnit vmdFilePath, Vrm.VmdFaceMapping defaultmap)
-        //{
-        //    var vmddata = VmdParser.ParseVmd(vmdFilePath);
-
-        //    var streamdata = vmddata.BuildVmdStreamData(defaultmap.VmdToVrmMaps);
-            
-        //    return streamdata;
-        //}
 
 
 

@@ -33,31 +33,35 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<T> LoadJsonAsync<T>(
-            this PathUnit path, IArchive archive, T jsondata, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+            this IArchive archive, PathUnit path, T jsondata, CancellationToken ct)
         {
             if (path.IsBlank()) return jsondata;
 
             if (archive is not null)
             {
-                var json = path.ToZipEntryPath() switch
-                {
-                    var entrypath when entrypath != "" =>
-                        await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, jsondata)),
-                    _ =>
-                        await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, jsondata)),
-                    // .json だけは .zip 自体の entry path を参照する。
-                    // 他のメディアでは .json に記されたパスを entry path と解釈する。
-                };
+                var json = await LoadErr.LoggingAsync(async () =>
+                    path.ToZipEntryPath() switch
+                    {
+                        var entrypath when entrypath != "" =>
+                            await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, jsondata)),
+                        _ =>
+                            await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, jsondata)),
+                        // .json だけは .zip 自体の entry path を参照する。
+                        // 他のメディアでは .json に記されたパスを entry path と解釈する。
+                    });
 
-                if (json is not null) return json;
+                if (json is not null)
+                    return json;
+
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadJsonAsync(path, jsondata, ct);
             }
 
             return await path.LoadJsonAsync<T>(jsondata, ct);
-        });
+        }
 
-        public static ValueTask<T> LoadJsonAsync<T>(this PathUnit path, IArchive archive, CancellationToken ct) where T:new() =>
-            path.LoadJsonAsync(archive, new T(), ct);
+        public static ValueTask<T> LoadJsonAsync<T>(this IArchive archive, PathUnit path, CancellationToken ct) where T:new() =>
+            archive.LoadJsonAsync(path, new T(), ct);
 
 
 
@@ -119,6 +123,7 @@ namespace AnimLite.Utility
             JsonOptions = new JsonSerializerSettings();
             JsonOptions.Converters.Add(new StringEnumConverter());
             JsonOptions.Converters.Add(new PathUnitConverter());
+            JsonOptions.Converters.Add(new PathListConverter());
             JsonOptions.Converters.Add(new DictionaryPopulativeConverter<ModelDefineJson>());
             JsonOptions.Converters.Add(new DictionaryPopulativeConverter<DanceMotionDefineJson>());
             JsonOptions.Formatting = Formatting.Indented;
@@ -188,6 +193,43 @@ namespace AnimLite.Utility
             JsonWriter writer, PathUnit value, JsonSerializer serializer)
         =>
             serializer.Serialize(writer, value.Value);
+    }
+
+    public class PathListConverter : JsonConverter<PathList>
+    {
+        public override PathList ReadJson(
+            JsonReader reader, Type objectType, PathList existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            return reader.TokenType switch
+            {
+                JsonToken.StartArray => new PathList
+                {
+                    Paths = serializer.Deserialize<string[]>(reader)
+                        .Where(x => (x ?? "") != "")
+                        .Select(x => x.ToPath()),
+                },
+                JsonToken.String =>
+                    (serializer.Deserialize<string>(reader)?.ToString() ?? "").ToPath(),
+                _ =>
+                    "".ToPath(),
+            };
+        }
+
+        public override void WriteJson(
+            JsonWriter writer, PathList value, JsonSerializer serializer)
+        {
+            switch (value.Paths.ToArray())
+            {
+                case var x when x.Length == 1:
+                    serializer.Serialize(writer, x[0].Value);
+                    break;
+                case var x:
+                    serializer.Serialize(writer, x);
+                    break;
+                default:
+                    break;
+            };
+        }
     }
 
 

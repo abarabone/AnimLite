@@ -41,18 +41,22 @@ namespace AnimLite.Vmd
         }
 
 
+        public ValueTask<VmdFaceMapping> GetFaceMapAsync(PathUnit facemappath) =>
+            this.Cache.GetFaceMapAsync(facemappath);
+
+
 
 
         public Task<(VmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadVmdStreamDataAsync(
-            PathUnit vmdFilePath, PathUnit faceMapFilePath, CancellationToken ct)
+            PathList vmdFilePaths, PathUnit faceMapFilePath, CancellationToken ct)
         =>
-            this.GetOrLoadVmdStreamDataAsync(vmdFilePath, faceMapFilePath, null, ct);
+            this.GetOrLoadVmdStreamDataAsync(vmdFilePaths, faceMapFilePath, null, ct);
 
 
         public async Task<(VmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadVmdStreamDataAsync(
-            PathUnit vmdFilePath, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
+            PathList vmdFilePaths, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
         {
-            var (_vmddata, facemap) = await this.Cache.GetOrLoadAsync(vmdFilePath, faceMapFilePath, archive, ct);
+            var (_vmddata, facemap) = await this.Cache.GetOrLoadAsync(vmdFilePaths, faceMapFilePath, archive, ct);
 
             var vmddata = _vmddata.CloneShallowlyWithCache();
 

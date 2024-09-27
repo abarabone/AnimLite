@@ -202,11 +202,13 @@ namespace AnimLite.Vmd
 
                 HumanBodyBones.LeftShoulder => accumulate(
                     //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
+                    //rkf.getrot(MmdBodyBones.左肩2),
                     rkf.getrot(MmdBodyBones.左肩)
                 ),
 
                 HumanBodyBones.RightShoulder => accumulate(
                     //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
+                    //rkf.getrot(MmdBodyBones.右肩2),
                     rkf.getrot(MmdBodyBones.右肩)
                 ),
 

@@ -67,7 +67,8 @@ namespace AnimLite.Utility
     [System.Serializable]
     public class AnimationDefineJson
     {
-        public PathUnit AnimationFilePath = "";
+        //public PathUnit AnimationFilePath = "";
+        public PathList AnimationFilePath = new () { Paths = { } };
         public PathUnit FaceMappingFilePath = "";
 
         public float DelayTime = 0.0f;

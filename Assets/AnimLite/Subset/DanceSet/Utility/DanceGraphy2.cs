@@ -208,8 +208,8 @@ namespace AnimLite.DancePlayable
 
                 void createBodyMotion_(MotionOrder order, StreamingTimer timer)
                 {
-                    //if (order == null) return;
-                    if (order.vmddata == null) return;
+                    //if (order is null) return;
+                    if (order.vmddata is null) return;
                     if (order.Model.IsUnityNull()) return;
 
                     var pkf = order.vmddata.PositionStreams
@@ -227,6 +227,7 @@ namespace AnimLite.DancePlayable
                 {
                     if (!order.face.IsCreated) return;
                     if (order.FaceRenderer.IsUnityNull()) return;
+                    if (order.vmddata is null) return;
 
                     var fkf = order.vmddata.FaceStreams
                         //.ToKeyFinderWith<Key2NearestShift, Clamp>();

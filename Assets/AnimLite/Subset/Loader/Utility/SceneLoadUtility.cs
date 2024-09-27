@@ -47,9 +47,10 @@ namespace AnimLite.Utility
         /// パスが zip であれば、ZipArchive を返す。それ以外は null を返す。
         /// IsSeaquentialLoadingInZip が false であれば、常に null を返す。
         /// </summary>
-        public static async ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, CancellationToken ct)
+        public static async ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, IArchive fallback, CancellationToken ct)
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
+
 
             var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();
@@ -58,20 +59,24 @@ namespace AnimLite.Utility
             {
                 var (zippath, _) when zippath != "" =>
                     DanceSceneLoader.IsSeaquentialLoadingInZip
-                        ? await openAsync_(zippath + queryString).OpenZipArchiveAwait()
-                        : await (zippath + queryString).OpenDummyArchiveAsync(ct),
+                        ? await openAsync_(zippath + queryString).OpenZipArchiveAwait(fallback)
+                        : await (zippath + queryString).OpenDummyArchiveAsync(fallback, ct),
                 _ =>
-                    null,
+                    //fallback,
+                    new NoArchive(fullpath, fallback),
             };
-        }
-        
+         }
+        public static ValueTask<IArchive> OpenWhenZipAsync(this PathUnit path, CancellationToken ct) =>
+            path.OpenWhenZipAsync(null, ct);
+
+
 
 
         public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(
             this PathUnit path, IArchive archive, CancellationToken ct)
         {
 
-            var json = await path.LoadJsonAsync<DanceSetJson>(archive, ct);
+            var json = await archive.LoadJsonAsync<DanceSetJson>(path, ct);
 
             return json.ToData();
 
@@ -116,7 +121,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         public static async ValueTask<Order> BuildDanceGraphyOrderParallelAsync(
-            this DanceSetJson ds, VmdStreamDataCache cache, IArchive archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSetJson ds, VmdStreamDataCache cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         {
             var audioTask =
                 Task.Run(async () => await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct) as object);
@@ -214,7 +219,7 @@ namespace AnimLite.Utility
         {
             var audiopath = define.AudioFilePath;
 
-            var clip = await audiopath.LoadAudioClipExAsync(archive, ct);
+            var clip = await archive.LoadAudioClipExAsync(audiopath, ct);
 
             return define.toAudioOrder(clip, audioSource);
         }
@@ -246,13 +251,15 @@ namespace AnimLite.Utility
             this DanceMotionDefineJson define, VmdStreamDataCache cache, IArchive archive, CancellationToken ct)
         {
             var modelpath = define.Model.ModelFilePath;
-            var vmdpath = define.Animation.AnimationFilePath;
             var facepath = define.Animation.FaceMappingFilePath;
+
+            var vmdpath = define.Animation.AnimationFilePath;
 
             var modelTask =
                 Task.Run(async () => await cache.loadModelAsync(modelpath, archive, ct) as object);
             var streamdataTask =
                 Task.Run(async () => await cache.loadVmdAsync(vmdpath, facepath, archive, ct) as object);
+
 
             var data = await Task.WhenAll(modelTask, streamdataTask);
 
@@ -261,8 +268,33 @@ namespace AnimLite.Utility
             var (vmddata, facemap) = ((VmdStreamData, VmdFaceMapping))data[1];
 
             await Awaitable.MainThreadAsync();
-            return define.toMotionOrder(vmddata, facemap, model);
+            return define.toMotionOrder(vmddata, facemap, model!);
         }
+        //static async ValueTask<MotionOrder> buildMotionOrderParallelAsync(
+        //    this DanceMotionDefineJson define, VmdStreamDataCache cache, IArchive archive, CancellationToken ct)
+        //{
+        //    var modelpath = define.Model.ModelFilePath;
+        //    var facepath = define.Animation.FaceMappingFilePath;
+        //    var vmdpaths = define.Animation.AnimationFilePath;
+
+        //    var modelTask =
+        //        Task.Run(async () => await cache.loadModelAsync(modelpath, archive, ct) as object);
+        //    //var streamdataTask =
+        //    //    Task.Run(async () => await cache.loadVmdAsync(vmdpath0, facepath, archive, ct) as object);
+        //    //var streamdataTaskList = vmdpaths.Paths.Select(vmdpath =>
+        //    //    Task.Run(async () => (await cache.loadVmdAsync(vmdpath, facepath, archive, ct)).Item1 as object));
+
+
+        //    var data = await modelTask.WrapEnumerable().Concat(streamdataTaskList).WhenAll();
+        //    //var data = await Task.WhenAll(modelTask, streamdataTask);
+
+
+        //    var model = data[0] as GameObject;
+        //    var (vmddata, facemap) = ((VmdStreamData, VmdFaceMapping))data[1];
+
+        //    await Awaitable.MainThreadAsync();
+        //    return define.toMotionOrder(vmddata, facemap, model);
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -290,15 +322,15 @@ namespace AnimLite.Utility
         =>
             (modelpath.IsResource() ? null : stocker)?.GetOrLoadModelAsync(modelpath, archive, ct).AsValueTask()
             ??
-            modelpath.LoadModelExAsync(archive, ct);
+            archive.LoadModelExAsync(modelpath, ct);
 
 
         static ValueTask<(VmdStreamData, VmdFaceMapping)> loadVmdAsync(
-            this VmdStreamDataCache cache, PathUnit vmdpath, PathUnit facepath, IArchive archive, CancellationToken ct)
+            this VmdStreamDataCache cache, PathList vmdpaths, PathUnit facepath, IArchive archive, CancellationToken ct)
         =>
-            cache?.GetOrLoadVmdStreamDataAsync(vmdpath, facepath, archive, ct).AsValueTask()
+            cache?.GetOrLoadVmdStreamDataAsync(vmdpaths, facepath, archive, ct).AsValueTask()
             ??
-            VmdData.LoadVmdStreamDataExAsync(vmdpath, facepath, archive, ct);
+            VmdData.LoadVmdStreamDataExAsync(vmdpaths, facepath, archive, ct);
 
 
 

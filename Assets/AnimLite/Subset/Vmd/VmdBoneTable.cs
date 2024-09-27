@@ -21,6 +21,7 @@ namespace AnimLite.Vmd
         頭,
         左肩P,
         左肩,
+        //左肩2,//暫定追加
         左肩C,
         左腕,
         左腕捩,
@@ -50,6 +51,7 @@ namespace AnimLite.Vmd
         左小指３,
         右肩P,
         右肩,
+        //右肩2,//暫定追加
         右肩C,
         右腕,
         右腕捩,
@@ -197,6 +199,7 @@ namespace AnimLite.Vmd
             {"左肩P",           MmdBodyBones.左肩P},
             {"左肩Ｐ",          MmdBodyBones.左肩P},
             {"左肩",            MmdBodyBones.左肩},
+            //{"左肩2",            MmdBodyBones.左肩2},   // 
             {"左肩C",           MmdBodyBones.左肩C},
             {"左肩Ｃ",          MmdBodyBones.左肩C},
             {"左腕",            MmdBodyBones.左腕},
@@ -264,6 +267,7 @@ namespace AnimLite.Vmd
             {"右肩P",           MmdBodyBones.右肩P},
             {"右肩Ｐ",          MmdBodyBones.右肩P},
             {"右肩",            MmdBodyBones.右肩},
+            //{"右肩2",            MmdBodyBones.右肩2},   // 
             {"右肩C",           MmdBodyBones.右肩C},
             {"右肩Ｃ",          MmdBodyBones.右肩C},
             {"右腕",            MmdBodyBones.右腕},

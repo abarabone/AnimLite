@@ -29,26 +29,31 @@ namespace AnimLite.Vmd
     using AnimLite.Utility;
 
 
-    public static partial class VmdParser
+    public static class VmdLoader
     {
 
 
 
 
         public static async ValueTask<VmdMotionData> LoadVmdExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+            this IArchive archive, PathUnit path, CancellationToken ct)
+        {
+            if (path.IsBlank()) return default;
+
+            if (archive is not null && !path.IsFullPath())
             {
+                var data = LoadErr.Logging(() =>
+                    archive.Extract(path, VmdParser.ParseVmd));
+                    
+                if (!data.IsBlank())
+                    return data;
 
-                if (archive != null && !path.IsFullPath())
-                {
-                    var data = archive.Extract(path, VmdParser.ParseVmd);
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadVmdExAsync(path, ct);
+            }
 
-                    if (data.bodyKeyStreams != null) return data;
-                }
-
-                return await path.LoadVmdExAsync(ct);
-            });
+            return await path.LoadVmdExAsync(ct);
+        }
 
 
 
@@ -58,6 +63,9 @@ namespace AnimLite.Vmd
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
                 path.OpenStreamFileOrWebOrAssetAsync<BinaryAsset>(asset => asset.bytes, ct);
+
+
+            if (path.IsBlank()) return default;
 
             var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();

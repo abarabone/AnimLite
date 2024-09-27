@@ -10,14 +10,17 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using System.Data.Common;
 using UnityEngine;
-using UnityEditor;
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEditor.Build;
 #endif
 
 namespace AnimLite.Utility
 {
+    using AnimLite.Utility.Linq;
+
+
     public static class LocalEncoding
     {
         public static Encoding sjis = Encoding.GetEncoding("shift_jis");
@@ -77,16 +80,17 @@ namespace AnimLite.Utility
         public static string DataFolderPath { get; private set; }
         public static string PersistentFolderPath { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void InitPath()
         {
-            PathUnit.CacheFolderPath = Application.temporaryCachePath;
-            PathUnit.DataFolderPath = Application.dataPath;
-            PathUnit.PersistentFolderPath = Application.persistentDataPath;
+            PathUnit.CacheFolderPath = Path.GetFullPath(Application.temporaryCachePath);
+            PathUnit.DataFolderPath = Path.GetFullPath(Application.dataPath);
+            PathUnit.PersistentFolderPath = Path.GetFullPath(Application.persistentDataPath);
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            PathUnit.ParentPath = Application.persistentDataPath;
+            PathUnit.ParentPath = Path.GetFullPath(Application.persistentDataPath);
 #else
-            PathUnit.ParentPath = Application.dataPath;
+            PathUnit.ParentPath = Path.GetFullPath(Application.dataPath);
 #endif
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -406,6 +410,7 @@ namespace AnimLite.Utility
         /// </summary>
         static public bool IsWithinParentFolder(this PathUnit target)
         {
+            // Path.GetFullPath() はパスを正規化してくれる。.. や . を除去してくれるし、ショートも直してくれる。
             var _parent = Path.GetFullPath(PathUnit.ParentPath + "/");
             var _target = Path.GetFullPath(target);
 
@@ -431,14 +436,62 @@ namespace AnimLite.Utility
 
 
 
-    public class PathUnit_Initializer
+    public struct PathList
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void Initialize()
+
+        public IEnumerable<PathUnit> Paths;// = new EmptyEnumerableStruct<PathUnit>();
+
+
+        public static implicit operator PathList (PathUnit path) => path.ToPathList();
+
+
+        // dictionary 用 boxing 回避 ------------------------------------
+        public override bool Equals(object obj)
         {
-            PathUnit.InitPath();
+            return obj is PathList unit && Equals(unit);
         }
+
+        public bool Equals(PathList other)
+        {
+            return this.Paths.SequenceEqual(other.Paths);
+        }
+
+        public override int GetHashCode()
+        {
+            if (this.Paths == null) return 0;
+
+            return this.Paths
+                .Select(x => x.GetHashCode())
+                .Aggregate((pre, cur) => HashCode.Combine(pre, cur));
+        }
+        // dictionary 用 boxing 回避 ------------------------------------
     }
+
+    public static class PathListExtension
+    {
+        public static PathList ToPathList(this PathUnit path) => new PathList
+        {
+            Paths = path.WrapEnumerable(),
+        };
+
+        public static PathList Merge(this PathUnit path, PathList append) => new PathList
+        {
+            Paths = path.WrapEnumerable().Concat(append.Paths),
+        };
+    }
+
+
+
+
+
+    //public class PathUnit_Initializer
+    //{
+    //    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    //    static void Initialize()
+    //    {
+    //        PathUnit.InitPath();
+    //    }
+    //}
 
 #if UNITY_EDITOR
     [InitializeOnLoad]

@@ -24,6 +24,7 @@ namespace AnimLite.DancePlayable
 
         public VmdStreamDataCache Cache;
 
+
         [FilePath]
         public PathUnit JsonFile;
         [FilePath]
@@ -58,16 +59,17 @@ namespace AnimLite.DancePlayable
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
-                    using var archive = await this.JsonFile.OpenWhenZipAsync(ct);
-                    var ds_= await this.JsonFile.LoadJsonAsync<DanceSetJson>(archive, ct);
-                    var ds = await this.JsonFileOverwrite.LoadJsonAsync<DanceSetJson>(ds_, ct);
-                    var order = await ds.BuildDanceGraphyOrderAsync(this.Cache, archive, this.AudioSource, ct);
-
+                    using var archive0 = await this.JsonFile.OpenWhenZipAsync(ct);
+                    using var archive1 = await this.JsonFileOverwrite.OpenWhenZipAsync(archive0, ct);
+                    var ds0 = await archive0.LoadJsonAsync<DanceSetJson>(this.JsonFile, ct);
+                    var ds1 = await archive1.LoadJsonAsync<DanceSetJson>(this.JsonFileOverwrite, ds0, ct);
+                    var order = await ds1.BuildDanceGraphyOrderAsync(this.Cache, archive1, this.AudioSource, ct);
+                    
                     await Awaitable.MainThreadAsync();
                     this.graphy = DanceGraphy2.CreateGraphy(order);
 
                     this.graphy.graph.Play();
-                    this.DanceSceneCaption?.NortifyPlaying(ds);
+                    this.DanceSceneCaption?.NortifyPlaying(ds1);
 
                     adjustModel_(order);
                     changeVisibility_(order, true);

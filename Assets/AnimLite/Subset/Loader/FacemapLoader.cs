@@ -33,7 +33,7 @@ namespace AnimLite.Vrm
     // リソース時、gameobject でロードできなかったら .vrm でロードする
 
 
-    public static partial class VrmParser
+    public static partial class VrmLoader
     {
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace AnimLite.Vrm
                 //    .ParseFaceMapAsync(default);
                 return await new ResourceName("default_facemap")
                     .LoadResourceToStreamAsync<TextAsset>(asset => asset.bytes, default)
-                    .Await(ParseFaceMapAsync, default);
+                    .Await(VrmParser.ParseFaceMapAsync, default);
             });
         //static VrmParser()
         //{
@@ -61,18 +61,22 @@ namespace AnimLite.Vrm
 
 
         public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+            this IArchive archive, PathUnit path, CancellationToken ct)
             {
-                if (!path.IsBlank() && archive != null && !path.IsFullPath())
+                if (!path.IsBlank() && archive is not null && !path.IsFullPath())
                 {
-                    var facemap = await archive.ExtractAsync(path, s => s.ParseFaceMapAsync(ct));
+                    var facemap = await LoadErr.LoggingAsync(() =>
+                        archive.ExtractAsync(path, s => s.ParseFaceMapAsync(ct)));
 
-                    if (facemap.VmdToVrmMaps != null) return facemap;
+                    if (facemap.VmdToVrmMaps is not null)
+                        return facemap;
+
+                    if (archive.FallbackArchive is not null)
+                        return await archive.FallbackArchive.LoadFaceMapExAsync(path, ct);
                 }
 
                 return await path.LoadFaceMapExAsync(ct);
-            });
+            }
 
         //public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
         //    this PathUnit entrypath, ZipArchive archive, CancellationToken ct)
@@ -92,7 +96,7 @@ namespace AnimLite.Vrm
             await LoadErr.LoggingAsync(async () =>
         {
             //if (path.IsBlank()) path = "face_map_default as resource";
-            if (path.IsBlank()) return await VrmParser.DefaultFacemampAsync;
+            if (path.IsBlank()) return await VrmLoader.DefaultFacemampAsync;
 
             ValueTask<Stream> openAsync_(PathUnit path) =>
                 path.OpenStreamFileOrWebOrAssetAsync<TextAsset>(asset => asset.bytes, ct);

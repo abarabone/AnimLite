@@ -31,6 +31,10 @@ namespace AnimLite.Utility
 
         T ExtractFirstEntry<T>(string extension, Func<Stream, T> convertAction);
         ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction);
+
+
+        IArchive FallbackArchive { get; }
+
     }
 
 

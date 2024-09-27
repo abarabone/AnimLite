@@ -150,7 +150,7 @@ namespace AnimLite.DancePlayable
                         ? defaultFaceMap
                         : await facefullpath.ParseFaceMapAsync(ct);
 
-                    var vmddata = await vmdfullpath.LoadVmdStreamDataExAsync(facemap, ct);
+                    var vmddata = await VmdData.LoadVmdStreamDataExAsync(vmdfullpath, facemap, ct);
 
                     return (vmddata, facemap);
                 }

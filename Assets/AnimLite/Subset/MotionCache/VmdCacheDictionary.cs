@@ -17,6 +17,11 @@ namespace AnimLite.Vmd
     //using VRM;
 
 
+    /// <summary>
+    /// streamdata と facemap をキャッシュする
+    /// facemap 単位で内部辞書があり、streamdata を登録する
+    /// facemap も一度だけのみロードされ、キャッシュされる
+    /// </summary>
     [Serializable]
     public class VmdCacheDictionary
     {
@@ -30,7 +35,7 @@ namespace AnimLite.Vmd
         struct InnerCache
         {
             //public Dictionary<PathUnit, VmdStreamDataHolder> cache { get; private set; }
-            public ConcurrentDictionary<PathUnit, AsyncLazy<CoreVmdStreamData>> cache { get; private set; }
+            public ConcurrentDictionary<PathList, AsyncLazy<CoreVmdStreamData>> cache { get; private set; }
 
             public VmdFaceMapping facemap;
 
@@ -41,15 +46,35 @@ namespace AnimLite.Vmd
             }
         }
 
+        public async ValueTask<VmdFaceMapping> GetFaceMapAsync(PathUnit facemappath) =>
+            (await this.cache[facemappath].Value).facemap;
+
+
+
+
+
+
+        //public Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
+        //    PathUnit vmdpath, PathUnit facemappath, CancellationToken ct) =>
+        //        GetOrLoadAsync(vmdpath, facemappath, null, ct);
+
+
+        //public async Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
+        //    PathUnit vmdpath, PathUnit facemappath, IArchive archive, CancellationToken ct)
+        //;
+
+
+
+
 
 
         public Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
-            PathUnit vmdpath, PathUnit facemappath, CancellationToken ct) =>
-                GetOrLoadAsync(vmdpath, facemappath, null, ct);
+            PathList vmdpaths, PathUnit facemappath, CancellationToken ct) =>
+                GetOrLoadAsync(vmdpaths, facemappath, null, ct);
 
 
         public async Task<(CoreVmdStreamData vmddata, VmdFaceMapping facemap)> GetOrLoadAsync(
-            PathUnit vmdpath, PathUnit facemappath, IArchive archive, CancellationToken ct)
+            PathList vmdpaths, PathUnit facemappath, IArchive archive, CancellationToken ct)
         {
 
             var outercache = this;
@@ -69,9 +94,16 @@ namespace AnimLite.Vmd
                 });
 
             Task<CoreVmdStreamData> getDataAsync_(InnerCache innercache) =>
-                innercache.cache.GetOrAddLazyAaync(vmdpath, () =>
+                innercache.cache.GetOrAddLazyAaync(vmdpaths, async () =>
                 {
-                    return vmdpath.LoadVmdCoreDataExAsync(innercache.facemap, archive, ct).AsTask();
+                    var vmddata = await vmdpaths.Paths
+                        .ToAsyncEnumerable()
+                        .SelectAwait(x => archive.LoadVmdExAsync(x, ct))
+                        .Where(x => !x.IsBlank())
+                        .DefaultIfEmpty()
+                        .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
+
+                    return vmddata.BuildStreamCoreData(innercache.facemap, ct);
                 });
         }
 

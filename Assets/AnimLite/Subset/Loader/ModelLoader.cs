@@ -34,26 +34,31 @@ namespace AnimLite.Vrm
     // リソース時、gameobject でロードできなかったら .vrm でロードする
 
 
-    public static partial class VrmParser
+    public static partial class VrmLoader
     {
 
 
 
 
         public static async ValueTask<GameObject> LoadModelExAsync(
-            this PathUnit path, IArchive archive, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+            this IArchive archive, PathUnit path, CancellationToken ct)
         {
+            if (path.IsBlank()) return default;
 
-            if (archive != null && !path.IsFullPath())
+            if (archive is not null && !path.IsFullPath())
             {
-                var model = await archive.ExtractAsync(path, s => s.convertAsync(path, ct));
+                var model = await LoadErr.LoggingAsync(() =>
+                    archive.ExtractAsync(path, s => s.convertAsync(path, ct)));
 
-                if (model != null) return model;
+                if (model is not null)
+                    return model;
+
+                if (archive.FallbackArchive is not null)
+                    return await archive.FallbackArchive.LoadModelExAsync(path, ct);
             }
 
             return await path.LoadModelExAsync(ct);
-        });
+        }
 
 
         //public static async ValueTask<Animator> LoadModelExAsync(
@@ -69,6 +74,9 @@ namespace AnimLite.Vrm
             await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
+
+
+            if (path.IsBlank()) return default;
 
             var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();

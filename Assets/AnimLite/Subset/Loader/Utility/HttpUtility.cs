@@ -38,23 +38,35 @@ namespace AnimLite.Utility
 
     public static class HttpLoader
     {
-        static bool isCreated = false;
+        //static bool isCreated = false;
 
-        readonly public static HttpClient Client;
+        //readonly public static HttpClient Client;
+        //static HttpLoader()
+        //{
+        //    HttpLoader.Dispose();
+        //    "http client created".ShowDebugLog();
 
+        //    Client = new HttpClient();
+        //    isCreated = true;
+        //}
 
-        static HttpLoader()
+        public static HttpClient Client { get; private set; } = null;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static public void Init()
         {
+            HttpLoader.Dispose();
             "http client created".ShowDebugLog();
 
-            Client = new HttpClient();
-            isCreated = true;
+            HttpLoader.Client = new HttpClient();
         }
 
         public static void Dispose()
         {
-            if (isCreated) Client.Dispose();
+            if (HttpLoader.Client is null) return;
 
+            HttpLoader.Client.Dispose();
+            HttpLoader.Client = null;
             "http client disposed".ShowDebugLog();
         }
     }
@@ -74,7 +86,11 @@ namespace AnimLite.Utility
 
 
             using var response = await HttpLoader.Client.GetAsync(url);
-            if (!response.IsSuccessStatusCode) throw new System.Net.Http.HttpRequestException($"response is not success status code. {url.Value}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new System.Net.Http.HttpRequestException($"response is not success status code. {url.Value}");
+            }
 
             ct.ThrowIfCancellationRequested();
 

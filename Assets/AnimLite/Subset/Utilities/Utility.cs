@@ -41,6 +41,8 @@ namespace AnimLite.Vmd
     {
         public Dictionary<VmdBoneName, VmdBodyMotionKey[]> bodyKeyStreams;
         public Dictionary<VmdFaceName, VmdFaceKey[]> faceKeyStreams;
+
+        public bool IsBlank() => this.bodyKeyStreams is null;
     }
 
 

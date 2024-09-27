@@ -25,15 +25,65 @@ namespace AnimLite.Utility
 {
 
 
+    public class NoArchive : IArchive
+    {
+        public NoArchive(PathUnit jsonpath, IArchive fallback = null)
+        {
+            this.FallbackArchive = fallback;
+            this.jsonfullpath = jsonpath;
+        }
+
+        PathUnit jsonfullpath;
+
+        public IArchive FallbackArchive { get; private set; }
+
+        public void Dispose()
+        {
+            if (this.jsonfullpath.Value is null) return;
+            Debug.Log("no disposing");
+
+            this.jsonfullpath.Value = null;
+            this.FallbackArchive?.Dispose();
+        }
+
+
+        public T Extract<T>(PathUnit entryPath, Func<Stream, T> convertAction) =>
+            entryPath.ToFullPath().OpenReadFileStream().Using(convertAction);
+
+        public ValueTask<T> ExtractAsync<T>(PathUnit entryPath, Func<Stream, ValueTask<T>> convertAction) =>
+            entryPath.ToFullPath().OpenReadFileStream().UsingAsync(convertAction);
+
+
+        public T ExtractFirstEntry<T>(string extension, Func<Stream, T> convertAction) =>
+            this.jsonfullpath.OpenReadFileStream().Using(convertAction);
+
+        public ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction) =>
+            this.jsonfullpath.OpenReadFileStream().UsingAsync(convertAction);
+    }
+
+
 
     public class ZipDummyArchive : IArchive
     {
-        public ZipDummyArchive(PathUnit archiveCachePath) => this.archiveCachePath = archiveCachePath;
+        public ZipDummyArchive(PathUnit archiveCachePath, IArchive fallback = null)
+        {
+            this.archiveCachePath = archiveCachePath;
+            this.FallbackArchive = fallback;
+        }
 
         PathUnit archiveCachePath;
 
 
-        public void Dispose() { }
+        public IArchive FallbackArchive { get; private set; }
+
+        public void Dispose()
+        {
+            if (this.archiveCachePath.Value is null) return;
+            Debug.Log("dummy disposing");
+
+            this.archiveCachePath.Value = null;
+            this.FallbackArchive?.Dispose();
+        }
 
 
         public T Extract<T>(PathUnit entryPath, Func<Stream, T> convertAction) =>
@@ -48,39 +98,54 @@ namespace AnimLite.Utility
         
         public ValueTask<T> ExtractFirstEntryAsync<T>(string extension, Func<Stream, ValueTask<T>> convertAction) =>
             this.archiveCachePath.OpenReadStream().UnzipFirstEntryAsync(extension, convertAction);
-        
     }
 
     public static class DummyArchiveUtility
     {
-        public static async ValueTask<ZipDummyArchive> OpenDummyArchiveAsync(this PathUnit fullpath, CancellationToken ct)
+        public static async ValueTask<ZipDummyArchive> OpenDummyArchiveAsync(this PathUnit fullpath, IArchive fallback, CancellationToken ct)
         {
-            var cachePath = await fullpath.GetCachePathAsync(StreamOpenUtility.OpenStreamFileOrWebAsync, ct);
+            var cachePath = fullpath.IsHttp()
+                ? await fullpath.GetCachePathAsync(StreamOpenUtility.OpenStreamFileOrWebAsync, ct)
+                : fullpath;
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"dummy archive : {fullpath.Value} -> {cachePath.Value}".ShowDebugLog();
 #endif
-            return new ZipDummyArchive(cachePath);
+            return new ZipDummyArchive(cachePath, fallback);
         }
     }
 
 
+    /// <summary>
+    /// 親を .Dispose() すると、FallbackArchive も .Dispose() される。
+    /// ただし Fallback されている側で .Dispose() しても問題ない。
+    /// </summary>
     public class ZipWrapArchive : IArchive
     {
-        public ZipWrapArchive(Stream stream)
+        public ZipWrapArchive(Stream stream, IArchive fallback = null)
         {
             this.stream = stream;
             this.zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            this.FallbackArchive = fallback;
         }
 
         ZipArchive zip;
-
         Stream stream;
 
 
+        public IArchive FallbackArchive { get; private set; }
+
         public void Dispose()
         {
+            if (this.zip is null) return;
+            Debug.Log("zip disposing");
+
             this.zip.Dispose();
             this.stream.Dispose();// archive を破棄しても破棄されないので（閉じられるらしいのに）
+            this.zip = null;
+            this.stream = null;
+
+            this.FallbackArchive?.Dispose();
         }
 
 
@@ -100,11 +165,11 @@ namespace AnimLite.Utility
 
     public static class ZipWrapArchiveUtility
     {
-        public static ZipWrapArchive OpenZipArchive(this Stream stream) =>
-            new ZipWrapArchive(stream);
+        public static ZipWrapArchive OpenZipArchive(this Stream stream, IArchive fallback) =>
+            new ZipWrapArchive(stream, fallback);
 
-        public static async ValueTask<ZipWrapArchive> OpenZipArchiveAwait(this ValueTask<Stream> stream) =>
-            new ZipWrapArchive(await stream);
+        public static async ValueTask<ZipWrapArchive> OpenZipArchiveAwait(this ValueTask<Stream> stream, IArchive fallback) =>
+            new ZipWrapArchive(await stream, fallback);
     }
 
 

@@ -20,29 +20,22 @@ namespace AnimLite.Vmd
     public static partial class VmdParser
     {
 
+        /// <summary>
+        /// í«â¡Ç∑ÇÈ
+        /// ìØÇ∂ÉLÅ[Ç™Ç†ÇÍÇŒ appenddata Ç≈è„èëÇ´Ç∑ÇÈ
+        /// </summary>
+        public static VmdMotionData AppendOrOverwrite(this VmdMotionData basedata, VmdMotionData appenddata)
+        {
+            appenddata.bodyKeyStreams
+                .ForEach(pair => basedata.bodyKeyStreams[pair.Key] = pair.Value);
+            appenddata.faceKeyStreams
+                .ForEach(pair => basedata.faceKeyStreams[pair.Key] = pair.Value);
 
-        //public async static Task<VmdMotionData> ParseVmdAsync(this PathUnit filepath, CancellationToken ct)
-        //{
-        //    ct.ThrowIfCancellationRequested();
+            return basedata;
+        }
 
-        //    using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 
-        //    using var m = new MemoryStream();
-        //    await f.CopyToAsync(m, ct);
 
-        //    return ParseVmd(m);
-        //}
-        
-
-        //public static VmdMotionData ParseVmd(this PathUnit filepath)
-        //{
-        //    using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-
-        //    using var m = new MemoryStream();
-        //    f.CopyTo(m);
-
-        //    return ParseVmd(m);
-        //}
         public static VmdMotionData ParseVmd(this PathUnit filepath)
         {
             using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);

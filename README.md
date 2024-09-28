@@ -9,6 +9,9 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2024.9.28
+- AudioPlayable で Graph.Evalute() が効かなかったのを修正
+
 2024.9.27
 - 複数の .vmd を読めるようにした
   - .json で "AnimationFilePath" に 配列も書ける  

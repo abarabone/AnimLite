@@ -23,19 +23,10 @@ namespace AnimLite.Vmd
     public class LoadFileCache
     {
 
-        public static LoadFileCache Instance { get; private set; }
+        public static LoadFileCache Instance { get; private set; } = null;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void _LoadFileCache()
-        {
-            Instance = new LoadFileCache();
-            Instance.CleanupTmpFiles();
-
-            "created load file cache".ShowDebugLog();
-        }
-
-        //public readonly static LoadFileCache Instance;
-        //static LoadFileCache()
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //static void Init()
         //{
         //    Instance = new LoadFileCache();
         //    Instance.CleanupTmpFiles();
@@ -43,6 +34,26 @@ namespace AnimLite.Vmd
         //    "created load file cache".ShowDebugLog();
         //}
 
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //static void Cleanup() => Instance?.CleanupTmpFiles();
+        
+        static LoadFileCache()
+        {
+            LoadFileCache.Dispose();
+            LoadFileCache.Instance = new LoadFileCache();
+
+            "created load file cache".ShowDebugLog();
+        }
+
+        // åªèÛÅAÇ«Ç±Ç©ÇÁÇ‡åƒÇŒÇÍÇƒÇ»Ç¢ÇÕÇ∏
+        public static void Dispose()
+        {
+            if (LoadFileCache.Instance is null) return;
+
+            LoadFileCache.Instance.CleanupTmpFiles();
+            LoadFileCache.Instance = null;
+            "load file cache disposed".ShowDebugLog();
+        }
 
 
         ConcurrentDictionary<PathUnit, AsyncLazy<PathUnit>> cache = new();

@@ -38,29 +38,30 @@ namespace AnimLite.Utility
 
     public static class HttpLoader
     {
-        //static bool isCreated = false;
 
         //readonly public static HttpClient Client;
-        //static HttpLoader()
+        public static HttpClient Client { get; private set; } = null;
+
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        //static public void Init()
         //{
         //    HttpLoader.Dispose();
         //    "http client created".ShowDebugLog();
 
-        //    Client = new HttpClient();
-        //    isCreated = true;
+        //    HttpLoader.Client = new HttpClient();
         //}
 
-        public static HttpClient Client { get; private set; } = null;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static public void Init()
+        static HttpLoader()
         {
             HttpLoader.Dispose();
             "http client created".ShowDebugLog();
 
-            HttpLoader.Client = new HttpClient();
+            Client = new HttpClient();
         }
 
+
+
+        // åªèÛÅAÇ«Ç±Ç©ÇÁÇ‡åƒÇŒÇÍÇƒÇ»Ç¢ÇÕÇ∏
         public static void Dispose()
         {
             if (HttpLoader.Client is null) return;

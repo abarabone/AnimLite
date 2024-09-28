@@ -524,6 +524,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1440763541}
   - component: {fileID: 1440763542}
+  - component: {fileID: 1440763543}
   m_Layer: 0
   m_Name: controller
   m_TagString: Untagged
@@ -566,6 +567,20 @@ MonoBehaviour:
   - Value: ds/dance_scene_override_riku.json
   - Value: 
   index: 4
+--- !u!114 &1440763543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440763540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a88fddb65da0d54e880df5def5aeeb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 219923944}
+  timeRate: 8
 --- !u!1 &1816883843
 GameObject:
   m_ObjectHideFlags: 0

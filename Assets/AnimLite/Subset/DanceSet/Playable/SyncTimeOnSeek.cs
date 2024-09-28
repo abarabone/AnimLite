@@ -33,7 +33,8 @@ namespace AnimLite.DancePlayable
 
         public override void OnGraphStart(Playable playable)
         {
-            playable.SetInputWeight(0, 0.0f);
+            //playable.SetInputWeight(0, 0.0f);
+            //playable.SetInputWeight(0, 1.0f);
 
             var src = playable.GetInput(0);
             this.preFrameTime = src.GetTime();
@@ -54,13 +55,8 @@ namespace AnimLite.DancePlayable
             //Debug.Log($"{preFrameTime} : {currentTime} / {endTime} - {info.evaluationType}");
             if (isEvaluted || isOverZero || isBackFromEnd)
             {
-                src.Pause();
-                src.SetTime(currentTime);// これやると音が出る（もっとちゃんとしたやり方知りたい）
-                src.Play();
-                //src.Play();// これだとダメ
-                //playable.SetDuration(endTime);
-                //Debug.Log("set time");
-                playable.SetInputWeight(0, 1.0f);
+                src.SetTime(playable.GetTime());// これやると音が出る（もっとちゃんとしたやり方知りたい）
+                //Debug.Log($"set time : {src.GetTime()}");
             }
 
             this.preFrameTime = currentTime;

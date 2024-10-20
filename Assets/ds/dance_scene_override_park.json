@@ -1,0 +1,17 @@
+{
+    "BackGrounds": {
+      "main": {
+        "ModelFilePath": "Resources_moved/Park.glb",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      }
+    }
+}

@@ -343,6 +343,7 @@ MonoBehaviour:
   JsonFiles:
   - Value: ds/dance_scene.json
   - Value: 
+  - Value: 
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &219923945
 Transform:
@@ -524,6 +525,7 @@ GameObject:
   - component: {fileID: 1440763541}
   - component: {fileID: 1440763543}
   - component: {fileID: 1440763544}
+  - component: {fileID: 1440763545}
   m_Layer: 0
   m_Name: controller
   m_TagString: Untagged
@@ -583,6 +585,27 @@ MonoBehaviour:
   index: 0
   ChangeToPrevKey: 276
   ChangeToNextKey: 275
+  KeepTimeOnChane: 1
+--- !u!114 &1440763545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440763540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4f808b990dbc845a2a2265c1d4dfe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DanceScenePlayer: {fileID: 219923944}
+  TargetJsonLevel: 2
+  JsonOverwriteList:
+  - Value: 
+  - Value: ds/dance_scene_override_park.json
+  index: 0
+  ChangeToPrevKey: 273
+  ChangeToNextKey: 274
   KeepTimeOnChane: 1
 --- !u!1 &1816883843
 GameObject:

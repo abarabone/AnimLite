@@ -14,25 +14,25 @@ namespace AnimLite.Vmd
     //using VRM;
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public class VmdStreamData2 : IDisposable
-    {
-        public StreamDataHolder<quaternion, Key4StreamCache<quaternion>, StreamIndex> RotationStreams;
-        public StreamDataHolder<float4, Key4StreamCache<float4>, StreamIndex> PositionStreams;
-        public StreamDataHolder<float, Key2StreamCache<float>, StreamIndex> FaceStreams;
+    ///// <summary>
+    ///// 
+    ///// </summary>
+    //public class VmdStreamData : IDisposable
+    //{
+    //    public StreamDataHolder<quaternion, Key4StreamCache<quaternion>, StreamIndex> RotationStreams;
+    //    public StreamDataHolder<float4, Key4StreamCache<float4>, StreamIndex> PositionStreams;
+    //    public StreamDataHolder<float, Key2StreamCache<float>, StreamIndex> FaceStreams;
 
-        public bool IsCreated => this.RotationStreams.Streams.KeyStreams.Values.IsCreated;
+    //    public bool IsCreated => this.RotationStreams.Streams.KeyStreams.Values.IsCreated;
 
 
-        public Action DisposeAction;
+    //    public Action DisposeAction;
 
-        public void Dispose()
-        {
-            this.DisposeAction();
-        }
-    }
+    //    public void Dispose()
+    //    {
+    //        this.DisposeAction();
+    //    }
+    //}
     /// <summary>
     /// Žb’è
     /// </summary>
@@ -105,7 +105,7 @@ namespace AnimLite.Vmd
             var vmddata = await vmdFilePaths.Paths
                 .ToAsyncEnumerable()
                 .SelectAwait(x => archive.LoadVmdExAsync(x, ct))
-                .Where(x => !x.IsBlank())
+                .Where(x => !x.IsUnload())
                 .DefaultIfEmpty()
                 .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
 
@@ -140,6 +140,43 @@ namespace AnimLite.Vmd
                 RotationStreams = rot_data.ToHolderWith(rot_cache, rot_index),
                 PositionStreams = pos_data.ToHolderWith(pos_cache, pos_index),
                 FaceStreams = face_data.ToHolderWith(face_cache, face_index),
+            };
+
+            dstvmddata.DisposeAction = () =>
+            {
+                "VmdStreamData disposed".ShowDebugLog();
+
+                dstvmddata.RotationStreams.Dispose();
+                dstvmddata.PositionStreams.Dispose();
+                dstvmddata.FaceStreams.Dispose();
+            };
+
+            return dstvmddata;
+        }
+
+
+        // Žb’è
+        public static VmdStreamData BuildVmdStreamData(this VmdCameraData srcvmdData)
+        {
+            var rot_data = srcvmdData.cameraKeyStream.CreateCameraData(key => key.rot);
+            var pos_data = srcvmdData.cameraKeyStream.CreateCameraData(key => key.pos);
+            var prm_data = srcvmdData.cameraKeyStream.CreateCameraData(key => key.fov);
+
+            var rot_index = rot_data.CreateIndex(indexBlockLength: 100);
+            var pos_index = pos_data.CreateIndex(indexBlockLength: 100);
+            var prm_index = prm_data.CreateIndex(indexBlockLength: 100);
+
+            var timer = new StreamingTimer(rot_data.GetLastKeyTime());
+
+            var rot_cache = rot_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulRot>(timer);
+            var pos_cache = pos_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulPos>(timer);
+            var face_cache = prm_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4Catmul>(timer);
+
+            var dstvmddata = new VmdStreamData
+            {
+                RotationStreams = rot_data.ToHolderWith(rot_cache, rot_index),
+                PositionStreams = pos_data.ToHolderWith(pos_cache, pos_index),
+                FaceStreams = prm_data.ToHolderWith(face_cache, prm_index),
             };
 
             dstvmddata.DisposeAction = () =>

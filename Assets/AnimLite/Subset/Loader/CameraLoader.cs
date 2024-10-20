@@ -29,13 +29,13 @@ namespace AnimLite.Vmd
     using AnimLite.Utility;
 
 
-    public static class VmdLoader
+    public static partial class VmdLoader
     {
 
 
 
 
-        public static async ValueTask<VmdMotionData> LoadVmdExAsync(
+        public static async ValueTask<VmdCameraData> LoadVmdCameraExAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
         {
             if (path.IsBlank()) return default;
@@ -43,22 +43,22 @@ namespace AnimLite.Vmd
             if (archive is not null && !path.IsFullPath())
             {
                 var data = LoadErr.Logging(() =>
-                    archive.Extract(path, VmdParser.ParseVmd));
+                    archive.Extract(path, VmdParser.ParseVmdCamera));
                     
-                if (!data.IsBlank())
+                if (!data.IsUnload())
                     return data;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadVmdExAsync(path, ct);
+                    return await archive.FallbackArchive.LoadVmdCameraExAsync(path, ct);
             }
 
-            return await path.LoadVmdExAsync(ct);
+            return await path.LoadVmdCameraExAsync(ct);
         }
 
 
 
 
-        public static async ValueTask<VmdMotionData> LoadVmdExAsync(this PathUnit path, CancellationToken ct) =>
+        public static async ValueTask<VmdCameraData> LoadVmdCameraExAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
@@ -73,11 +73,11 @@ namespace AnimLite.Vmd
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, VmdParser.ParseVmd),
+                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, VmdParser.ParseVmdCamera),
                 var (zippath, _) when fullpath.IsZipArchive() =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vmd", VmdParser.ParseVmd),
+                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vmd", VmdParser.ParseVmdCamera),
                 _ =>
-                    await openAsync_(fullpath + queryString).UsingAwait(VmdParser.ParseVmd),
+                    await openAsync_(fullpath + queryString).UsingAwait(VmdParser.ParseVmdCamera),
             };
         });
 

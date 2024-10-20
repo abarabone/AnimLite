@@ -61,7 +61,7 @@ namespace AnimLite.Utility
         public static CoreVmdStreamData BuildStreamCoreData(
             this VmdMotionData vmddata, VmdFaceMapping facemap, CancellationToken ct)
         {
-            if (vmddata.IsBlank()) return null;
+            if (vmddata.IsUnload()) return null;
             ct.ThrowIfCancellationRequested();
 
             var rot_data = vmddata.bodyKeyStreams.CreateRotationData();

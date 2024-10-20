@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.Playables;
 using Unity.Mathematics;
@@ -8,7 +7,7 @@ namespace AnimLite.DancePlayable
     using AnimLite;
     using AnimLite.Vrm;
 
-    public class FaceShifterPlayable : PlayableBehaviour
+    public class CameraPlayable : PlayableBehaviour
     {
 
         IKeyFinderWithoutProcedure<float> kf;

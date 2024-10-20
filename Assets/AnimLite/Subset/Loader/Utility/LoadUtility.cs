@@ -1,3 +1,5 @@
+
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,11 +43,27 @@ namespace AnimLite.Utility
                 Debug.LogWarning(e);
                 return default;
             }
+            catch (UnityEngine.AddressableAssets.InvalidKeyException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
             catch (System.InvalidOperationException e)
             {
                 Debug.LogWarning(e);
                 return default;
             }
+            catch (ArgumentNullException e)
+            // リソースロード失敗時に stream が null で発生。stream を受ける関数ではじきたいけどまあいいか
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            //catch (Exception e)
+            //{
+            //    Debug.LogWarning(e);
+            //    return default;
+            //}
         }
         public static T Logging<T>(Func<T> action)
         {
@@ -63,11 +81,27 @@ namespace AnimLite.Utility
                 Debug.LogWarning(e);
                 return default;
             }
+            catch (UnityEngine.AddressableAssets.InvalidKeyException e)
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
             catch (System.InvalidOperationException e)
             {
                 Debug.LogWarning(e);
                 return default;
             }
+            catch (ArgumentNullException e)
+            // リソースロード失敗時に stream が null で発生。stream を受ける関数ではじきたいけどまあいいか
+            {
+                Debug.LogWarning(e);
+                return default;
+            }
+            //catch (Exception e)
+            //{
+            //    Debug.LogWarning(e);
+            //    return default;
+            //}
         }
     }
 
@@ -138,6 +172,8 @@ namespace AnimLite.Utility
                 _ =>
                     fullpath.OpenReadStream(),
             };
+
+
 
     }
 

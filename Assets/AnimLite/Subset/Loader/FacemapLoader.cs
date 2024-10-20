@@ -22,12 +22,12 @@ namespace AnimLite.Utility
     using AnimLite.Vmd;
     using AnimLite.Vrm;
 
-}
+//}
 
-namespace AnimLite.Vrm
-{
-    using AnimLite.Utility;
-    using AnimLite.Vmd;
+//namespace AnimLite.Vrm
+//{
+    //using AnimLite.Utility;
+    //using AnimLite.Vmd;
 
     // todo
     // リソース時、gameobject でロードできなかったら .vrm でロードする
@@ -48,7 +48,8 @@ namespace AnimLite.Vrm
                 //    .ParseFaceMapAsync(default);
                 return await new ResourceName("default_facemap")
                     .LoadResourceToStreamAsync<TextAsset>(asset => asset.bytes, default)
-                    .Await(VrmParser.ParseFaceMapAsync, default);
+                    .UsingAwait(s => s.ParseFaceMapAsync(default));
+                    //.Await(VrmParser.ParseFaceMapAsync, default);
             });
         //static VrmParser()
         //{

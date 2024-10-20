@@ -30,10 +30,9 @@ namespace AnimLite.Vmd
                 .ForEach(pair => basedata.bodyKeyStreams[pair.Key] = pair.Value);
             appenddata.faceKeyStreams
                 .ForEach(pair => basedata.faceKeyStreams[pair.Key] = pair.Value);
-
+            
             return basedata;
         }
-
 
 
         public static VmdMotionData ParseVmd(this PathUnit filepath)
@@ -62,13 +61,21 @@ namespace AnimLite.Vmd
             $"model name : {n}".ShowDebugLog();
 #endif
 
+
             var bodydata = body_(r);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Count()}")).ShowDebugLog();
+            string.Join(", ", bodydata.Select(x => $"{x.Key.name}:{x.Value.Length}")).ShowDebugLog();
 #endif
 
-
             var facedata = face_(r);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            string.Join(", ", facedata.Select(x => $"{x.Key.name}:{x.Value.Length}")).ShowDebugLog();
+#endif
+
+//            var cameradata = camera_(r);
+//#if UNITY_EDITOR || DEVELOPMENT_BUILD
+//            $"camera:{cameradata.Length}".ShowDebugLog();
+//#endif
 
             return new VmdMotionData
             {
@@ -76,6 +83,63 @@ namespace AnimLite.Vmd
                 faceKeyStreams = facedata,
             };
         }
+
+
+
+
+
+        public static VmdCameraData ParseVmdCamera(this PathUnit filepath)
+        {
+            using var f = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+
+            return ParseVmdCamera(f);
+        }
+        public static VmdCameraData ParseVmdCamera(byte[] byteData)
+        {
+            using var m = new MemoryStream(byteData);
+
+            return ParseVmdCamera(m);
+        }
+
+
+        public static VmdCameraData ParseVmdCamera(this Stream s)
+        {
+            //System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            using var r = new BinaryReader(s);
+
+            var (h, n) = header_(r);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"format name : {h}".ShowDebugLog();
+            $"model name : {n}".ShowDebugLog();
+#endif
+
+            skip_();
+
+            var cameradata = camera_(r);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"camera:{cameradata.Length}".ShowDebugLog();
+#endif
+
+            return new VmdCameraData
+            {
+                cameraKeyStream = cameradata,
+            };
+
+
+            void skip_()
+            {
+                var bodyKeyLength = r.ReadUInt32();
+                r.ReadBytes(111 * (int)bodyKeyLength);
+
+                var faceKeyLength = r.ReadUInt32();
+                r.ReadBytes(23 * (int)faceKeyLength);
+            }
+        }
+
+
+
+
 
 
 
@@ -166,6 +230,49 @@ namespace AnimLite.Vmd
         }
 
 
+
+        static VmdCameraMotionKey[] camera_(BinaryReader r)
+        {
+            const float frametime_rate = (float)(1.0 / 30.0);
+
+            var keyLength = r.ReadUInt32();
+
+            var q =
+                from i in Enumerable.Range(0, (int)keyLength)
+                let frameno = r.ReadUInt32()
+                let distance = r.ReadSingle()
+                let vx = r.ReadSingle()
+                let vy = r.ReadSingle()
+                let vz = r.ReadSingle()
+                let rx = r.ReadSingle()
+                let ry = r.ReadSingle()
+                let rz = r.ReadSingle()
+                let _ = r.ReadBytes(24)
+                let fov = r.ReadUInt32()
+                let isPerthed = r.ReadByte()
+                
+                let rot = Quaternion.Euler(new Vector3(-rx, ry, rz))
+                let look_at_pos = new Vector3(-vx, vy, -vz)
+                let move = Vector3.forward * -distance
+                let camera_pos = look_at_pos + rot * move
+                
+                select new VmdCameraMotionKey
+                {
+                    frameno = frameno,
+                    time = frameno * frametime_rate,
+                    pos = new float4(camera_pos, 1.0f),
+                    //pos = new float4(look_at_pos, 1.0f),
+                    rot = rot,
+                    distance = distance,
+                    fov = (float)fov
+                };
+
+            return q
+                //.Do(x => Debug.Log($"{x.Key.name} {x.Count()}"))
+                //.Do(x => { if (x.Key.name.EndsWith("‚h‚j") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
+                .ToArray()
+                ;
+        }
     }
 
 }

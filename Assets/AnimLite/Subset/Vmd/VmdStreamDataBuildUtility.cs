@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -17,11 +18,20 @@ namespace AnimLite.Vmd
     public static class VmdStreamDataBuildExtension
     {
 
+
+        static VmdBodyMotionKey IdentityMotionKey =>
+            new VmdBodyMotionKey
+            {
+                time = 0.0f,
+                pos = float4.zero,
+                rot = quaternion.identity,
+            };
+
+
         /// <summary>
         /// 
         /// </summary>
-        public static StreamData<quaternion> CreateRotationData(
-            this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)//, int indexBlockLength = 100)
+        public static StreamData<quaternion> CreateRotationData(this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)
         {
             var qSrc =
                 from x in nameToStream//.Do(x => Debug.Log($"{x.Key.name}:{x.Count()}"))
@@ -47,7 +57,6 @@ namespace AnimLite.Vmd
                 select ny
                 ;
             var rotsrc = qRotSrc
-
                 //.Do(x => Debug.Log(x))
                 .Select(x => x.keys)
                 .ToArray();
@@ -55,7 +64,7 @@ namespace AnimLite.Vmd
             return new StreamData<quaternion>
             {
                 KeyStreams = rotsrc.BuildKeyData(key => key.rot, key => key.time, IdentityMotionKey),
-                Sections = rotsrc.BuildSectionData(IdentityMotionKey),
+                Sections = rotsrc.BuildSectionData(defaultKey: IdentityMotionKey),
             };
         }
 
@@ -80,7 +89,7 @@ namespace AnimLite.Vmd
                 tonai_("‰E‘«‚h‚j", "‰E‘«IK"),
             };
 
-            var sections = qPosSrc.BuildSectionData(IdentityMotionKey);
+            var sections = qPosSrc.BuildSectionData(defaultKey: IdentityMotionKey);
             var keys = qPosSrc.BuildKeyData(key => key.pos, key => key.time, IdentityMotionKey);
 
             return new StreamData<float4>
@@ -89,16 +98,6 @@ namespace AnimLite.Vmd
                 KeyStreams = keys,
             };
         }
-
-
-        static VmdBodyMotionKey IdentityMotionKey =>
-            new VmdBodyMotionKey
-            {
-                time = 0.0f,
-                pos = float4.zero,
-                rot = quaternion.identity,
-            };
-
 
 
 
@@ -130,6 +129,64 @@ namespace AnimLite.Vmd
                 KeyStreams = keys,
             };
         }
+
+    }
+
+
+
+    public static class VmdCameraStreamDataBuildExtension
+    {
+
+
+        static VmdCameraMotionKey IdentityMotionKey =>
+            new VmdCameraMotionKey
+            {
+                time = 0.0f,
+                fov = 60.0f,
+                pos = float4.zero,
+                rot = quaternion.identity,
+            };
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static StreamData<T> CreateCameraData<T>(
+            this VmdCameraMotionKey[] stream, Func<VmdCameraMotionKey, T> conv)
+                where T : unmanaged
+        {
+            var src = stream.WrapEnumerable();
+
+            return new StreamData<T>
+            {
+                KeyStreams = src.BuildKeyData(conv, key => key.time, IdentityMotionKey),
+                Sections = src.BuildSectionData(defaultKey: IdentityMotionKey),
+            };
+        }
+
+        //public static StreamData<float4> CreatePositionData(this VmdCameraMotionKey[] stream)
+        //{
+        //    var src = stream.WrapEnumerable();
+
+        //    return new StreamData<float4>
+        //    {
+        //        KeyStreams = src.BuildKeyData(key => key.pos, key => key.time, IdentityMotionKey),
+        //        Sections = src.BuildSectionData(defaultKey: IdentityMotionKey),
+        //    };
+        //}
+
+        //public static StreamData<float> CreateCameraParameterData(this VmdCameraMotionKey[] stream)
+        //{
+        //    var src = stream.WrapEnumerable();
+
+        //    return new StreamData<float>
+        //    {
+        //        KeyStreams = src.BuildKeyData(key => key.fov, key => key.time, IdentityMotionKey),
+        //        Sections = src.BuildSectionData(defaultKey: IdentityMotionKey),
+        //    };
+        //}
+
+
 
     }
 }

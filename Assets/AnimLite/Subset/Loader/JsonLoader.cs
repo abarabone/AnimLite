@@ -33,9 +33,11 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<T> LoadJsonAsync<T>(
-            this IArchive archive, PathUnit path, T jsondata, CancellationToken ct)
+            this IArchive archive, PathUnit path, T prevjson, CancellationToken ct) where T : new()
         {
-            if (path.IsBlank()) return jsondata;
+            if (prevjson is null) prevjson = new T();
+
+            if (path.IsBlank()) return prevjson;
 
             if (archive is not null)
             {
@@ -43,9 +45,9 @@ namespace AnimLite.Utility
                     path.ToZipEntryPath() switch
                     {
                         var entrypath when entrypath != "" =>
-                            await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, jsondata)),
+                            await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, prevjson)),
                         _ =>
-                            await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, jsondata)),
+                            await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, prevjson)),
                         // .json だけは .zip 自体の entry path を参照する。
                         // 他のメディアでは .json に記されたパスを entry path と解釈する。
                     });
@@ -54,19 +56,23 @@ namespace AnimLite.Utility
                     return json;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadJsonAsync(path, jsondata, ct);
+                    return await archive.FallbackArchive.LoadJsonAsync(path, prevjson, ct);
             }
 
-            return await path.LoadJsonAsync<T>(jsondata, ct);
+            return await path.LoadJsonAsync<T>(prevjson, ct);
         }
 
-        public static ValueTask<T> LoadJsonAsync<T>(this IArchive archive, PathUnit path, CancellationToken ct) where T:new() =>
-            archive.LoadJsonAsync(path, new T(), ct);
+        /// <summary>
+        /// ds を渡さないバージョン 
+        /// </summary>
+        public static ValueTask<T> LoadJsonAsync<T>(
+            this IArchive archive, PathUnit path, CancellationToken ct) where T:new() =>
+                archive.LoadJsonAsync(path, new T(), ct);
 
 
 
 
-        public static async ValueTask<T> LoadJsonAsync<T>(this PathUnit path, T jsondata, CancellationToken ct) =>
+        public static async ValueTask<T> LoadJsonAsync<T>(this PathUnit path, T prevjson, CancellationToken ct) where T : new() =>
             await LoadErr.LoggingAsync(async () =>
         {
 
@@ -74,7 +80,9 @@ namespace AnimLite.Utility
                 path.OpenStreamFileOrWebOrAssetAsync<TextAsset>(asset => asset.bytes, ct);
 
 
-            if (path.IsBlank()) return jsondata;
+            if (prevjson is null) prevjson = new T();
+
+            if (path.IsBlank()) return prevjson;
 
             var (fullpath, queryString) = path.ToFullPath().DividToPathAndQueryString();
             fullpath.ThrowIfAccessedOutsideOfParentFolder();
@@ -83,13 +91,15 @@ namespace AnimLite.Utility
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => DeserializeJsonAsync<T>(s, jsondata)),
+                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => DeserializeJsonAsync<T>(s, prevjson)),
                 var (zippath, _) when zippath != "" =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".json", s => DeserializeJsonAsync<T>(s, jsondata)),
+                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".json", s => DeserializeJsonAsync<T>(s, prevjson)),
                 var (_, _) =>
-                    await openAsync_(fullpath + queryString).UsingAwait(s => DeserializeJsonAsync<T>(s, jsondata)),
+                    await openAsync_(fullpath + queryString).UsingAwait(s => DeserializeJsonAsync<T>(s, prevjson)),
             };
-        });
+        })
+        ??
+        new T();
 
         public static ValueTask<T> LoadJsonAsync<T>(this PathUnit path, CancellationToken ct) where T : new() =>
             path.LoadJsonAsync(new T(), ct);
@@ -187,7 +197,7 @@ namespace AnimLite.Utility
         public override PathUnit ReadJson(
             JsonReader reader, Type objectType, PathUnit existingValue, bool hasExistingValue, JsonSerializer serializer)
         =>
-            (serializer.Deserialize<string>(reader)?.ToString() ?? "").ToPath();
+            (serializer.Deserialize<string>(reader)?.ToString() ?? (hasExistingValue ? existingValue : "")).ToPath();
 
         public override void WriteJson(
             JsonWriter writer, PathUnit value, JsonSerializer serializer)
@@ -204,14 +214,19 @@ namespace AnimLite.Utility
             {
                 JsonToken.StartArray => new PathList
                 {
-                    Paths = serializer.Deserialize<string[]>(reader)
+                    Paths = (serializer.Deserialize<string[]>(reader) ?? new string[] { })
                         .Where(x => (x ?? "") != "")
-                        .Select(x => x.ToPath()),
+                        .Select(x => x.ToPath())
+                        .ToArray(),
                 },
+
                 JsonToken.String =>
                     (serializer.Deserialize<string>(reader)?.ToString() ?? "").ToPath(),
+
                 _ =>
-                    "".ToPath(),
+                    hasExistingValue
+                        ? existingValue
+                        : "".ToPath(),
             };
         }
 
@@ -226,12 +241,9 @@ namespace AnimLite.Utility
                 case var x:
                     serializer.Serialize(writer, x);
                     break;
-                default:
-                    break;
             };
         }
     }
-
 
     // 名前付き配列がほしいために、わざわざ辞書を使うのも無駄だなと思い、
     // キーバリューペアの配列から辞書と同じ json を書き出すコンバータも考えたが、

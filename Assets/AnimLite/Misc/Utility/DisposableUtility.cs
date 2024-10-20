@@ -90,8 +90,13 @@ namespace AnimLite.Utility
             new DisposableWrap<T>(src, disposeAction);
 
 
+
         // 負荷よりも書き味を優先する用
-        public static async ValueTask<DisposableWrap<T>> AsDisposableAsync<T>(this Task<T> srcAsync, Action<T> disposeAction)
+        public static async ValueTask<DisposableWrap<T>> AsDisposableAwait<T>(this Task<T> srcAsync, Action<T> disposeAction)
+        {
+            return (await srcAsync).AsDisposable(disposeAction);
+        }
+        public static async ValueTask<DisposableWrap<T>> AsDisposableAwait<T>(this ValueTask<T> srcAsync, Action<T> disposeAction)
         {
             return (await srcAsync).AsDisposable(disposeAction);
         }

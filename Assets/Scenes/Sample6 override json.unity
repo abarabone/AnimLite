@@ -340,10 +340,9 @@ MonoBehaviour:
   LookAtTarget: {fileID: 993949184}
   AudioSource: {fileID: 219923943}
   Cache: {fileID: 1347650036}
-  JsonFile:
-    Value: ds/dance_scene.json
-  JsonFileOverwrite:
-    Value: 
+  JsonFiles:
+  - Value: ds/dance_scene.json
+  - Value: 
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &219923945
 Transform:
@@ -523,8 +522,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1440763541}
-  - component: {fileID: 1440763542}
   - component: {fileID: 1440763543}
+  - component: {fileID: 1440763544}
   m_Layer: 0
   m_Name: controller
   m_TagString: Untagged
@@ -547,26 +546,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1440763542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1440763540}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e629583b6677ce2428529673afb31968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DanceScenePlayer: {fileID: 219923944}
-  JsonOverwriteList:
-  - Value: ds/dance_scene_override_alicia.json
-  - Value: ds/dance_scene_override_lady.json
-  - Value: ds/dance_scene_override_prona.json
-  - Value: ds/dance_scene_override_riku.json
-  - Value: 
-  index: 4
 --- !u!114 &1440763543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -581,6 +560,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 219923944}
   timeRate: 8
+--- !u!114 &1440763544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440763540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e4f808b990dbc845a2a2265c1d4dfe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DanceScenePlayer: {fileID: 219923944}
+  TargetJsonLevel: 1
+  JsonOverwriteList:
+  - Value: 
+  - Value: ds/dance_scene_override_alicia.json
+  - Value: ds/dance_scene_override_lady.json
+  - Value: ds/dance_scene_override_prona.json
+  - Value: ds/dance_scene_override_riku.json
+  index: 0
+  ChangeToPrevKey: 276
+  ChangeToNextKey: 275
+  KeepTimeOnChane: 1
 --- !u!1 &1816883843
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,3 @@
-using AnimLite.Vmd;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Audio;
@@ -6,11 +5,14 @@ using UnityEngine.Playables;
 using Unity.VisualScripting;
 //using SimpleDance.FacialAnimation;
 //using SimpleDance;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace AnimLite.DancePlayable
 {
     using AnimLite.Vrm;
+    using AnimLite.Vmd;
 
 
     public static class DancePlayableUtility
@@ -36,9 +38,9 @@ namespace AnimLite.DancePlayable
 
 
             var playable_job = AnimationScriptPlayable.Create(graph, job);
-            playable_job.SetInputCount(1);
+            //playable_job.SetInputCount(1);
             playable_job.SetOutputCount(1);
-            playable_job.SetInputWeight(0, 1);
+            //playable_job.SetInputWeight(0, 1);
 
             var playable_sync = SyncJobTimerPlayable.Create(graph, currentTime =>
             {
@@ -51,6 +53,9 @@ namespace AnimLite.DancePlayable
 
 
             playable_job.SetTime(-delay);
+            playable_sync.SetTime(-delay);
+            //playable_job.SetDuration(timer.TotalTime + delay);
+            //playable_sync.SetDuration(timer.TotalTime + delay);
             playable_job.SetDuration(timer.TotalTime);
             playable_sync.SetDuration(timer.TotalTime);
 
@@ -73,12 +78,13 @@ namespace AnimLite.DancePlayable
 
 
             var playable_face = FaceShifterPlayable.Create(graph, model, kf, face, timer);
-            playable_face.SetInputCount(1);
+            //playable_face.SetInputCount(1);
             playable_face.SetOutputCount(1);
-            playable_face.SetInputWeight(0, 1);
+            //playable_face.SetInputWeight(0, 1);
 
 
             playable_face.SetTime(-delay);
+            //playable_face.SetDuration(timer.TotalTime + delay);
             playable_face.SetDuration(timer.TotalTime);
 
             output.SetSourcePlayable(playable_face);
@@ -100,14 +106,16 @@ namespace AnimLite.DancePlayable
 
 
             var playable_anim = AnimationClipPlayable.Create(graph, clip);
-            playable_anim.SetInputCount(1);
+            //playable_anim.SetInputCount(1);
             playable_anim.SetOutputCount(1);
-            playable_anim.SetInputWeight(0, 1);
+            //playable_anim.SetInputWeight(0, 1);
 
 
             playable_anim.SetTime(-delay);
+            //playable_anim.SetDuration(clip.length + delay);
+            playable_anim.SetDuration(clip.length);
 
-            graph.Connect(playable_anim, 0, playable_anim, 0);
+            //graph.Connect(playable_anim, 0, playable_anim, 0);
             output.SetSourcePlayable(playable_anim);
         }
 
@@ -125,27 +133,71 @@ namespace AnimLite.DancePlayable
 
 
             var output = AudioPlayableOutput.Create(graph, name, audio);
-            //output.SetEvaluateOnSeek(false);
+            output.SetEvaluateOnSeek(false);
 
 
             var playable_audio = AudioClipPlayable.Create(graph, clip, looping: false);
-            playable_audio.SetInputCount(1);
+            //playable_audio.SetInputCount(1);
             playable_audio.SetOutputCount(1);
-            playable_audio.SetInputWeight(0, 1f);
+            //playable_audio.SetInputWeight(0, 1f);
 
-            var playable_reseter = SyncTimeOnSeek.Create(graph);
+            var playable_reseter = SyncTimeOnSeek.Create(graph);//, audio);
             playable_reseter.SetInputCount(1);
             playable_reseter.SetOutputCount(1);
             playable_reseter.SetInputWeight(0, 1f);
 
 
             playable_audio.SetTime(-delay);
+            playable_reseter.SetTime(-delay);
+            //playable_audio.SetDuration(clip.length + delay);
+            //playable_reseter.SetDuration(clip.length + delay);
+            playable_audio.SetDuration(clip.length);
             playable_reseter.SetDuration(clip.length);
 
             graph.Connect(playable_audio, 0, playable_reseter, 0);
             output.SetSourcePlayable(playable_reseter, 0);
 
             //output.SetEvaluateOnSeek(true);// ‚È‚ñ‚¾‚ë‚¤‚±‚ê
+        }
+
+
+        public static void AdjustPlayableLength(this PlayableGraph graph)
+        {
+            
+            var q =
+                from ir in Enumerable.Range(0, graph.GetRootPlayableCount())
+                let rp = graph.GetRootPlayable(ir)
+                //from p in next_(rp)
+                //select p
+                select rp
+                ;
+            if (q.IsEmpty()) return;
+
+            //var maxlength = q.Max(p => p.GetDuration() + -p.GetTime());
+            
+            q.ForEach(p =>
+            {
+                //Debug.Log(p.GetDuration());
+                //var offset = -p.GetTime();
+                //var duration = p.GetDuration();
+                //var total = duration + offset;
+                //var distance = maxlength - total;
+                //p.SetDuration(duration - distance);
+                p.SetDuration(double.PositiveInfinity);
+            });
+
+
+            IEnumerable<Playable> next_(Playable rootplayable)
+            {
+
+                yield return rootplayable;
+
+                for (var p = rootplayable; p.GetInputCount() != 0; p = p.GetInput(0))
+                //for (var p = rootplayable; p.GetOutputCount() != 0; p = p.GetOutput(0))
+                {
+                    yield return p;
+                }
+            }
         }
     }
 }

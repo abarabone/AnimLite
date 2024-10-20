@@ -77,8 +77,8 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct) =>
-            await LoadErr.LoggingAsync(async () =>
+        public static ValueTask<AudioClipAsDisposable> LoadAudioClipExAsync(this PathUnit path, CancellationToken ct) =>
+            LoadErr.LoggingAsync(async () =>
         {
 
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);
@@ -139,12 +139,13 @@ namespace AnimLite.Utility
             {
                 var schemedpath = path.IsHttp()
                     ? path
-                    : $"file://{path.Value}".ToPath();
+                    : $"file://{path.Value}".ToPath();// android だとスキーム必要ぽい
 
                 await Awaitable.MainThreadAsync();
                 using var req = UnityWebRequestMultimedia.GetAudioClip(schemedpath, audioType);
 
-                ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;
+                //((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;// graph.Evalute() での音ズレの原因である可能性ありなのでやめる
+                ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = false;
 
                 await req.SendWebRequest();
 

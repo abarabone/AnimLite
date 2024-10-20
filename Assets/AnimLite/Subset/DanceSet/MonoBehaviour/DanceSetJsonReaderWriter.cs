@@ -109,6 +109,13 @@ namespace AnimLite.Utility.old
             ds.Motions = qMotionWithoutPos.ToArray();
             holder.dance = ds;
         }
+        static IEnumerable<Transform> GetChildren(this Transform tfSelf)
+        {
+            foreach (var tf in tfSelf)
+            {
+                yield return tf as Transform;
+            }
+        }
 
 
 

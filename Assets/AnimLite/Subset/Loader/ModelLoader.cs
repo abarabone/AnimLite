@@ -22,12 +22,12 @@ namespace AnimLite.Utility
     using AnimLite.Vmd;
     using AnimLite.Vrm;
 
-}
+//}
 
-namespace AnimLite.Vrm
-{
+//namespace AnimLite.Vrm
+//{
     using AnimLite.Utility;
-    using AnimLite.Vmd;
+    //using AnimLite.Vmd;
     using UniGLTF;
 
     // todo
@@ -110,52 +110,112 @@ namespace AnimLite.Vrm
 
 
 
+        //static async ValueTask<GameObject> convertGlbToModelAsync(this Stream s, CancellationToken ct)
+        //{
+        //    ct.ThrowIfCancellationRequested();
+
+        //    using var m = new MemoryStream();
+        //    await s.CopyToAsync(m, ct);
+
+        //    using var data = new GlbBinaryParser(m.ToArray(), "_").Parse();
+        //    await Awaitable.MainThreadAsync();
+        //    using var context = new UniGLTF.ImporterContext(data);
+        //    var instance = await context.LoadAsync(new UniGLTF.RuntimeOnlyNoThreadAwaitCaller());
+
+        //    await Awaitable.MainThreadAsync();
+        //    instance.ShowMeshes();
+        //    ct.ThrowIfCancellationRequested(instance.gameObject.Destroy);
+
+        //    return instance.gameObject.hideModel();
+        //}
         static async ValueTask<GameObject> convertGlbToModelAsync(this Stream s, CancellationToken ct)
         {
-            ct.ThrowIfCancellationRequested();
+
+            if (s.CanSeek)// もっとうまいことできないかなぁ…
+            {
+                return await convert_(s);
+            }
 
             using var m = new MemoryStream();
             await s.CopyToAsync(m, ct);
+            m.Seek(0, SeekOrigin.Begin);
 
-            using var data = new GlbBinaryParser(m.ToArray(), "_").Parse();
-            using var context = new UniGLTF.ImporterContext(data);
-            await Awaitable.MainThreadAsync();
-            var instance = await context.LoadAsync(new VRMShaders.RuntimeOnlyNoThreadAwaitCaller());
+            return await convert_(m);
 
-            await Awaitable.MainThreadAsync();
-            instance.ShowMeshes();
-            ct.ThrowIfCancellationRequested(instance.gameObject.Destroy);
 
-            return instance.gameObject.hideModel();
+            async ValueTask<GameObject> convert_(Stream s)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                using var br = new System.IO.BinaryReader(s);
+                using var data = new GlbBinaryParser(br.ReadBytes((int)s.Length), "_").Parse();
+
+                await Awaitable.MainThreadAsync();
+                using var context = new UniGLTF.ImporterContext(data);
+                var instance = await context.LoadAsync(new UniGLTF.RuntimeOnlyNoThreadAwaitCaller());
+
+                await Awaitable.MainThreadAsync();
+                instance.ShowMeshes();
+                ct.ThrowIfCancellationRequested(instance.gameObject.Destroy);
+
+                return instance.gameObject.hideModel();
+            }
         }
 
+        //static async ValueTask<GameObject> convertVrmToModelAsync(this Stream s, CancellationToken ct)
+        //{
+        //    ct.ThrowIfCancellationRequested();
+
+        //    using var m = new MemoryStream();
+        //    await s.CopyToAsync(m, ct);
+
+        //    await Awaitable.MainThreadAsync();
+        //    var vrm10 = await Vrm10.LoadBytesAsync(m.ToArray(), true, ControlRigGenerationOption.None, ct: ct);
+
+        //    await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
+
+        //    await Awaitable.MainThreadAsync();
+        //    return vrm10.gameObject.hideModel();
+        //}
         static async ValueTask<GameObject> convertVrmToModelAsync(this Stream s, CancellationToken ct)
         {
-            ct.ThrowIfCancellationRequested();
+
+            if (s.CanSeek)// もっとうまいことできないかなぁ…
+            {
+                return await convert_(s);
+            }
 
             using var m = new MemoryStream();
             await s.CopyToAsync(m, ct);
+            m.Seek(0, SeekOrigin.Begin);
 
-            await Awaitable.MainThreadAsync();
-            var vrm10 = await Vrm10.LoadBytesAsync(m.ToArray(), true, ControlRigGenerationOption.None, ct: ct);
+            return await convert_(m);
 
-            await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
+            async ValueTask<GameObject> convert_(Stream s)
+            {
+                ct.ThrowIfCancellationRequested();
 
-            await Awaitable.MainThreadAsync();
-            return vrm10.gameObject.hideModel();
+                using var br = new System.IO.BinaryReader(s);
+
+                await Awaitable.MainThreadAsync();
+                var vrm10 = await Vrm10.LoadBytesAsync(br.ReadBytes((int)s.Length), true, ControlRigGenerationOption.None, ct: ct);
+
+                await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
+
+                await Awaitable.MainThreadAsync();
+                return vrm10.gameObject.hideModel();
+            }
         }
 
+        // プレハブリソースを返す
         static async ValueTask<GameObject> loadModelFromResourceAsync(this ResourceName name, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
             await Awaitable.MainThreadAsync();
-            var _go = await name.LoadAssetAsync<GameObject>();
-            await Awaitable.MainThreadAsync();
-            var go = GameObject.Instantiate(_go);
-            Addressables.Release(_go);
+            var go = await name.LoadAssetAsync<GameObject>();
 
-            await ct.ThrowIfCancellationRequested(go.DestroyOnMainThreadAsync);
+            ct.ThrowIfCancellationRequested(go.Release);
 
             await Awaitable.MainThreadAsync();
             return go.hideModel();
@@ -174,6 +234,7 @@ namespace AnimLite.Vrm
             go.SetActive(false);
             return go;
         }
+
 
     }
 }

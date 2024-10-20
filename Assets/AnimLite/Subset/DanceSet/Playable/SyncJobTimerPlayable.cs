@@ -30,7 +30,8 @@ namespace AnimLite.DancePlayable
         public override void PrepareFrame(Playable playable, FrameData info)// これだと来る、output の種類による？
         //public override void ProcessFrame(Playable playable, FrameData info, object playerData)// 来ない、なんで？
         {
-            var currentTime = playable.GetInput(0).GetTime();
+            //var currentTime = playable.GetInput(0).GetTime();
+            var currentTime = playable.GetTime();
 
             this.UpdateTimer((float)currentTime);
 

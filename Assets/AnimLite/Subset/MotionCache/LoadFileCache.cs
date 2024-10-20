@@ -45,15 +45,32 @@ namespace AnimLite.Vmd
             "created load file cache".ShowDebugLog();
         }
 
-        // åªèÛÅAÇ«Ç±Ç©ÇÁÇ‡åƒÇŒÇÍÇƒÇ»Ç¢ÇÕÇ∏
+        // åªèÛÅAëºÇ©ÇÁÇÕåƒÇŒÇÍÇƒÇ»Ç¢ÇÕÇ∏
+        //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Dispose()
         {
+            LoadFileCache.CleanupTmpFiles();
+
             if (LoadFileCache.Instance is null) return;
 
-            LoadFileCache.Instance.CleanupTmpFiles();
+            LoadFileCache.Instance.cache?.Clear();
             LoadFileCache.Instance = null;
+
             "load file cache disposed".ShowDebugLog();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void CleanupTmpFiles()
+        {
+            var tmpfolderpath = $"{PathUnit.CacheFolderPath}/loadcache";
+
+            if (!Directory.Exists(tmpfolderpath)) return;
+
+            Directory.Delete(tmpfolderpath, recursive: true);
+        }
+
 
 
         ConcurrentDictionary<PathUnit, AsyncLazy<PathUnit>> cache = new();
@@ -87,19 +104,6 @@ namespace AnimLite.Vmd
             return dstpath;
         }
 
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void CleanupTmpFiles()
-        {
-            var tmpfolderpath = $"{PathUnit.CacheFolderPath}/loadcache";
-
-            if (!Directory.Exists(tmpfolderpath)) return;
-
-            Directory.Delete(tmpfolderpath, recursive: true);
-        }
 
 
     }

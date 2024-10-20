@@ -99,7 +99,7 @@ namespace AnimLite.Vmd
                     var vmddata = await vmdpaths.Paths
                         .ToAsyncEnumerable()
                         .SelectAwait(x => archive.LoadVmdExAsync(x, ct))
-                        .Where(x => !x.IsBlank())
+                        .Where(x => !x.IsUnload())
                         .DefaultIfEmpty()
                         .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
 

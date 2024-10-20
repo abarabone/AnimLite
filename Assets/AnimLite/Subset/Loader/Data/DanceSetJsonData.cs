@@ -23,22 +23,6 @@ namespace AnimLite.Utility
 
 #nullable enable
 
-    [System.Serializable]
-    public class MotionOptionsJson
-    {
-        public float BodyScaleFromHuman = 0.0f;
-        public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
-    }
-
-    [System.Serializable]
-    public class InformationDefine
-    {
-        public string Caption = "";
-        public string Author = "";
-        public string Url = "";
-        public string Description = "";
-    }
-
 
     [System.Serializable]
     public class DanceSetJson
@@ -48,6 +32,8 @@ namespace AnimLite.Utility
 
         public Dictionary<string, ModelDefineJson> BackGrounds = new ();
         public Dictionary<string, DanceMotionDefineJson> Motions = new ();
+
+        public CameraDefineJson Camera = new();
 
         public string CaptionMode = "";
         public InformationDefine AudioInformation = new ();
@@ -68,7 +54,7 @@ namespace AnimLite.Utility
     public class AnimationDefineJson
     {
         //public PathUnit AnimationFilePath = "";
-        public PathList AnimationFilePath = new () { Paths = { } };
+        public PathList AnimationFilePath = new () { Paths = new PathUnit [] { } };
         public PathUnit FaceMappingFilePath = "";
 
         public float DelayTime = 0.0f;
@@ -91,7 +77,30 @@ namespace AnimLite.Utility
         public Vector3 EulerAngles = Vector3.zero;
         public float Scale = 1.0f;
     }
+    [System.Serializable]
+    public class CameraDefineJson
+    {
+        public PathUnit AnimationFilePath = "";
 
+        public float DelayTime = 0.0f;
+    }
+
+
+    [System.Serializable]
+    public class MotionOptionsJson
+    {
+        public float BodyScaleFromHuman = 0.0f;
+        public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
+    }
+
+    [System.Serializable]
+    public class InformationDefine
+    {
+        public string Caption = "";
+        public string Author = "";
+        public string Url = "";
+        public string Description = "";
+    }
 
 
 }

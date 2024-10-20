@@ -16,7 +16,7 @@ namespace AnimLite.DancePlayable
 
     using AnimLite.Vmd;
     using AnimLite.Vrm;
-    using static AnimLite.DancePlayable.DanceGraphy;
+    using static AnimLite.DancePlayable.DanceGraphy2;
     //using static UnityEditor.Progress;
 
 #nullable enable
@@ -42,13 +42,13 @@ namespace AnimLite.DancePlayable
                 if (d.ModelInformation.IsBlank())
                 {
                     d.ModelInformation =
-                        d.Model.ToInformation(o.Model?.GetComponent<UniVRM10.Vrm10Instance>());
+                        d.Model.ToInformation(o.Model?.Value?.GetComponent<UniVRM10.Vrm10Instance>());
                 }
 
                 if (d.AnimationInformation.IsBlank())
                 {
                     d.AnimationInformation =
-                        d.Animation.ToInformation(o.vmddata);
+                        d.Animation.ToInformation(o);
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace AnimLite.DancePlayable
                 Author = "不明",
             };
 
-            var info = vrm.Vrm.Meta;
+            var info = vrm!.Vrm.Meta;
 
             return new InformationDefine
             {
@@ -84,9 +84,9 @@ namespace AnimLite.DancePlayable
             };
         }
 
-        public static InformationDefine ToInformation(this AnimationDefineJson ad, VmdStreamData vmd)
+        public static InformationDefine ToInformation(this AnimationDefineJson ad, MotionOrderBase order)
         {
-            if (vmd == null) return new InformationDefine
+            if (order.IsMotionBlank) return new InformationDefine
             {
                 Caption = "不明",
                 Author = "作者不明",
@@ -105,8 +105,8 @@ namespace AnimLite.DancePlayable
         {
             if (clip.IsUnityNull()) return new InformationDefine
             {
-                Caption = "不明",
-                Author = "作者不明",
+                //Caption = "不明",
+                //Author = "作者不明",
             };
 
             return new InformationDefine

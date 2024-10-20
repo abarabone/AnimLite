@@ -52,6 +52,7 @@ namespace AnimLite
 
         /// <summary>
         /// ブロックごとの先頭キーインデックスを返す。
+        /// ブロックは最大時間を超えないようにする。
         /// </summary>
         public int GetKeyIndexInBlock(int istream, float time)
         {
@@ -59,7 +60,8 @@ namespace AnimLite
             var streamOffset = istream * this.FrameBlockUnitLength;
             var blockOffset = (int)(time * this.FrameBlockUnitRangeReciprocal);
 
-            return this.TopKeyIndicesPerFrameBlock[streamOffset + blockOffset];
+            var blockOffsetLimited = math.min(blockOffset, this.FrameBlockUnitLength);
+            return this.TopKeyIndicesPerFrameBlock[streamOffset + blockOffsetLimited];
         }
 
 

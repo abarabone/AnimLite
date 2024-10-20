@@ -43,11 +43,14 @@ namespace AnimLite.Utility
             ct.ThrowIfCancellationRequested();
 
             await Awaitable.MainThreadAsync();
-            using var asset = await name.LoadAssetAsync<TAsset>().AsDisposableAsync(x => x.Release());
+            var asset = await name.LoadAssetAsync<TAsset>();//.AsDisposableAsync(x => x?.Release());
+            if (asset.IsUnityNull()) return default;
 
+            using var wrapped = asset.AsDisposable(x => x.Release());
             var content = createAction(asset);
 
             ct.ThrowIfCancellationRequested();
+            await Awaitable.MainThreadAsync();
             return content;
         }
 
@@ -60,10 +63,13 @@ namespace AnimLite.Utility
             ct.ThrowIfCancellationRequested();
 
             await Awaitable.MainThreadAsync();
+            //var asset = await LoadErr.LoggingAsync<TAsset>(() => name.LoadAssetAsync<TAsset>().AsValueTask());
             var asset = await name.LoadAssetAsync<TAsset>();
+            ////var asset = default(TAsset);
+            if (asset.IsUnityNull()) return null;
 
             await Awaitable.MainThreadAsync();
-            ct.ThrowIfCancellationRequested(asset.Release);
+            ct.ThrowIfCancellationRequested(() => asset.Release());
 
             return new MemoryStreamTakenAsset<TAsset>(asset, getBytesAction(asset));
         }

@@ -321,7 +321,9 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         public static bool IsZipEntry(this PathUnit path) =>
-            path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase)
+            ||
+            path.Value.Contains(@".zip\", StringComparison.InvariantCultureIgnoreCase);// 一応つけるが、他に方法ないか？
             //||
             //path.Value.Contains(".zip");
 
@@ -332,6 +334,7 @@ namespace AnimLite.Utility
         public static (PathUnit zipPath, PathUnit entryPath) DividZipToArchiveAndEntry(this PathUnit path)
         {
             var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// 一応つけるが、他に方法ないか？
             return (i >= 0) switch
             {
                 true =>
@@ -357,6 +360,7 @@ namespace AnimLite.Utility
         public static PathUnit ToZipEntryPath(this PathUnit path)
         {
             var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
+            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// 一応つけるが、他に方法ないか？
             if (i == -1) return "".ToPath();
 
             return path.Value[(i + 5)..];
@@ -462,6 +466,7 @@ namespace AnimLite.Utility
 
             return this.Paths
                 .Select(x => x.GetHashCode())
+                .DefaultIfEmpty()
                 .Aggregate((pre, cur) => HashCode.Combine(pre, cur));
         }
         // dictionary 用 boxing 回避 ------------------------------------
@@ -513,6 +518,7 @@ namespace AnimLite.Utility
     //    }
     //}
 #endif
+
 
 
 }

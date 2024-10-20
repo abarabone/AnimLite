@@ -489,7 +489,7 @@ MonoBehaviour:
   AudioSource: {fileID: 875487696}
   Cache: {fileID: 1347650036}
   JsonFiles:
-  - Value: https://raw.githubusercontent.com/abarabone/AnimLite/refs/heads/master/dance_scene.json
+  - Value: https://github.com/abarabone/AnimLite/raw/master/Assets/ds/dance_scene.json
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &875487698
 Transform:
@@ -729,7 +729,7 @@ MonoBehaviour:
   AudioSource: {fileID: 1083116349}
   Cache: {fileID: 1347650036}
   JsonFiles:
-  - Value: https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/dance_scene.json
+  - Value: https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &1083116351
 Transform:
@@ -939,7 +939,7 @@ MonoBehaviour:
   AudioSource: {fileID: 1776308112}
   Cache: {fileID: 1347650036}
   JsonFiles:
-  - Value: ../ds-utf8.zip
+  - Value: ../ds-utf8.zip/ds/dance_scene.json
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &1776308114
 Transform:

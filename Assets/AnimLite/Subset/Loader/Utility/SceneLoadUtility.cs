@@ -184,11 +184,15 @@ namespace AnimLite.Utility
             var audioTask =
                 Task.Run(async () => await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct) as object);
 
-            var bgTasks = ds.BackGrounds.Values.Select(define =>
-                Task.Run(async () => await define.buildBackGroundModelOrderAsync(cache, archive, ct) as object));
+            var bgTasks = ds.BackGrounds
+                .Where(x => x.Key[0] != '_')
+                .Select(define =>
+                Task.Run(async () => await define.Value.buildBackGroundModelOrderAsync(cache, archive, ct) as object));
 
-            var motionTasks = ds.Motions.Values.Select(define =>
-                Task.Run(async () => await define.buildMotionOrderParallelAsync(cache, archive, ct) as object));
+            var motionTasks = ds.Motions
+                .Where(x => x.Key[0] != '_')
+                .Select(define =>
+                Task.Run(async () => await define.Value.buildMotionOrderParallelAsync(cache, archive, ct) as object));
 
 
             var orders = await audioTask.WrapEnumerable().Concat(bgTasks).Concat(motionTasks)
@@ -214,12 +218,16 @@ namespace AnimLite.Utility
             var audioOrder = await ds.Audio
                 .buildAudioOrderAsync(archive, audioSource, ct);
 
-            var bgOrders = await ds.BackGrounds.Values.ToAsyncEnumerable()
-                .SelectAwait(define => define.buildBackGroundModelOrderAsync(cache, archive, ct))
+            var bgOrders = await ds.BackGrounds
+                .Where(x => x.Key[0] != '_')
+                .ToAsyncEnumerable()
+                .SelectAwait(define => define.Value.buildBackGroundModelOrderAsync(cache, archive, ct))
                 .ToArrayAsync();
 
-            var motionOrders = await ds.Motions.Values.ToAsyncEnumerable()
-                .SelectAwait(define => define.buildMotionOrderSequentialAsync(cache, archive, ct))
+            var motionOrders = await ds.Motions
+                .Where(x => x.Key[0] != '_')
+                .ToAsyncEnumerable()
+                .SelectAwait(define => define.Value.buildMotionOrderSequentialAsync(cache, archive, ct))
                 .ToArrayAsync();
 
 
@@ -329,6 +337,7 @@ namespace AnimLite.Utility
             return
                 define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
                 ??
+                // animation clip が face やブレンドを整備するまでの暫定
                 await define.toMotionOrderAwait(model, ct);
         }
         //static async ValueTask<MotionOrder> buildMotionOrderParallelAsync(
@@ -373,6 +382,7 @@ namespace AnimLite.Utility
             return
                 define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
                 ??
+                // animation clip が face やブレンドを整備するまでの暫定
                 await define.toMotionOrderAwait(model, ct);
         }
 
@@ -435,9 +445,10 @@ namespace AnimLite.Utility
         static MotionOrder? toMotionOrder(
             this DanceMotionDefineJson define, VmdStreamData vmddata, VmdFaceMapping facemap, Instance<GameObject>? model)
         =>
-            //vmddata is not null
-            //? new()
-            new()
+            // animation clip が face やブレンドを整備するまでの暫定
+            vmddata is not null
+            ? new()
+            //new()
             {
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
@@ -457,9 +468,10 @@ namespace AnimLite.Utility
                 Rotation = Quaternion.Euler(define.Model.EulerAngles),
                 Scale = define.Model.Scale,
             }
-            //: null;
-            ;
-
+            : null;
+            //;
+            
+        // animation clip がキャッシュ、face やブレンドを整備するまでの暫定
         static async ValueTask<MotionOrderWithAnimationClip> toMotionOrderAwait(
             this DanceMotionDefineJson define, Instance<GameObject>? model, CancellationToken ct)
         =>
@@ -469,11 +481,12 @@ namespace AnimLite.Utility
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
 
                 // vmd ロード失敗してたら、animation clip をリソースロードする
-                AnimationClip = await define.Animation.AnimationFilePath.Paths
+                AnimationClip = (await define.Animation.AnimationFilePath.Paths
                     .DefaultIfEmpty("".ToPath())
                     .First()
                     .ToResourceName()
-                    .loadAnimationClipFromResourceAsync(ct),
+                    .LoadAnimationClipAsync(PrototypeReleaseMode.AutoRelease, ct))
+                    ?.Instantiate(),
 
                 DelayTime = define.Animation.DelayTime,
 

@@ -150,13 +150,25 @@ namespace AnimLite.Utility
             return path.IsResource() switch
             {
                 true =>
-                    new ModelResource(model, mode),
+                    new Resource<GameObject>(model, mode),
                 false =>
                     new ModelOrigin(model, mode),
             };
         }
 
+
+        public static async ValueTask<IPrototype<AnimationClip>> LoadAnimationClipAsync(
+            this ResourceName name, PrototypeReleaseMode mode, CancellationToken ct)
+        {
+            var clip = await name.loadAnimationClipFromResourceAsync(ct);
+            if (clip.IsUnityNull()) return null;
+
+            return new Resource<AnimationClip>(clip, mode);
+        }
+
+
     }
+
 
 
 
@@ -167,13 +179,14 @@ namespace AnimLite.Utility
     /// <summary>
     /// ・prototype にリソースを保持
     /// </summary>
-    public class ModelResource : IPrototype<GameObject>
+    public class Resource<T> : IPrototype<T>
+        where T : UnityEngine.Object
     {
-        public ModelResource(GameObject prototype)
+        public Resource(T prototype)
         {
             this.prototype = prototype;
         }
-        public ModelResource(GameObject prototype, PrototypeReleaseMode mode)
+        public Resource(T prototype, PrototypeReleaseMode mode)
         {
             this.prototype = prototype;
             this.Mode = mode;
@@ -182,23 +195,22 @@ namespace AnimLite.Utility
 
         public PrototypeReleaseMode Mode { get; } = PrototypeReleaseMode.AutoRelease;
 
-        GameObject prototype = null;
+        T prototype = null;
 
         int refCount = 0;
 
 
-        public Instance<GameObject> Instantiate()
+        public Instance<T> Instantiate()
         {
-            var go = GameObject.Instantiate(this.prototype);
-            //go.SetActive(true);
+            var instance = UnityEngine.Object.Instantiate(this.prototype);
 
             Interlocked.Increment(ref this.refCount);
-            return new Instance<GameObject>(go, this);
+            return new Instance<T>(instance, this);
         }
 
-        public void ReleaseWithDestroy(GameObject go)
+        public void ReleaseWithDestroy(T instance)
         {
-            go.Destroy();
+            instance.Destroy();
 
             var inow = Interlocked.Decrement(ref this.refCount);
 
@@ -226,6 +238,100 @@ namespace AnimLite.Utility
     }
 
 
+
+
+    /// <summary>
+    /// 取得
+    /// ・最初にインスタンスを１つロードし、非アクティブ化する
+    /// ・そのインスタンスを本体とし、prototype とする
+    /// ・prototype が空いていればインスタンスとして使用する
+    /// ・prototype が使用中なら複製を渡す
+    /// 破棄
+    /// ・複製なら destory
+    /// ・prototype なら非アクティブ化
+    /// </summary>
+    public class ModelOrigin : IPrototype<GameObject>
+    {
+        public ModelOrigin(GameObject prototype)
+        {
+            this.prototype = prototype;
+        }
+        public ModelOrigin(GameObject prototype, PrototypeReleaseMode mode)
+        {
+            this.prototype = prototype;
+            this.Mode = mode;
+        }
+
+
+        public PrototypeReleaseMode Mode { get; } = PrototypeReleaseMode.AutoRelease;
+
+        int refCount = 0;
+        int prototypeUsed = 0;
+
+        GameObject prototype;
+
+
+        public Instance<GameObject> Instantiate()
+        {
+            var inow = Interlocked.Increment(ref this.refCount);
+
+            var prevProtoUsed = Interlocked.CompareExchange(ref this.prototypeUsed, 1, 0);
+
+            var go = prevProtoUsed == 0
+                ? this.prototype
+                : GameObject.Instantiate(this.prototype);
+
+            return new Instance<GameObject>(go, this);
+        }
+
+        public void ReleaseWithDestroy(GameObject go)
+        {
+            var inow = Interlocked.Decrement(ref this.refCount);
+
+            if (!go.IsUnityNull())
+            {
+                if (go == this.prototype)
+                {
+                    go.SetActive(false);
+
+                    var anim = go.GetComponent<Animator>().AsUnityNull();
+                    anim?.UnbindAllStreamHandles();
+                    anim?.ResetPose();
+
+                    Interlocked.CompareExchange(ref this.prototypeUsed, 0, 1);
+                }
+                else
+                {
+                    go.Destroy();
+                }
+            }
+
+            if (inow > 0) return;
+
+
+            switch (this.Mode)
+            {
+                case PrototypeReleaseMode.AutoRelease:
+                    this.Dispose();
+                    break;
+
+                case PrototypeReleaseMode.NoRelease:
+                    break;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.prototype == null) return;
+
+            this.prototype.Destroy();
+            this.prototype = null;
+
+            "Dispose ModelOrigin".ShowDebugLog();
+        }
+    }
+
+
     /// <summary>
     /// 取得
     /// ・最初にインスタンスを１つロードする
@@ -237,13 +343,13 @@ namespace AnimLite.Utility
     /// ・インスタンスが常に１つ残るようにする
     /// ・残りが１つなら destroy しない
     /// </summary>
-    public class ModelOrigin : IPrototype<GameObject>
+    public class ModelLastOne : IPrototype<GameObject>
     {
-        public ModelOrigin(GameObject prototype)
+        public ModelLastOne(GameObject prototype)
         {
             this.instances.Add(prototype);
         }
-        public ModelOrigin(GameObject prototype, PrototypeReleaseMode mode)
+        public ModelLastOne(GameObject prototype, PrototypeReleaseMode mode)
         {
             this.instances.Add(prototype);
             this.Mode = mode;
@@ -329,8 +435,11 @@ namespace AnimLite.Utility
             });
             this.instances = null;
 
-            "Dispose ModelOrigin".ShowDebugLog();
+            "Dispose ModelLastOne".ShowDebugLog();
         }
     }
+
+
+
 
 }

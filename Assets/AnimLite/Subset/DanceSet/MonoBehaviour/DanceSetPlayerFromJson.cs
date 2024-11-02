@@ -34,6 +34,7 @@ namespace AnimLite.DancePlayable
         DanceGraphy2 graphy;
 
         public PlayableGraph? Graph => this.graphy?.graph;
+        public float? TotalTime => this.graphy?.TotalTime;// Žb’è
 
 
         [SerializeField]
@@ -131,7 +132,7 @@ namespace AnimLite.DancePlayable
                 }
                 "disable end".ShowDebugLog();
 
-                this.DanceSceneCaption?.SetEnable(false);
+                this.DanceSceneCaption.AsUnityNull()?.SetEnable(false);
             });
         }
     }

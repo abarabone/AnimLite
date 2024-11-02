@@ -35,28 +35,30 @@ namespace AnimLite.Utility
             }
             catch (System.IO.FileNotFoundException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (System.IO.DirectoryNotFoundException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (UnityEngine.AddressableAssets.InvalidKeyException e)
+            // なぜかこれキャッチできたためしがない、コンソールに常にエラーで表示されてしまう
+            // しかもそのまま先に進んでる気がする、ほんとに例外でてんのこれ？
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (System.InvalidOperationException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (ArgumentNullException e)
             // リソースロード失敗時に stream が null で発生。stream を受ける関数ではじきたいけどまあいいか
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             //catch (Exception e)
@@ -73,28 +75,30 @@ namespace AnimLite.Utility
             }
             catch (System.IO.FileNotFoundException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (System.IO.DirectoryNotFoundException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (UnityEngine.AddressableAssets.InvalidKeyException e)
+            // なぜかこれキャッチできたためしがない、コンソールに常にエラーで表示されてしまう
+            // しかもそのまま先に進んでる気がする、ほんとに例外でてんのこれ？
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (System.InvalidOperationException e)
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             catch (ArgumentNullException e)
             // リソースロード失敗時に stream が null で発生。stream を受ける関数ではじきたいけどまあいいか
             {
-                Debug.LogWarning(e);
+                e.showWarning();
                 return default;
             }
             //catch (Exception e)
@@ -102,6 +106,13 @@ namespace AnimLite.Utility
             //    Debug.LogWarning(e);
             //    return default;
             //}
+        }
+
+        public static void showWarning(this Exception e)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.LogWarning(e);
+#endif
         }
     }
 

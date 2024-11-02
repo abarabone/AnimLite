@@ -66,7 +66,8 @@ namespace AnimLite.Utility
             //var asset = await LoadErr.LoggingAsync<TAsset>(() => name.LoadAssetAsync<TAsset>().AsValueTask());
             var asset = await name.LoadAssetAsync<TAsset>();
             ////var asset = default(TAsset);
-            if (asset.IsUnityNull()) return null;
+            //if (asset.IsUnityNull()) throw new UnityEngine.AddressableAssets.InvalidKeyException();// $"{name} ");
+            if (asset.IsUnityNull()) throw new InvalidOperationException($"resouce not found : {name.Value}");
 
             await Awaitable.MainThreadAsync();
             ct.ThrowIfCancellationRequested(() => asset.Release());

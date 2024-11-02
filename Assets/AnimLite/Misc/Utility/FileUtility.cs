@@ -440,10 +440,12 @@ namespace AnimLite.Utility
 
 
 
+    [Serializable]
     public struct PathList
     {
 
-        public IEnumerable<PathUnit> Paths;// = new EmptyEnumerableStruct<PathUnit>();
+        //public IEnumerable<PathUnit> Paths;// = new EmptyEnumerableStruct<PathUnit>();
+        public PathUnit[] Paths;
 
 
         public static implicit operator PathList (PathUnit path) => path.ToPathList();
@@ -476,12 +478,12 @@ namespace AnimLite.Utility
     {
         public static PathList ToPathList(this PathUnit path) => new PathList
         {
-            Paths = path.WrapEnumerable(),
+            Paths = path.WrapEnumerable().ToArray(),
         };
 
         public static PathList Merge(this PathUnit path, PathList append) => new PathList
         {
-            Paths = path.WrapEnumerable().Concat(append.Paths),
+            Paths = path.WrapEnumerable().Concat(append.Paths).ToArray(),
         };
     }
 

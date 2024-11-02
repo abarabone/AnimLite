@@ -12,7 +12,9 @@ namespace AnimLite.Utility
 
         public static void SetEnable(this MonoBehaviour c, bool isEnabled)
         {
-            if (c != null) c.enabled = isEnabled;
+            if (c is null) return;
+            
+            c.enabled = isEnabled;
         }
 
         public static T AsUnityNull<T>(this T obj, Func<T, bool?> criteria)

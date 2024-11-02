@@ -174,7 +174,8 @@ namespace AnimLite.DancePlayable
             if (q.IsEmpty()) return;
 
             //var maxlength = q.Max(p => p.GetDuration() + -p.GetTime());
-            
+            //var maxlength = q.Max(p => p.GetDuration());
+
             q.ForEach(p =>
             {
                 //Debug.Log(p.GetDuration());
@@ -184,20 +185,21 @@ namespace AnimLite.DancePlayable
                 //var distance = maxlength - total;
                 //p.SetDuration(duration - distance);
                 p.SetDuration(double.PositiveInfinity);
+                //p.SetDuration(maxlength);
             });
 
 
-            IEnumerable<Playable> next_(Playable rootplayable)
-            {
+            //IEnumerable<Playable> next_(Playable rootplayable)
+            //{
 
-                yield return rootplayable;
+            //    yield return rootplayable;
 
-                for (var p = rootplayable; p.GetInputCount() != 0; p = p.GetInput(0))
-                //for (var p = rootplayable; p.GetOutputCount() != 0; p = p.GetOutput(0))
-                {
-                    yield return p;
-                }
-            }
+            //    for (var p = rootplayable; p.GetInputCount() != 0; p = p.GetInput(0))
+            //    //for (var p = rootplayable; p.GetOutputCount() != 0; p = p.GetOutput(0))
+            //    {
+            //        yield return p;
+            //    }
+            //}
         }
     }
 }

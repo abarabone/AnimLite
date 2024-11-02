@@ -24,10 +24,8 @@ namespace AnimLite.Utility
 
 }
 
-namespace AnimLite.Vmd
+namespace AnimLite.Utility
 {
-    using AnimLite.Utility;
-
 
     public static partial class AnimationClipLoader
     {
@@ -46,11 +44,13 @@ namespace AnimLite.Vmd
 
             await Awaitable.MainThreadAsync();
             var clip = await name.LoadAssetAsync<AnimationClip>();
+            if (clip.IsUnityNull()) return null;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log($"load anim clip {clip?.name}");
 #endif
 
+            await Awaitable.MainThreadAsync();
             ct.ThrowIfCancellationRequested(clip.Release);
 
             return clip;

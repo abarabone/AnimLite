@@ -30,6 +30,10 @@ namespace AnimLite.DancePlayable
         Action DisposeAction = () => { };
 
 
+        public float TotalTime;// 暫定、ちゃんとした方法にしたい
+
+
+
         //public Awaitable WaitForPlayingAsync() => this._waitForPlaying.Awaitable;
 
         //AwaitableCompletionSource _waitForPlaying = new();
@@ -119,13 +123,14 @@ namespace AnimLite.DancePlayable
         }
         public class MotionOrderWithAnimationClip : MotionOrderBase
         {
-            public AnimationClip AnimationClip;
+            public Instance<AnimationClip> AnimationClip;
             public float DelayTime;
 
             public override bool IsMotionBlank => this.AnimationClip is null;
             public override void Dispose()
             {
-                this.AnimationClip?.Release();
+                this.AnimationClip?.Dispose();
+                this.Model?.Dispose();
             }
         }
         //public class MotionOrder
@@ -180,16 +185,23 @@ namespace AnimLite.DancePlayable
 
             createAudioPlayable_(graph, order.Audio);
 
-            order.Audio.AudioSource.volume = order.Audio.Volume;// playable の weight で変えるべきとも思うが、audio の playable output にそういう機能はないようなのでとりあえずここで
+            if (order.Audio is not null)
+                order.Audio.AudioSource.volume = order.Audio.Volume;// playable の weight で変えるべきとも思うが、audio の playable output にそういう機能はないようなのでとりあえずここで
 
-            //graph.SetTimeUpdateMode(DirectorUpdateMode.DSPClock);
+
+            var totalTime = graph.GetRootPlayableCount() > 0
+                ? (float)graph.GetRootPlayable(0).GetDuration()
+                : 0.0f;
+
             graph.AdjustPlayableLength();
 
             return new DanceGraphy2
             {
                 graph = graph,
 
-                DisposeAction = () => { }
+                DisposeAction = () => { },
+
+                TotalTime = totalTime,//
             };
 
 

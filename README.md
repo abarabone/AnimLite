@@ -10,7 +10,7 @@
 
 # 新機能・修正
 2024.11.3
-- .json の BackGrounds と Motions のキー名でワイルドカードを使えるようにした。
+- .json の BackGrounds と Motions のキー名でワイルドカードを使えるようにした
 
 2024.10.20
 - vrm 0.127.0 にした
@@ -262,7 +262,7 @@
           "DelayTime": 0.4
         }
       },
-      "center-ch": {                           // _center-* がマッチするので、_* をベースとして継承できる
+      "center-ch": {                           // _center-* がマッチするので、ベースとして継承できる
         "Model": {
            "ModelFilePath": "character1.vrm"   // character1.vrm は普通に適用
         },

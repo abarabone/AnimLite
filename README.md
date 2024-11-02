@@ -9,6 +9,9 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2024.11.3
+- .json の BackGrounds と Motions のキー名でワイルドカードを使えるようにした。
+
 2024.10.20
 - vrm 0.127.0 にした
 - graph.Evalute() でシークすると音ズレしていたが、ストリーミング読込のせいだとわかったのでオフにした
@@ -118,11 +121,11 @@
         "Volume": 0.0,
         "DelayTime": 0.0
     },
-    "DefaultAnimation": {                         // デフォルトのアニメーション（現在は機能していない）
-        "AnimationFilePath": "",
-        "FaceMappingFilePath": "",
-        "DelayTime": 0.0
-    },
+    //"DefaultAnimation": {                         // デフォルトのアニメーション <- 廃止（ワイルドカードで代用）
+    //    "AnimationFilePath": "",
+    //    "FaceMappingFilePath": "",
+    //    "DelayTime": 0.0
+    //},
     "BackGrounds": {                              // 背景用モデルをキーバリューペアで定義（ .glb を想定）
       "key-name": {
         "ModelFilePath": "",
@@ -222,6 +225,55 @@
   - ただしまだエラー処理とかテストとかしてないので、いろいろエラーも出ると思う
   - 各種データのパスとキャラ位置さえ指定しておけば、あとは省略（初期値となる）でもなんとなくOkだと思う
   - .json を別の .json でオーバーライドできるが、省略した部分はオーバーライドされる前の .json の値が残る
+- Motions/BackGrounds のキー名でワイルドカード（ *, ?, # ）を使い、エントリの値を上書きできる
+  - マッチするキーのエントリの値を上書きする
+    - ちなみに # は数字１文字とマッチするが、# 自体ともマッチするようにした
+  - ワイルドカードを使ったキーのエントリ自体は、表示対象ではなくなる
+  - ワイルドカードでの上書きは、.json に登場した順に適用する
+  - .json をオーバーライドした場合、下位 .json のエントリも上書きの対象となる
+    ```
+    "Motions": {
+      "mob##": {                               // ワイルドカードを使ったキー名
+        "Animation": {
+          "AnimationFilePath": "step,vmd"
+        }
+      },
+      "mob01": {                               // mob## がマッチするので、上書きされる対象となる
+        "Model": {
+           "ModelFilePath": "character1.vrm",  // ただし mob## では ModelFilePath の設定がないので、character1.vrm は生きる
+        },
+        "Animation": {
+          "AnimationFilePath": "walk,vmd"      // mob## に AnimationFilePath の設定があるので、step.vmd で上書きされる
+        }
+      }
+    }
+    ```
+- Motions/BackGrounds のキー名が '_' で始まるものは、表示対象ではなくなる
+  - ただしキー名がマッチする他のエントリのベースとなることができる
+  - ベースキーにはワイルドカードも使用できる
+  - ベースも他のベースを継承できる
+  - ベース継承は、より前に記述されたベースからのみ可能
+  - 下位 .json からはベース継承できない（可能とするか迷ったが、意図しない継承が起きそうなのでやめた）
+    ```
+    "Motions": {
+      "_center-*": {                           // ワイルドカードを使ったベースエントリ
+        "Animation": {
+          "AnimationFilePath": "step,vmd",
+          "DelayTime": 0.4
+        }
+      },
+      "center-ch": {                           // _center-* がマッチするので、_* をベースとして継承できる
+        "Model": {
+           "ModelFilePath": "character1.vrm"   // character1.vrm は普通に適用
+        },
+        "Animation": {
+                                               // AnimationFilePath は center-ch に記述がないので、_center-* の step.vmd が継承できる
+          "DelayTime": 0.0                     // DelayTime は center-ch で記述されているので 0.0 が適用
+        }
+      }
+    }
+    ```
+- ワイルドカードでの上書き/ベース継承を実装したため、デフォルトアニメーションは廃止とした
 
 # その他
 - ~~vrm 自動インポートを切っていると、サンプルシーンでプレハブがきれてしまうのに気づきました~~

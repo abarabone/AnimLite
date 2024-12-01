@@ -7,7 +7,7 @@
         },
         "center-option": {
             "Model": {
-                "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
+                "ModelFilePath": "ぶいけっとにゃん.vrm",
                 "Position": {
                     "x": 0.5,
                     "y": 0.0,
@@ -20,7 +20,7 @@
                 }
             },
             "Animation": {
-                "AnimationFilePath": "ds/step1.vmd",
+                "AnimationFilePath": "step1.vmd",
                 "FaceMappingFilePath": "",
                 "DelayTime": 0.0
             },

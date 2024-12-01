@@ -1,12 +1,12 @@
 {
     "Audio": {
-        "AudioFilePath": "ds/ポップキャンディ.mp3",
+        "AudioFilePath": "ポップキャンディ.mp3",
         "Volume": 0.487,
         "DelayTime": 0.0
     },
     "BackGrounds": {
       "main": {
-        "ModelFilePath": "Resources_moved/神社橋配布用test.glb",
+        "ModelFilePath": "Resources_moved/神社橋配布用test.glb?",
         "Position": {
           "x": 0.0,
           "y": 0.0,
@@ -22,7 +22,7 @@
     "Motions": {
         "center": {
             "Model": {
-                "ModelFilePath": "ds/ぶいけっとにゃん.vrm",
+                "ModelFilePath": "ぶいけっとにゃん.vrm",
                 "Position": {
                     "x": 0.0,
                     "y": 0.0,
@@ -35,7 +35,7 @@
                 }
             },
             "Animation": {
-                "AnimationFilePath": "ds/step1.vmd",
+                "AnimationFilePath": "step1.vmd",
                 "FaceMappingFilePath": "",
                 "DelayTime": 0.0
             },
@@ -70,7 +70,7 @@
         },
         "left": {
             "Model": {
-                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/ぶいけっとにゃん.vrm",
+                "ModelFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ぶいけっとにゃん.vrm",
                 "Position": {
                     "x": -1.0,
                     "y": 0.0,
@@ -83,7 +83,7 @@
                 }
             },
             "Animation": {
-                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/ds/step1.vmd",
+                "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/step1.vmd",
                 "FaceMappingFilePath": "",
                 "DelayTime": 0.0
             },

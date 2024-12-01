@@ -116,5 +116,14 @@ namespace AnimLite.Utility
             return text;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Exception ShowDebugError(this Exception e)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.LogError(e);
+#endif
+            return e;
+        }
+
     }
 }

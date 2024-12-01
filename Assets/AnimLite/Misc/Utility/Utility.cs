@@ -13,7 +13,8 @@ using Newtonsoft.Json;
 
 namespace AnimLite.Utility
 {
-
+    #nullable enable
+    
     public static class Utility
     {
 
@@ -28,8 +29,21 @@ namespace AnimLite.Utility
         }
 
 
+        public static T Then<T>(this T src, Func<T, bool> criteria, Func<T, T> expression) =>
+            criteria(src)
+                ? expression(src)
+                : src;
 
-        public static T Instantiate<T>(this T src)
+
+        public static ValueTask DisposeNullableAsync<T>(this T? obj) where T : IAsyncDisposable =>
+            obj?.DisposeAsync() ?? new ValueTask();
+
+        public static ValueTask InvokeNullableAsync(this Func<ValueTask>? f) =>
+            f?.Invoke() ?? new ValueTask();
+
+
+
+        public static T CloneViaJson<T>(this T src)
         {
             var json = JsonUtility.ToJson(src);
             return JsonUtility.FromJson<T>(json);

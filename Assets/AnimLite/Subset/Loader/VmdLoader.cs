@@ -42,8 +42,8 @@ namespace AnimLite.Vmd
 
             if (archive is not null && !path.IsFullPath())
             {
-                var data = LoadErr.Logging(() =>
-                    archive.Extract(path, VmdParser.ParseVmd));
+                var data = await LoadErr.LoggingAsync(() =>
+                    archive.GetEntryAsync(path, VmdParser.ParseVmd, ct));
                     
                 if (!data.IsUnload())
                     return data;
@@ -74,9 +74,9 @@ namespace AnimLite.Vmd
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, VmdParser.ParseVmd),
+                    await openAsync_(zippath + queryString).UsingAwait(s => s.Unzip(entrypath, VmdParser.ParseVmd)),
                 var (zippath, _) when fullpath.IsZipArchive() =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vmd", VmdParser.ParseVmd),
+                    await openAsync_(zippath + queryString).UsingAwait(s => s.UnzipFirstEntry(".vmd", VmdParser.ParseVmd)),
                 _ =>
                     await openAsync_(fullpath + queryString).UsingAwait(VmdParser.ParseVmd),
             };

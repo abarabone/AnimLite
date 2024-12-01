@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 namespace AnimLite.Utility
 {
 
@@ -101,6 +103,27 @@ namespace AnimLite.Utility
 
 
 
+        //public static ValueTask NullableAsync(this ValueTask? src) =>
+        //    src ?? new ValueTask();
+
+        //public static ValueTask<T> NullableAsync<T>(this ValueTask<T>? src) =>
+        //    src ?? new ValueTask<T>();
+
+
+        public static ValueTask NullableAsync<T>(this T? obj, Func<T, ValueTask> f) =>
+            obj is not null
+                ? f(obj)
+                : new ValueTask();
+
+        public static ValueTask<U?> NullableAsync<T, U>(this T? obj, Func<T, ValueTask<U?>> f) =>
+            obj is not null
+                ? f(obj)
+                : new ValueTask<U?>();
+
+        //public static async ValueTask<U?> NullableAsync<T, U>(this T? obj, Func<T, ValueTask<U>> f) =>
+        //    obj is not null
+        //        ? await f(obj)
+        //        : default;
 
 
         public static async Awaitable OnMainThreadAsync(this Action action)

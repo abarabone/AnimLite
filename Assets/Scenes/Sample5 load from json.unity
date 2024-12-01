@@ -729,7 +729,7 @@ MonoBehaviour:
   AudioSource: {fileID: 1083116349}
   Cache: {fileID: 1347650036}
   JsonFiles:
-  - Value: https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip
+  - Value: https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds
   DanceSceneCaption: {fileID: 5}
 --- !u!4 &1083116351
 Transform:
@@ -776,8 +776,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843fdb58bb0f1bd4a826394307f604b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsAccessWithinParentPathOnly: 0
-  IsSeaquentialLoadingInZip: 0
+  IsAccessWithinParentPathOnly: 1
+  ZipLoaderMode: 1
   UseAsyncModeForFileStreamApi: 0
 --- !u!4 &1347650035
 Transform:

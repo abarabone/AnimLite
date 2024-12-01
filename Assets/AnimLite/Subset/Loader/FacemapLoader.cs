@@ -67,7 +67,7 @@ namespace AnimLite.Utility
                 if (!path.IsBlank() && archive is not null && !path.IsFullPath())
                 {
                     var facemap = await LoadErr.LoggingAsync(() =>
-                        archive.ExtractAsync(path, s => s.ParseFaceMapAsync(ct)));
+                        archive.GetEntryAsync(path, s => s.ParseFaceMapAsync(ct), ct));
 
                     if (facemap.VmdToVrmMaps is not null)
                         return facemap;
@@ -108,11 +108,14 @@ namespace AnimLite.Utility
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.ParseFaceMapAsync(ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipAsync(entrypath, s => s.ParseFaceMapAsync(ct))),
                 var (zippath, _) when fullpath.IsZipArchive() =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait("facemap.txt", (s, _) => s.ParseFaceMapAsync(ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipFirstEntryAsync("facemap.txt", (s, _) => s.ParseFaceMapAsync(ct))),
                 var (_, _) =>
-                    await openAsync_(fullpath + queryString).UsingAwait(s => s.ParseFaceMapAsync(ct)),
+                    await openAsync_(fullpath + queryString)
+                        .UsingAwait(s => s.ParseFaceMapAsync(ct)),
             };
         });
 

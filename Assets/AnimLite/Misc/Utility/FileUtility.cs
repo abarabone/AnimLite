@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using System.Data.Common;
 using UnityEngine;
+using Unity.Mathematics;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -58,7 +60,7 @@ namespace AnimLite.Utility
     public struct PathUnit : IEquatable<PathUnit>
     {
         /// <summary>
-        /// true ‚É‚·‚é‚ÆAParentPath ˆÈ‰º‚É‚µ‚©ƒAƒNƒZƒX‚Å‚«‚È‚¢BƒfƒtƒHƒ‹ƒg‚Í true
+        /// true ï¿½É‚ï¿½ï¿½ï¿½ÆAParentPath ï¿½È‰ï¿½ï¿½É‚ï¿½ï¿½ï¿½ï¿½Aï¿½Nï¿½Zï¿½Xï¿½Å‚ï¿½ï¿½È‚ï¿½ï¿½Bï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½ true
         /// </summary>
         static public bool IsAccessWithinParentPathOnly = true;
 
@@ -70,12 +72,17 @@ namespace AnimLite.Utility
         public PathUnit(string path) => this.Value = path;
 
         public static implicit operator string(PathUnit path) => path.Value;
-        public static implicit operator PathUnit(string path) => new PathUnit(path);// Šy‚¾‚¯‚Ç‚â‚ß‚½‚Ù‚¤‚ª‚¢‚¢‚©‚àc
+        public static implicit operator PathUnit(string path) => new PathUnit(path);// ï¿½yï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ß‚ï¿½ï¿½Ù‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½c
+
+        public static PathUnit operator +(PathUnit lpath, PathUnit rpath) => new[] { lpath, rpath }
+            .Where(x => !x.IsBlank())
+            .Select(x => x.Value)
+            .JoinString('/');
+            
 
 
 
-
-        // ƒpƒX‚ÌƒLƒƒƒbƒVƒ…BApplication.xxxPath ‚ÍƒƒCƒ“ƒXƒŒƒbƒh‚©‚ç‚µ‚©‚æ‚×‚È‚¢‚Æ‚¢‚¤ƒCƒ~ƒt‚³‚È‚Ì‚Å‚Á‚Ä‚¨‚­
+        // ï¿½pï¿½Xï¿½ÌƒLï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½BApplication.xxxPath ï¿½Íƒï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½ï¿½ï¿½ç‚µï¿½ï¿½ï¿½ï¿½×‚È‚ï¿½ï¿½Æ‚ï¿½ï¿½ï¿½ï¿½Cï¿½~ï¿½tï¿½ï¿½ï¿½È‚Ì‚Åï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
         public static string CacheFolderPath { get; private set; }
         public static string DataFolderPath { get; private set; }
         public static string PersistentFolderPath { get; private set; }
@@ -108,15 +115,15 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// .ToPath() ‚Å•t‰Á‚³‚ê‚éeƒpƒX‚ğw’è‚·‚éB
-        /// ƒfƒtƒHƒ‹ƒg‚Í Application.dataPath 
+        /// .ToPath() ï¿½Å•tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½eï¿½pï¿½Xï¿½ï¿½ï¿½wï¿½è‚·ï¿½ï¿½B
+        /// ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½ Application.dataPath 
         /// </summary>
         static public string ParentPath { get; private set; }
 
 
 
         /// <summary>
-        /// ƒtƒ‹ƒpƒXƒ‚[ƒh‚ğƒZƒbƒg‚·‚é‚ÆAParentPath ‚ª•Ï‰»‚·‚éB
+        /// ï¿½tï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½Zï¿½bï¿½gï¿½ï¿½ï¿½ï¿½ÆAParentPath ï¿½ï¿½ï¿½Ï‰ï¿½ï¿½ï¿½ï¿½ï¿½B
         /// </summary>
         static public FullPathMode mode
         {
@@ -137,7 +144,7 @@ namespace AnimLite.Utility
 
 
 
-        // dictionary —p boxing ‰ñ”ğ ------------------------------------
+        // dictionary ï¿½p boxing ï¿½ï¿½ï¿½ ------------------------------------
         public override bool Equals(object obj)
         {
             return obj is PathUnit unit && Equals(unit);
@@ -152,7 +159,7 @@ namespace AnimLite.Utility
         {
             return HashCode.Combine(Value);
         }
-        // dictionary —p boxing ‰ñ”ğ ------------------------------------
+        // dictionary ï¿½p boxing ï¿½ï¿½ï¿½ ------------------------------------
     }
 
 
@@ -176,6 +183,7 @@ namespace AnimLite.Utility
         public QueryString(string name) => this.Value = name;
 
 
+        public static implicit operator QueryString(string res) => new QueryString(res);
         public static implicit operator string(QueryString res) => res.Value;
 
         public static PathUnit operator +(PathUnit path, QueryString queryString) =>
@@ -194,7 +202,7 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ’Pƒ‚É•¶š—ñ‚ğ PathUnit ‚Å•ï‚ñ‚Å•Ô‚·B
+        /// ï¿½Pï¿½ï¿½ï¿½É•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ PathUnit ï¿½Å•ï¿½ï¿½Å•Ô‚ï¿½ï¿½B
         /// </summary>
         public static PathUnit ToPath(this string path) =>
             new PathUnit(path);
@@ -209,7 +217,7 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ƒtƒ‹ƒpƒX‚Å‚È‚¯‚ê‚Î parentpath ‚ğ•t‰Á‚µ‚Ä•Ô‚·Bnull ‚Í "" ‚ğ•Ô‚·B
+        /// ï¿½tï¿½ï¿½ï¿½pï¿½Xï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½ parentpath ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½Ä•Ô‚ï¿½ï¿½Bnull ï¿½ï¿½ "" ï¿½ï¿½Ô‚ï¿½ï¿½B
         /// </summary>
         public static PathUnit ToFullPath(this PathUnit path, string parentpath) =>
             path.IsFullPath() || path.IsBlank()
@@ -218,7 +226,7 @@ namespace AnimLite.Utility
             ;
 
         /// <summary>
-        /// ƒtƒ‹ƒpƒX‚Å‚È‚¯‚ê‚Î PathUnit.ParentPath ‚ğ•t‰Á‚µ‚Ä•Ô‚·Bnull ‚Í "" ‚ğ•Ô‚·B
+        /// ï¿½tï¿½ï¿½ï¿½pï¿½Xï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½ PathUnit.ParentPath ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½Ä•Ô‚ï¿½ï¿½Bnull ï¿½ï¿½ "" ï¿½ï¿½Ô‚ï¿½ï¿½B
         /// </summary>
         public static PathUnit ToFullPath(this PathUnit path) =>
             path.ToFullPath(PathUnit.ParentPath)
@@ -234,14 +242,14 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ƒtƒ‹ƒpƒX‚È‚ç true ‚ğ•Ô‚·B
-        /// ƒtƒ‹ƒpƒX‚Í ƒhƒ‰ƒCƒuƒŒƒ^[/‚t‚q‚kƒXƒL[ƒ€‚©‚çn‚Ü‚éi‚P`‚V•¶š–Ú‚Ü‚Å‚É : ‚ğŠÜ‚Şj, / ‚©‚çn‚Ü‚é, as resource ‚ÅI‚í‚é
+        /// ï¿½tï¿½ï¿½ï¿½pï¿½Xï¿½È‚ï¿½ true ï¿½ï¿½Ô‚ï¿½ï¿½B
+        /// ï¿½tï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ ï¿½hï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½^ï¿½[/ï¿½tï¿½qï¿½kï¿½Xï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½Ü‚ï¿½iï¿½Pï¿½`ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ú‚Ü‚Å‚ï¿½ : ï¿½ï¿½ï¿½Ü‚Şj, / ï¿½ï¿½ï¿½ï¿½nï¿½Ü‚ï¿½, as resource ï¿½ÅIï¿½ï¿½ï¿½
         /// </summary>
         public static bool IsFullPath(this PathUnit path) =>
             !path.IsBlank()
             &&
             (
-                path.Value[1..6].Contains(':')// ƒhƒ‰ƒCƒuƒŒƒ^[A‚t‚q‚hƒXƒL[ƒ€
+                path.Value[1..math.min(path.Value.Length, 6)].Contains(':')// ï¿½hï¿½ï¿½ï¿½Cï¿½uï¿½ï¿½ï¿½^ï¿½[ï¿½Aï¿½tï¿½qï¿½hï¿½Xï¿½Lï¿½[ï¿½ï¿½
                 ||
                 path.Value[0] == '/'
                 ||
@@ -258,7 +266,10 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// .../xxx.xxx? ‚Ì‚æ‚¤‚ÉAu?v‚ÅI‚í‚é‚à‚Ì‚É‚à‘Î‰
+        /// ï¿½Nï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+        /// ï¿½yï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ .../xxx.xxx?yyy=yyy&yyy=yyy#www ï¿½Æï¿½ï¿½ï¿½ï¿½ç‚µï¿½ï¿½ï¿½Ì‚ÅAï¿½ï¿½ï¿½Ìƒmï¿½ï¿½ï¿½ï¿½ /zzz/zzz ï¿½ï¿½ï¿½Nï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ÌŒï¿½Éï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½Bhttps://help.webantenna.info/8821/
+        /// ï¿½Nï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ / ï¿½ï¿½ï¿½oï¿½Ä‚ï¿½ï¿½ï¿½Pï¿½[ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½é‚ªï¿½Aï¿½tï¿½qï¿½kï¿½Gï¿½ï¿½ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ %2F ï¿½Æ‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Í‚ï¿½ï¿½È‚Ì‚Å–ï¿½ï¿½Æ‚ï¿½ï¿½È‚ï¿½ï¿½Bhttps://tech.excite.co.jp/entry/2023/03/06/141256
+        /// .../xxx.xxx? ï¿½Ì‚æ‚¤ï¿½ÉAï¿½u?ï¿½vï¿½ÅIï¿½ï¿½ï¿½ï¿½ï¿½Ì‚É‚ï¿½ï¿½Î‰ï¿½
         /// </summary>
         public static PathUnit TrimQueryString(this PathUnit weburl)
         {
@@ -274,20 +285,37 @@ namespace AnimLite.Utility
         }
 
         /// <summary>
-        /// .../xxx.xxx? ‚Ì‚æ‚¤‚ÉAu?v‚ÅI‚í‚é‚à‚Ì‚É‚à‘Î‰
+        /// .../xxx.xxx?yyy=yyy&yyy=yyy ï¿½ï¿½ .../xxx.xxx ï¿½ï¿½ yyy=yyy&yyy=yyy ï¿½É•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+        /// .../xxx.xxx?yyy=yyy&yyy=yyy/zzz/zzz ï¿½ÍA.../xxx.xxx/zzz/zzz ï¿½ï¿½ yyy=yyy&yyy=yyy ï¿½É•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
+        /// ï¿½yï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ .../xxx.xxx?yyy=yyy&yyy=yyy#www ï¿½Æï¿½ï¿½ï¿½ï¿½ç‚µï¿½ï¿½ï¿½Ì‚ÅAï¿½ï¿½ï¿½Ìƒmï¿½ï¿½ï¿½ï¿½ /zzz/zzz ï¿½ï¿½ï¿½Nï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ÌŒï¿½Éï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½Bhttps://help.webantenna.info/8821/
+        /// ï¿½Nï¿½Gï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½ / ï¿½ï¿½ï¿½oï¿½Ä‚ï¿½ï¿½ï¿½Pï¿½[ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½ï¿½é‚ªï¿½Aï¿½tï¿½qï¿½kï¿½Gï¿½ï¿½ï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ %2F ï¿½Æ‚È‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Í‚ï¿½ï¿½È‚Ì‚Å–ï¿½ï¿½Æ‚ï¿½ï¿½È‚ï¿½ï¿½Bhttps://tech.excite.co.jp/entry/2023/03/06/141256
+        /// .../xxx.xxx? ï¿½Ì‚æ‚¤ï¿½ÉAï¿½u?ï¿½vï¿½ÅIï¿½ï¿½ï¿½ï¿½ï¿½Ì‚É‚ï¿½ï¿½Î‰ï¿½
         /// </summary>
         public static (PathUnit path, QueryString querystring) DividToPathAndQueryString(this PathUnit weburl)
         {
             var ist = weburl.Value.IndexOf('?');
-            if (ist == -1) return (weburl, new QueryString(""));
+            if (ist == -1)
+            {
+                var path = weburl;
+                var qstr = "";
+                return (path, qstr);
+            }
 
             var ied = weburl.Value.IndexOf('/', ist);
-            if (ied == -1) return (weburl.Value[..ist], new QueryString(weburl.Value[(ist+1)..]));
+            if (ied == -1)
+            {
+                var path = weburl.Value[..ist];
+                var qstr = weburl.Value[(ist + 1)..];
+                return (path, qstr);
+            }
 
-            var st = weburl.Value[..ist];
-            var ed = weburl.Value[ied..];
-            var queryString = weburl.Value[(ist+1)..ied];
-            return ((st + ed).ToPath(), new QueryString(queryString));
+            {
+                var st = weburl.Value[..ist];
+                var ed = weburl.Value[ied..];
+                var path = st + ed;
+                var qstr = weburl.Value[(ist + 1)..ied];
+                return (path, qstr);
+            }
         }
 
 
@@ -297,7 +325,7 @@ namespace AnimLite.Utility
             path.Value.EndsWith("as resource", StringComparison.InvariantCultureIgnoreCase);
 
         /// <summary>
-        /// as resource ‚ª•t‰Á‚³‚ê‚Ä‚¢‚ê‚Îœ‹‚µ‚½–¼‘O‚ğA‚»‚¤‚Å‚È‚¯‚ê‚Î "" ‚ğ•Ô‚·B
+        /// as resource ï¿½ï¿½ï¿½tï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Îï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½ "" ï¿½ï¿½Ô‚ï¿½ï¿½B
         /// </summary>
         public static ResourceName ToResourceName(this PathUnit path) =>
             path.IsResource()
@@ -310,7 +338,7 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// .zip ‚ÅI‚í‚é‚È‚ç true ‚ğ•Ô‚·
+        /// .zip ï¿½ÅIï¿½ï¿½ï¿½È‚ï¿½ true ï¿½ï¿½Ô‚ï¿½
         /// </summary>
         public static bool IsZipArchive(this PathUnit path) =>
             path.Value.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase);
@@ -318,23 +346,23 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// 
+        /// .zip ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ü‚Å‚Ìƒpï¿½Xï¿½ÆAï¿½ï¿½ï¿½ï¿½È‰ï¿½ï¿½Ìƒpï¿½Xï¿½Ì‘gï¿½İï¿½ï¿½í‚¹ï¿½È‚ï¿½ true
         /// </summary>
         public static bool IsZipEntry(this PathUnit path) =>
             path.Value.Contains(".zip/", StringComparison.InvariantCultureIgnoreCase)
             ||
-            path.Value.Contains(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ˆê‰‚Â‚¯‚é‚ªA‘¼‚É•û–@‚È‚¢‚©H
+            path.Value.Contains(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ï¿½ê‰ï¿½Â‚ï¿½ï¿½é‚ªï¿½Aï¿½ï¿½ï¿½É•ï¿½ï¿½@ï¿½È‚ï¿½ï¿½ï¿½ï¿½H
             //||
             //path.Value.Contains(".zip");
 
         /// <summary>
-        /// ƒpƒX‚ğ .zip/ ‚Å•ªŠ„‚µA.zip ‚Ü‚Å‚Æ / ‚æ‚èŒã‚ë‚ğ•Ô‚·B
-        /// zip ‚Å‚È‚¯‚ê‚Î ("", "") ‚ğ•Ô‚·B
+        /// ï¿½pï¿½Xï¿½ï¿½ .zip/ ï¿½Å•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A.zip ï¿½Ü‚Å‚ï¿½ / ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½ï¿½B
+        /// zip ï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½ ("", "") ï¿½ï¿½Ô‚ï¿½ï¿½B
         /// </summary>
         public static (PathUnit zipPath, PathUnit entryPath) DividZipToArchiveAndEntry(this PathUnit path)
         {
             var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
-            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ˆê‰‚Â‚¯‚é‚ªA‘¼‚É•û–@‚È‚¢‚©H
+            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ï¿½ê‰ï¿½Â‚ï¿½ï¿½é‚ªï¿½Aï¿½ï¿½ï¿½É•ï¿½ï¿½@ï¿½È‚ï¿½ï¿½ï¿½ï¿½H
             return (i >= 0) switch
             {
                 true =>
@@ -354,13 +382,13 @@ namespace AnimLite.Utility
         }
 
         /// <summary>
-        /// ƒpƒX‚ğ .zip/ ‚Å•ªŠ„‚µA/ ‚æ‚èŒã‚ë‚ğ•Ô‚·B
-        /// zip ‚Å‚È‚¯‚ê‚Î "" ‚ğ•Ô‚·B
+        /// ï¿½pï¿½Xï¿½ï¿½ .zip/ ï¿½Å•ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½A/ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½ï¿½B
+        /// zip ï¿½Å‚È‚ï¿½ï¿½ï¿½ï¿½ "" ï¿½ï¿½Ô‚ï¿½ï¿½B
         /// </summary>
         public static PathUnit ToZipEntryPath(this PathUnit path)
         {
             var i = path.Value.IndexOf(".zip/", StringComparison.InvariantCultureIgnoreCase);
-            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ˆê‰‚Â‚¯‚é‚ªA‘¼‚É•û–@‚È‚¢‚©H
+            if (i == -1) i = path.Value.IndexOf(@".zip\", StringComparison.InvariantCultureIgnoreCase);// ï¿½ê‰ï¿½Â‚ï¿½ï¿½é‚ªï¿½Aï¿½ï¿½ï¿½É•ï¿½ï¿½@ï¿½È‚ï¿½ï¿½ï¿½ï¿½H
             if (i == -1) return "".ToPath();
 
             return path.Value[(i + 5)..];
@@ -380,6 +408,22 @@ namespace AnimLite.Utility
         //        .ToPath();
 
 
+
+
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        public static PathUnit NormalizeRelative(this PathUnit path) =>
+            Path.GetFullPath($"x:/{path.Value}")[3..].ToPath();
+
+        public static PathUnit NormalizeReativeWithSlash(this PathUnit path) =>
+            path.NormalizeRelative().Value.Replace('\\', '/').ToPath();
+#else
+        public static PathUnit NormalizeRelative(this PathUnit path) =>
+            Path.GetFullPath($"/{path.Value}")[1..].ToPath();
+
+        public static PathUnit NormalizeReativeWithSlash(this PathUnit path) =>
+            path.NormalizeRelative().Value.Replace('\\', '/').ToPath();
+#endif
 
 
 
@@ -409,12 +453,12 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// target ‚ª PathUnit.ParentPath ˆÈ‰º‚È‚ç true ‚ğ•Ô‚·B
-        /// ƒŠƒ\[ƒX‚â web ‚©‚Ç‚¤‚©‚Íl—¶‚µ‚È‚¢B
+        /// target ï¿½ï¿½ PathUnit.ParentPath ï¿½È‰ï¿½ï¿½È‚ï¿½ true ï¿½ï¿½Ô‚ï¿½ï¿½B
+        /// ï¿½ï¿½ï¿½\ï¿½[ï¿½Xï¿½ï¿½ web ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ílï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½B
         /// </summary>
         static public bool IsWithinParentFolder(this PathUnit target)
         {
-            // Path.GetFullPath() ‚ÍƒpƒX‚ğ³‹K‰»‚µ‚Ä‚­‚ê‚éB.. ‚â . ‚ğœ‹‚µ‚Ä‚­‚ê‚é‚µAƒVƒ‡[ƒg‚à’¼‚µ‚Ä‚­‚ê‚éB
+            // Path.GetFullPath() ï¿½Íƒpï¿½Xï¿½ğ³‹Kï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½B.. ï¿½ï¿½ . ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½é‚µï¿½Aï¿½Vï¿½ï¿½ï¿½[ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½B
             var _parent = Path.GetFullPath(PathUnit.ParentPath + "/");
             var _target = Path.GetFullPath(target);
 
@@ -425,8 +469,8 @@ namespace AnimLite.Utility
         }
 
         /// <summary>
-        /// target ‚ª PathUnit.ParentPath ‚ÌŠO‘¤‚ğ‚³‚µ‚Ä‚¢‚ê‚Î IOException ‚ğƒXƒ[‚·‚éB
-        /// ‚½‚¾‚µAƒŠƒ\[ƒX‚â Http ‚Ì web url ‚Å‚ ‚ê‚Î‹–—e‚·‚éB
+        /// target ï¿½ï¿½ PathUnit.ParentPath ï¿½ÌŠOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ IOException ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½B
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½\ï¿½[ï¿½Xï¿½ï¿½ Http ï¿½ï¿½ web url ï¿½Å‚ï¿½ï¿½ï¿½Î‹ï¿½ï¿½eï¿½ï¿½ï¿½ï¿½B
         /// </summary>
         static public void ThrowIfAccessedOutsideOfParentFolder(this PathUnit path)
         {
@@ -435,6 +479,7 @@ namespace AnimLite.Utility
 
             throw new IOException("Attempted to access a file beyond the scope of 'PathUnit.ParentPath'.");
         }
+
 
     }
 
@@ -449,9 +494,15 @@ namespace AnimLite.Utility
 
 
         public static implicit operator PathList (PathUnit path) => path.ToPathList();
+        //public static implicit operator PathList (string[] paths) => new PathList
+        //{
+        //    Paths = paths
+        //        .Select(x => x.ToPath())
+        //        .ToArray(),
+        //};
 
 
-        // dictionary —p boxing ‰ñ”ğ ------------------------------------
+        // dictionary ï¿½p boxing ï¿½ï¿½ï¿½ ------------------------------------
         public override bool Equals(object obj)
         {
             return obj is PathList unit && Equals(unit);
@@ -471,7 +522,7 @@ namespace AnimLite.Utility
                 .DefaultIfEmpty()
                 .Aggregate((pre, cur) => HashCode.Combine(pre, cur));
         }
-        // dictionary —p boxing ‰ñ”ğ ------------------------------------
+        // dictionary ï¿½p boxing ï¿½ï¿½ï¿½ ------------------------------------
     }
 
     public static class PathListExtension
@@ -479,6 +530,13 @@ namespace AnimLite.Utility
         public static PathList ToPathList(this PathUnit path) => new PathList
         {
             Paths = path.WrapEnumerable().ToArray(),
+        };
+
+        public static PathList ToPathList(this IEnumerable<string> paths) => new PathList
+        {
+            Paths = paths
+                .Select(x => x.ToPath())
+                .ToArray(),
         };
 
         public static PathList Merge(this PathUnit path, PathList append) => new PathList

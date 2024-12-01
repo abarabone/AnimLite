@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
 
 
 namespace AnimLite.Utility.Linq
@@ -106,6 +106,44 @@ namespace AnimLite.Utility.Linq
             (x.src1, x.src2).Zip((x, y) => (x, y));
 
 
+
+
+
+        public static IEnumerable<T> WhereIn<T, U>(this IEnumerable<T> src, IEnumerable<U> list, Func<T, U, bool> expression) =>
+            src.Where(x => list.Where(y => expression(x, y)).Any());
+        //list.Select(x => src.Where(y => expression(y, x)).Cast<T?>().FirstOrDefault())
+        //    .Where(x => x is null);
+
+
+        public static IEnumerable<string> WhereExtIn(this IEnumerable<string> src, IEnumerable<string> extensionlist) =>
+            src.WhereIn(extensionlist, (x, y) => x.EndsWith(y, StringComparison.InvariantCultureIgnoreCase));
+
+        public static IEnumerable<string> WhereExtIn(this IEnumerable<string> src, string extensions) =>
+            src.WhereExtIn(extensions.Split(';'));
+
+
+        public static IEnumerable<T> WhereExtIn<T>(this IEnumerable<T> src, IEnumerable<string> extensionlist, Func<T, string> conversion) =>
+            src.WhereIn(extensionlist, (x, y) => conversion(x).EndsWith(y, StringComparison.InvariantCultureIgnoreCase));
+
+        public static IEnumerable<T> WhereExtIn<T>(this IEnumerable<T> src, string extensions, Func<T, string> conversion) =>
+            src.WhereExtIn(extensions.Split(';'), conversion);
+
+
+        public static IEnumerable<string> WhereWildIn(this IEnumerable<string> src, IEnumerable<string> matchlist)
+        {
+            var wilds = matchlist.Select(x => x.ToWildcard()).ToArray();
+            return src.WhereIn(wilds, (x, y) => x.Like(y));
+        }
+        public static IEnumerable<string> WhereWildIn(this IEnumerable<string> src, string matchs) =>
+            src.WhereWildIn(matchs.Split(';'));
+
+        public static IEnumerable<T> WhereWildIn<T>(this IEnumerable<T> src, IEnumerable<string> matchlist, Func<T, string> conversion)
+        {
+            var wilds = matchlist.Select(x => x.ToWildcard()).ToArray();
+            return src.WhereIn(wilds, (x, y) => conversion(x).Like(y));
+        }
+        public static IEnumerable<T> WhereWildIn<T>(this IEnumerable<T> src, string matchs, Func<T, string> conversion) =>
+            src.WhereWildIn(matchs.Split(';'), conversion);
     }
 
 }

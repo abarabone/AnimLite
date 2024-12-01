@@ -33,6 +33,11 @@ namespace AnimLite.Utility
         public static void Release<T>(this T asset) where T : UnityEngine.Object =>
             Addressables.Release(asset);
 
+        public static async ValueTask ReleaseOnMainThreadAsync<T>(this T asset) where T : UnityEngine.Object
+        {
+            await Awaitable.MainThreadAsync();
+            Addressables.Release(asset);        // もしかしたらメインスレッドじゃなくてもいいのかも
+        }
 
 
 
@@ -94,7 +99,7 @@ namespace AnimLite.Utility
             public async new ValueTask DisposeAsync()
             {
                 await Awaitable.MainThreadAsync();
-
+                
                 this.Dispose();
             }
         }

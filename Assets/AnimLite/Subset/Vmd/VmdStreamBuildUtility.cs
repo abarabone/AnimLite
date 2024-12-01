@@ -20,7 +20,7 @@ namespace AnimLite.Vmd
 
 
         /// <summary>
-        /// 
+        /// セクションは最後にデフォルトキーを追加するので、ボーン数より１つ多い
         /// </summary>
         public static KeyStreamSections BuildSectionData<TKey>(
             this IEnumerable<IEnumerable<TKey>> streamsList, TKey defaultKey = default)

@@ -16,3 +16,7 @@
 右ウィンク	Wink_R
 まばたき	Blink
 ohter		Neutral
+ウィンク左	Wink_L
+ウィンク右	Wink_R
+にっこり	Fun
+真面目	Neutral

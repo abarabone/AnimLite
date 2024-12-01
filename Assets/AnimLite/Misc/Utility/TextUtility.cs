@@ -12,6 +12,16 @@ namespace AnimLite.Utility
 {
 
 
+    public static class StringUtility
+    {
+        public static string JoinString(this IEnumerable<string> src, string delim) => string.Join(delim, src);
+        public static string JoinString(this IEnumerable<string> src, char delim) => string.Join(delim, src);
+    }
+
+
+
+
+
     public struct Wildcard
     {
         public string value;
@@ -41,7 +51,7 @@ namespace AnimLite.Utility
             ;
 
         /// <summary>
-        /// ×‚©‚¢“_‚Ì’ˆÓF # ‚Í”šˆµ‚¢
+        /// ï¿½×‚ï¿½ï¿½ï¿½ï¿½_ï¿½Ì’ï¿½ï¿½ÓF # ï¿½Íï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         public static Wildcard ToWildcard(this string s)
         {
@@ -66,6 +76,5 @@ namespace AnimLite.Utility
             }
         }
     }
-
 
 }

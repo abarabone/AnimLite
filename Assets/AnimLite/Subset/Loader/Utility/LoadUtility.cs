@@ -192,11 +192,6 @@ namespace AnimLite.Utility
     static public class DisposeUtility
     {
 
-
-        public static async ValueTask<T> UsingAwait<T>(this ValueTask<Stream> s, Func<Stream, T> action) =>
-            (await s).Using(action);
-
-
         public static T Using<T>(this Stream s, Func<Stream, T> action)
         {
             using (s)
@@ -204,6 +199,31 @@ namespace AnimLite.Utility
                 return action(s);
             }
         }
+
+
+        public static async ValueTask<T> UsingAwait<T>(this ValueTask<Stream> s, Func<Stream, T> action) =>
+            await (await s).UsingAsync(action);
+
+
+        public static async ValueTask<T> UsingAsync<T>(this Stream s, Func<Stream, T> action)
+        {
+            await using (s)
+            {
+                return action(s);
+            }
+        }
+
+        //public static async ValueTask<T> UsingAwait<T, U>(this ValueTask<Stream> s, U arg, Func<Stream, U, T> action) =>
+        //    (await s).Using(arg, action);
+
+
+        //public static T Using<T, U>(this Stream s, U arg, Func<Stream, U, T> action)
+        //{
+        //    using (s)
+        //    {
+        //        return action(s, arg);
+        //    }
+        //}
 
 
         public static async ValueTask<T> UsingAwait<T>(this ValueTask<Stream> s, Func<Stream, ValueTask<T>> action) =>

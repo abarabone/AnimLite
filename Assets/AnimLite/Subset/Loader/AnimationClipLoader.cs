@@ -19,13 +19,6 @@ using System.IO.Compression;
 
 namespace AnimLite.Utility
 {
-    using AnimLite.Vmd;
-    using AnimLite.Vrm;
-
-}
-
-namespace AnimLite.Utility
-{
 
     public static partial class AnimationClipLoader
     {

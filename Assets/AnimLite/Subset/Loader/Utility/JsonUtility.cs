@@ -8,7 +8,6 @@ using UnityEngine;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using static UnityEditor.ShaderData;
 
 namespace AnimLite.Utility
 {
@@ -79,7 +78,7 @@ namespace AnimLite.Utility
                     }
                     else if (find_base_(thiskey) is var basevalue && basevalue != null)
                     {
-                        var newvalue = basevalue.Instantiate();
+                        var newvalue = basevalue.CloneViaJson();
                         dictionary[thiskey] = newvalue;
 
                         using var subReader = thisvalue.CreateReader();

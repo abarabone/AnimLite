@@ -12,7 +12,7 @@ namespace AnimLite
 
         public bool IsAccessWithinParentPathOnly = PathUnit.IsAccessWithinParentPathOnly;
 
-        public bool IsSeaquentialLoadingInZip = DanceSceneLoader.IsSeaquentialLoadingInZip;
+        public DanceSceneLoader.ZipMode ZipLoaderMode = DanceSceneLoader.ZipMode.ParallelOpenMultiFiles;
 
         public bool UseAsyncModeForFileStreamApi = DanceSceneLoader.UseAsyncModeForFileStreamApi;
 
@@ -23,13 +23,13 @@ namespace AnimLite
 
             PathUnit.IsAccessWithinParentPathOnly = this.IsAccessWithinParentPathOnly;
 
-            DanceSceneLoader.IsSeaquentialLoadingInZip = this.IsSeaquentialLoadingInZip;
+            DanceSceneLoader.ZipLoaderMode = this.ZipLoaderMode;
 
             DanceSceneLoader.UseAsyncModeForFileStreamApi = this.UseAsyncModeForFileStreamApi;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"PathUnit.IsAccessWithinParentPathOnly : {PathUnit.IsAccessWithinParentPathOnly}".ShowDebugLog();
-            $"DanceSceneLoader.IsSeaquentialLoadingInZip : {DanceSceneLoader.IsSeaquentialLoadingInZip}".ShowDebugLog();
+            $"DanceSceneLoader.ZipLoaderMode : {DanceSceneLoader.ZipLoaderMode}".ShowDebugLog();
             $"DanceSceneLoader.UseAsyncModeForFileStreamApi : {DanceSceneLoader.UseAsyncModeForFileStreamApi}".ShowDebugLog();
             $"PathUnit.PathUnit.CacheFolderPath : {PathUnit.CacheFolderPath}".ShowDebugLog();
             $"PathUnit.DataFolderPath : {PathUnit.DataFolderPath}".ShowDebugLog();

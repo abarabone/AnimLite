@@ -51,7 +51,7 @@ namespace AnimLite.Utility
             if (archive is not null && !path.IsFullPath())
             {
                 var clip = await LoadErr.LoggingAsync(() =>
-                    archive.ExtractAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct)));
+                    archive.GetEntryAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct), ct));
 
                 if (!clip.clip.IsUnityNull()) return clip;
 
@@ -92,9 +92,12 @@ namespace AnimLite.Utility
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.loadAudioClipViaTmpFileAsync(entrypath, ct)),
+                    //await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.loadAudioClipViaTmpFileAsync(entrypath, ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipAsync(entrypath, s => s.loadAudioClipViaTmpFileAsync(entrypath, ct))),
                 var (zippath, _) when zippath != "" =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".mp3;.ogg;.acc;.wav", (s, n) => s.loadAudioClipViaTmpFileAsync(n, ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipFirstEntryAsync(".mp3;.ogg;.acc;.wav", (s, n) => s.loadAudioClipViaTmpFileAsync(n, ct))),
                 var (_, _) when fullpath.IsResource() =>
                     await fullpath.ToResourceName().LoadAudioClipFromResourceAsync(ct),
                 var (_, _) =>
@@ -155,11 +158,11 @@ namespace AnimLite.Utility
                 var clip = new AudioClipAsDisposable
                 {
                     clip = _clip,
-                    disposeAction = _clip.Destroy,
+                    disposeAction = _clip.DestroyOnMainThreadAsync,
                 };
                 _clip.name = Path.GetFileNameWithoutExtension(path);
 
-                ct.ThrowIfCancellationRequested(clip.Dispose);
+                await ct.ThrowIfCancellationRequested(clip.DisposeAsync);
 
                 return clip;
             }
@@ -181,7 +184,7 @@ namespace AnimLite.Utility
                 clip = await name.LoadAssetAsync<AudioClip>(),
             };
 
-            ct.ThrowIfCancellationRequested(clip.Dispose);
+            await ct.ThrowIfCancellationRequested(clip.DisposeAsync);
 
             return clip;
         }
@@ -191,14 +194,17 @@ namespace AnimLite.Utility
 
 
     [Serializable]
-    public struct AudioClipAsDisposable : IDisposable
+    public struct AudioClipAsDisposable : IAsyncDisposable
     {
         public AudioClip clip;// { get; private set; }
-        public Action disposeAction { private get; set; }
+        public Func<ValueTask> disposeAction { private get; set; }// = () => new ValueTask();
+        
         //public void Dispose() => this.disposeAction?.Invoke();
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            this.disposeAction?.Invoke();
+
+            await this.disposeAction.InvokeNullableAsync();
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"dispose audio : {this.clip?.name}".ShowDebugLog();
 #endif

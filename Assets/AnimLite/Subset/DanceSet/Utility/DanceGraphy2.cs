@@ -22,12 +22,12 @@ namespace AnimLite.DancePlayable
     //using static UnityEditor.Progress;
 
 
-    public class DanceGraphy2 : IDisposable
+    public class DanceGraphy2 : IAsyncDisposable
     {
 
         public PlayableGraph graph { get; private set; }
 
-        Action DisposeAction = () => { };
+        Func<ValueTask> DisposeAction = () => new ValueTask();
 
 
         public float TotalTime;// 暫定、ちゃんとした方法にしたい
@@ -70,7 +70,7 @@ namespace AnimLite.DancePlayable
             public ModelOrder[] BackGrouds;
             public MotionOrderBase[] Motions;
 
-            public Action DisposeAction;
+            public Func<ValueTask> DisposeAction;
         }
 
         public class ModelOrder
@@ -91,12 +91,12 @@ namespace AnimLite.DancePlayable
             public float DelayTime;
         }
 
-        public abstract class MotionOrderBase : ModelOrder, IDisposable
+        public abstract class MotionOrderBase : ModelOrder, IAsyncDisposable
         {
             public SkinnedMeshRenderer FaceRenderer;
 
             public virtual bool IsMotionBlank => true;
-            public virtual void Dispose() { }
+            public virtual ValueTask DisposeAsync() => new ValueTask();
         }
         public class MotionOrder : MotionOrderBase
         {
@@ -112,13 +112,15 @@ namespace AnimLite.DancePlayable
             public float BodyScale;
 
             public override bool IsMotionBlank => this.vmddata is null;
-            public override void Dispose()
+            public override async ValueTask DisposeAsync()
             {
                 //this.face.Dispose();
                 this.bone.Dispose();
                 this.vmddata?.Dispose();
+
+                await Awaitable.MainThreadAsync();// 不要かも
                 //this.Model.AsUnityNull(o => o?.activeSelf)?.Destroy();
-                this.Model?.Dispose();
+                await this.Model.DisposeNullableAsync();
             }
         }
         public class MotionOrderWithAnimationClip : MotionOrderBase
@@ -127,10 +129,11 @@ namespace AnimLite.DancePlayable
             public float DelayTime;
 
             public override bool IsMotionBlank => this.AnimationClip is null;
-            public override void Dispose()
+            public override async ValueTask DisposeAsync()
             {
-                this.AnimationClip?.Dispose();
-                this.Model?.Dispose();
+                await Awaitable.MainThreadAsync();// 不要かも
+                await this.AnimationClip.DisposeNullableAsync();
+                await this.Model.DisposeNullableAsync();
             }
         }
         //public class MotionOrder
@@ -155,12 +158,12 @@ namespace AnimLite.DancePlayable
         //}
 
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             this.graph.Stop();
             this.graph.Destroy();
 
-            this.DisposeAction();
+            await this.DisposeAction();
         }
 
 
@@ -199,7 +202,7 @@ namespace AnimLite.DancePlayable
             {
                 graph = graph,
 
-                DisposeAction = () => { },
+                DisposeAction = () => new ValueTask(),
 
                 TotalTime = totalTime,//
             };

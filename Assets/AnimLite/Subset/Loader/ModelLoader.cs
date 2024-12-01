@@ -48,7 +48,7 @@ namespace AnimLite.Utility
             if (archive is not null && !path.IsFullPath())
             {
                 var model = await LoadErr.LoggingAsync(() =>
-                    archive.ExtractAsync(path, s => s.convertAsync(path, ct)));
+                    archive.GetEntryAsync(path, s => s.convertAsync(path, ct), ct));
 
                 if (model is not null)
                     return model;
@@ -84,13 +84,17 @@ namespace AnimLite.Utility
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => s.convertAsync(entrypath, ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipAsync(entrypath, s => s.convertAsync(entrypath, ct))),
                 var (zippath, _) when fullpath.IsZipArchive() =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".vrm;.glb", (s, path) => s.convertAsync(path, ct)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipFirstEntryAsync(".vrm;.glb", (s, path) => s.convertAsync(path, ct))),
                 var (_, _) when fullpath.IsResource() =>
-                    await fullpath.ToResourceName().loadModelFromResourceAsync(ct),
+                    await fullpath.ToResourceName()
+                        .loadModelFromResourceAsync(ct),
                 var (_, _) =>
-                    await openAsync_(fullpath + queryString).UsingAwait(s => s.convertAsync(fullpath, ct)),
+                    await openAsync_(fullpath + queryString)
+                        .UsingAwait(s => s.convertAsync(fullpath, ct)),
             };
         });
 
@@ -156,9 +160,10 @@ namespace AnimLite.Utility
 
                 await Awaitable.MainThreadAsync();
                 instance.ShowMeshes();
-                ct.ThrowIfCancellationRequested(instance.gameObject.Destroy);
 
-                return instance.gameObject.hideModel();
+                await ct.ThrowIfCancellationRequested(instance.gameObject.DestroyOnMainThreadAsync);
+
+                return await instance.gameObject.hideModelAsync();
             }
         }
 
@@ -202,8 +207,7 @@ namespace AnimLite.Utility
 
                 await ct.ThrowIfCancellationRequested(vrm10.gameObject.DestroyOnMainThreadAsync);
 
-                await Awaitable.MainThreadAsync();
-                return vrm10.gameObject.hideModel();
+                return await vrm10.gameObject.hideModelAsync();
             }
         }
 

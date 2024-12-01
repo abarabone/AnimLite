@@ -19,52 +19,51 @@ namespace AnimLite.Vmd
     {
 
 
-        static VmdBodyMotionKey IdentityMotionKey =>
-            new VmdBodyMotionKey
-            {
-                time = 0.0f,
-                pos = float4.zero,
-                rot = quaternion.identity,
-            };
-
-
         /// <summary>
-        /// 
+        /// StreamData をビルドする。
+        /// 任意フォーマットのボーン名から、MmdBodyBones のＩＤにマップされる。
+        /// 対応ボーンがない部位は、empty keys が格納される。
         /// </summary>
-        public static StreamData<quaternion> CreateRotationData(this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)
+        public static StreamData<quaternion> CreateRotationData(
+            this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)
         {
-            var qSrc =
+            // dict<name, keys> -> (id, keys)[]
+            // 表記ゆれも吸収する（全角半角、漢字違い、表記違いなど）
+            var qNameToId =
                 from x in nameToStream//.Do(x => Debug.Log($"{x.Key.name}:{x.Count()}"))
                 let boneid = VmdBone.MmdBoneNameToId.TryGetOrDefault(x.Key, MmdBodyBones.nobone)
                 where boneid != MmdBodyBones.nobone
                 //select (boneid, keys: x.Value.OrderBy(x => x.frameno).AsEnumerable())
                 select (boneid, keys: x.Value.AsEnumerable())
                 ;
-            var src = qSrc
+            var src = qNameToId
                 //.Do(x => Debug.Log($"{x.boneid}={x.keys.Count()}"))
                 .ToArray();
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             Debug.Log(string.Join(", ", src.Select(x => $"{x.boneid}:{x.keys.Count()}")));
 #endif
 
-            var qRotSrc =
+            // MmdBodyBones の順番通りに並び変える。
+            // 対応ボーンがない場合は、empty を生成する。
+            var qNormalizeOrder =
                 from x in Enumerable.Range(0, (int)MmdBodyBones.length)
                 join y in src on (MmdBodyBones)x equals y.boneid into ys
                 let boneid = (MmdBodyBones)x
                 let blankkeys = new EmptyEnumerableStruct<VmdBodyMotionKey>()
                 from ny in ys.DefaultIfEmpty((boneid, blankkeys))
-                    //orderby x
                 select ny
                 ;
-            var rotsrc = qRotSrc
+            var rotsrc = qNormalizeOrder
                 //.Do(x => Debug.Log(x))
                 .Select(x => x.keys)
                 .ToArray();
 
+            // stream data としてビルドする
             return new StreamData<quaternion>
             {
-                KeyStreams = rotsrc.BuildKeyData(key => key.rot, key => key.time, IdentityMotionKey),
-                Sections = rotsrc.BuildSectionData(defaultKey: IdentityMotionKey),
+                KeyStreams = rotsrc.BuildKeyData(key => key.rot, key => key.time, defaultKey: VmdBodyMotionKey.Identity),
+                Sections = rotsrc.BuildSectionData(defaultKey: VmdBodyMotionKey.Identity),
             };
         }
 
@@ -89,8 +88,8 @@ namespace AnimLite.Vmd
                 tonai_("右足ＩＫ", "右足IK"),
             };
 
-            var sections = qPosSrc.BuildSectionData(defaultKey: IdentityMotionKey);
-            var keys = qPosSrc.BuildKeyData(key => key.pos, key => key.time, IdentityMotionKey);
+            var sections = qPosSrc.BuildSectionData(defaultKey: VmdBodyMotionKey.Identity);
+            var keys = qPosSrc.BuildKeyData(key => key.pos, key => key.time, VmdBodyMotionKey.Identity);
 
             return new StreamData<float4>
             {

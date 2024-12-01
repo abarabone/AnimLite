@@ -37,6 +37,11 @@ namespace AnimLite.Vmd
         static public implicit operator VmdFaceName(string name) => name.AsVmdFaceName();
     }
 
+
+    /// <summary>
+    /// キー名とキーフレーム配列の辞書
+    /// キーフレームは、時間と位置・回転のセット
+    /// </summary>
     public struct VmdMotionData
     {
         public Dictionary<VmdBoneName, VmdBodyMotionKey[]> bodyKeyStreams;
@@ -59,6 +64,14 @@ namespace AnimLite.Vmd
         public float4 pos;
         public quaternion rot;
         //public float4[] interpolation;
+
+        public static VmdBodyMotionKey Identity => new VmdBodyMotionKey
+        {
+            frameno = 0,
+            time = 0.0f,
+            pos = float4.zero,
+            rot = quaternion.identity,
+        };
     }
 
     public struct VmdFaceKey

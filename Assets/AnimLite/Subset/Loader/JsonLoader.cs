@@ -34,21 +34,21 @@ namespace AnimLite.Utility
 
 
         public static async ValueTask<T> LoadJsonAsync<T>(
-            this IArchive archive, PathUnit path, T prevjson, CancellationToken ct) where T : new()
+            this IArchive archive, PathUnit entrypath, T prevjson, CancellationToken ct) where T : new()
         {
             if (prevjson is null) prevjson = new T();
 
-            if (path.IsBlank()) return prevjson;
+            //if (entrypath.IsBlank()) return prevjson;
 
             if (archive is not null)
             {
                 var json = await LoadErr.LoggingAsync(async () =>
-                    path.ToZipEntryPath() switch
+                    entrypath switch
                     {
-                        var entrypath when entrypath != "" =>
-                            await archive.ExtractAsync(entrypath, s => DeserializeJsonAsync<T>(s, prevjson)),
+                        _ when entrypath != "" =>
+                            await archive.GetEntryAsync(entrypath, s => DeserializeJsonAsync<T>(s, prevjson), ct),
                         _ =>
-                            await archive.ExtractFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, prevjson)),
+                            await archive.FindFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, prevjson), ct),
                         // .json だけは .zip 自体の entry path を参照する。
                         // 他のメディアでは .json に記されたパスを entry path と解釈する。
                     });
@@ -57,10 +57,10 @@ namespace AnimLite.Utility
                     return json;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadJsonAsync(path, prevjson, ct);
+                    return await archive.FallbackArchive.LoadJsonAsync(entrypath, prevjson, ct);
             }
 
-            return await path.LoadJsonAsync<T>(prevjson, ct);
+            return await entrypath.LoadJsonAsync<T>(prevjson, ct);
         }
 
         /// <summary>
@@ -92,11 +92,14 @@ namespace AnimLite.Utility
             return fullpath.DividZipToArchiveAndEntry() switch
             {
                 var (zippath, entrypath) when entrypath != "" =>
-                    await openAsync_(zippath + queryString).UnzipAwait(entrypath, s => DeserializeJsonAsync<T>(s, prevjson)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipAsync(entrypath, s => DeserializeJsonAsync<T>(s, prevjson))),
                 var (zippath, _) when zippath != "" =>
-                    await openAsync_(zippath + queryString).UnzipFirstEntryAwait(".json", s => DeserializeJsonAsync<T>(s, prevjson)),
+                    await openAsync_(zippath + queryString)
+                        .UsingAwait(s => s.UnzipFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, prevjson))),
                 var (_, _) =>
-                    await openAsync_(fullpath + queryString).UsingAwait(s => DeserializeJsonAsync<T>(s, prevjson)),
+                    await openAsync_(fullpath + queryString)
+                        .UsingAwait(s => DeserializeJsonAsync<T>(s, prevjson)),
             };
         })
         ??

@@ -60,8 +60,7 @@ namespace AnimLite.Utility
                 return null;
             }
 
-            await Awaitable.MainThreadAsync();
-            return prototype.Instantiate();
+            return await prototype.InstantiateAsync();
         }
 
 

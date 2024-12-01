@@ -60,7 +60,7 @@ namespace AnimLite.DancePlayable
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
-                    using var x = await this.JsonFiles.LoadDaceSceneAsync(ct);
+                    using var x = await this.JsonFiles.LoadDanceSceneAsync(ct);
                     var order = await x.dancescene.BuildDanceGraphyOrderAsync(this.Cache, x.archive, this.AudioSource, ct);
 
                     await Awaitable.MainThreadAsync();
@@ -77,13 +77,13 @@ namespace AnimLite.DancePlayable
             catch (OperationCanceledException e)
             {
                 e.Message.ShowDebugLog();
-                this.graphy?.Dispose();
+                await this.graphy.DisposeNullableAsync();
                 this.graphy = null;
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
-                this.graphy?.Dispose();
+                e.ShowDebugError();
+                await this.graphy.DisposeNullableAsync();
                 this.graphy = null;
             }
             finally
@@ -127,7 +127,7 @@ namespace AnimLite.DancePlayable
                     //await (this.Cache?.HideAndDestroyModelAsync() ?? default);
 
                     //await Awaitable.MainThreadAsync();
-                    this.graphy?.Dispose();
+                    await this.graphy.DisposeNullableAsync();
                     this.graphy = null;
                 }
                 "disable end".ShowDebugLog();

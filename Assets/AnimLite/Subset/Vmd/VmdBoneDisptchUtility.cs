@@ -143,13 +143,13 @@ namespace AnimLite.Vmd
         static quaternion mul(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6) => math.mul(mul(r1, r2, r3, r4, r5), r6);
 
 
-        //static quaternion accumulate(quaternion r1) => r1;
-        //static quaternion accumulate(quaternion r1, quaternion r2) => math.mul(r2, r1);
-        //static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3) => accumulate(accumulate(r1, r2), r3);// mul(3, mul(2, 1))
-        //static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4) => accumulate(accumulate(r1, r2, r3), r4);
-        //static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5) => accumulate(accumulate(r1, r2, r3, r4), r5);
-        //static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6) => accumulate(accumulate(r1, r2, r3, r4, r5), r6);
-        //static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6, quaternion r7) => accumulate(accumulate(r1, r2, r3, r4, r5, r6), r7);
+        static quaternion accumulate(quaternion r1) => r1;
+        static quaternion accumulate(quaternion r1, quaternion r2) => math.mul(r2, r1);
+        static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3) => accumulate(accumulate(r1, r2), r3);// mul(3, mul(2, 1))
+        static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4) => accumulate(accumulate(r1, r2, r3), r4);
+        static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5) => accumulate(accumulate(r1, r2, r3, r4), r5);
+        static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6) => accumulate(accumulate(r1, r2, r3, r4, r5), r6);
+        static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6, quaternion r7) => accumulate(accumulate(r1, r2, r3, r4, r5, r6), r7);
 
 
         static quaternion downArmL() => quaternion.RotateZ(math.radians(+30));
@@ -177,17 +177,18 @@ namespace AnimLite.Vmd
                     rkf.getrot(MmdBodyBones.グルーブ)
                 ),
 
-                HumanBodyBones.Hips => mul(
+                HumanBodyBones.Hips => accumulate(
                     //rkf.getrot(MmdBodyBones.センター),
                     //rkf.getrot(MmdBodyBones.グルーブ),
                     rkf.getrot(MmdBodyBones.下半身)
                 //kh.(MmdBodyBones.下半身2)
                 ),
-                HumanBodyBones.Spine => mul(
-                    //mul(math.inverse(rkf.getrot(MmdBodyBones.下半身)), rkf.getrot(MmdBodyBones.上半身))
+                HumanBodyBones.Spine => accumulate(
+                    //accumulate(math.inverse(rkf.getrot(MmdBodyBones.下半身)), rkf.getrot(MmdBodyBones.上半身))
                     //rkf.getrot(MmdBodyBones.下半身2),
-                    math.inverse(rkf.getrot(MmdBodyBones.下半身)),
-                    rkf.getrot(MmdBodyBones.上半身)
+                    //math.inverse(rkf.getrot(MmdBodyBones.下半身)),
+                    rkf.getrot(MmdBodyBones.上半身),
+                    math.inverse(rkf.getrot(MmdBodyBones.下半身))
                 ),
 
 
@@ -201,13 +202,13 @@ namespace AnimLite.Vmd
                 //    MmdBodyBones.首,
 
 
-                HumanBodyBones.LeftShoulder => mul(
+                HumanBodyBones.LeftShoulder => accumulate(
                     //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
                     //rkf.getrot(MmdBodyBones.左肩2),
                     rkf.getrot(MmdBodyBones.左肩)
                 ),
 
-                HumanBodyBones.RightShoulder => mul(
+                HumanBodyBones.RightShoulder => accumulate(
                     //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
                     //rkf.getrot(MmdBodyBones.右肩2),
                     rkf.getrot(MmdBodyBones.右肩)
@@ -215,14 +216,14 @@ namespace AnimLite.Vmd
 
                 // 肩ボーンはいろいろあるみたいだけど、関係性がわからないからとりあえず無視
 
-                //HumanBodyBones.LeftShoulder => mul(
+                //HumanBodyBones.LeftShoulder => accumulate(
                 //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
                 //    rkf.getrot(MmdBodyBones.左肩P),
                 //    rkf.getrot(MmdBodyBones.左肩),
                 //    math.inverse(rkf.getrot(MmdBodyBones.左肩C))
                 //),
 
-                //HumanBodyBones.RightShoulder => mul(
+                //HumanBodyBones.RightShoulder => accumulate(
                 //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
                 //    rkf.getrot(MmdBodyBones.右肩P),
                 //    rkf.getrot(MmdBodyBones.右肩),
@@ -230,25 +231,25 @@ namespace AnimLite.Vmd
                 //),
 
 
-                HumanBodyBones.LeftUpperArm => mul(
+                HumanBodyBones.LeftUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasLeftSholder),
                     //downArmL(),
                     rkf.getrot(MmdBodyBones.左腕捩),
-                    rkf.getrot(MmdBodyBones.左腕)//
+                    rkf.getrot(MmdBodyBones.左腕)
                 ),
 
-                HumanBodyBones.RightUpperArm => mul(
+                HumanBodyBones.RightUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.RightShoulder, !opt.HasRightSholder),
                     //downArmR(),,
                     rkf.getrot(MmdBodyBones.右腕捩),
-                    rkf.getrot(MmdBodyBones.右腕)//
+                    rkf.getrot(MmdBodyBones.右腕)
                 ),
 
                 // 腕のねじりは、１～３はメッシュ用にねじりを分散させた補間値っぽい
                 // 捩ボーンだけ考えればいいと思うんだけどどうなんだろ？
                 // （腕付け根に捩りを入れてしまうと、肩付近から回転してしまうし、肘に仕込むと前腕の捩りになってしまうので、腕と捩りは分割せざるを得ない、んだと思う）
 
-                HumanBodyBones.LeftLowerArm => mul(
+                HumanBodyBones.LeftLowerArm => accumulate(
                     ////rkf.getrot(MmdBodyBones.左腕捩1),
                     ////rkf.getrot(MmdBodyBones.左腕捩2),
                     ////rkf.getrot(MmdBodyBones.左腕捩3),
@@ -259,7 +260,7 @@ namespace AnimLite.Vmd
                     //rkf.getrot(MmdBodyBones.左腕捩)
                 ),
 
-                HumanBodyBones.RightLowerArm => mul(
+                HumanBodyBones.RightLowerArm => accumulate(
                     ////rkf.getrot(MmdBodyBones.右腕捩1),
                     ////rkf.getrot(MmdBodyBones.右腕捩2),
                     ////rkf.getrot(MmdBodyBones.右腕捩3),
@@ -270,30 +271,26 @@ namespace AnimLite.Vmd
                     //rkf.getrot(MmdBodyBones.右腕捩)
                 ),
 
-                HumanBodyBones.LeftHand => mul(
-                //    rkf.getrot(MmdBodyBones.左手捩),
-                //    rkf.getrot(MmdBodyBones.左手首)
-                rkf.getrot(MmdBodyBones.左手首),
-                rkf.getrot(MmdBodyBones.左手捩)
+                HumanBodyBones.LeftHand => accumulate(
+                    rkf.getrot(MmdBodyBones.左手捩),
+                    rkf.getrot(MmdBodyBones.左手首)
                 ),
 
-                HumanBodyBones.RightHand => mul(
-                //rkf.getrot(MmdBodyBones.右手捩),
-                //rkf.getrot(MmdBodyBones.右手首)
-                rkf.getrot(MmdBodyBones.右手首),
-                rkf.getrot(MmdBodyBones.右手捩)
+                HumanBodyBones.RightHand => accumulate(
+                    rkf.getrot(MmdBodyBones.右手捩),
+                    rkf.getrot(MmdBodyBones.右手首)
                 ),
 
 
-                //HumanBodyBones.LeftThumbProximal => mul(
+                //HumanBodyBones.LeftThumbProximal => accumulate(
                 //    downArmL(),
                 //    rkf.getrot(MmdBodyBones.左親指０)
                 //    ),
-                //HumanBodyBones.LeftThumbIntermediate => mul(
+                //HumanBodyBones.LeftThumbIntermediate => accumulate(
                 //    downArmL(),
                 //    rkf.getrot(MmdBodyBones.左親指１)
                 //    ),
-                //HumanBodyBones.LeftThumbDistal =>mul(
+                //HumanBodyBones.LeftThumbDistal =>accumulate(
                 //    downArmL(),
                 //    rkf.getrot(MmdBodyBones.左親指２)
                 //    ),
@@ -303,7 +300,7 @@ namespace AnimLite.Vmd
                 ////    MmdBodyBones.左足,
                 ////HumanBodyBones.LeftLowerLeg =>
                 ////    MmdBodyBones.左ひざ,
-                //HumanBodyBones.LeftFoot => mul(
+                //HumanBodyBones.LeftFoot => accumulate(
                 //    rkf.getrot(MmdBodyBones.左足首)
                 ////rkf.getrot(MmdBodyBones.左足ＩＫ)
                 //),
@@ -314,7 +311,7 @@ namespace AnimLite.Vmd
                 ////    MmdBodyBones.右足,
                 ////HumanBodyBones.RightLowerLeg =>
                 ////    MmdBodyBones.右ひざ,
-                //HumanBodyBones.RightFoot => mul(
+                //HumanBodyBones.RightFoot => accumulate(
                 //    rkf.getrot(MmdBodyBones.右足首)
                 ////rkf.getrot(MmdBodyBones.右足ＩＫ)
                 //),
@@ -326,6 +323,175 @@ namespace AnimLite.Vmd
             };
         }
 
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public static quaternion AccumulateStreamRotation<TFinder>(
+        //    this TFinder rkf, OptionalBoneChecker opt, HumanBodyBones humanbone, MmdBodyBones mmdbone = MmdBodyBones.nobone)
+        //    where TFinder : IKeyFinder<quaternion>
+        //{
+
+        //    return humanbone switch
+        //    {
+
+        //        HumanBodyBones.LastBone => mul(
+        //            rkf.getrot(MmdBodyBones.全ての親),
+        //            rkf.getrot(MmdBodyBones.センター),
+        //            rkf.getrot(MmdBodyBones.グルーブ)
+        //        ),
+
+        //        HumanBodyBones.Hips => mul(
+        //            //rkf.getrot(MmdBodyBones.センター),
+        //            //rkf.getrot(MmdBodyBones.グルーブ),
+        //            rkf.getrot(MmdBodyBones.下半身)
+        //        //kh.(MmdBodyBones.下半身2)
+        //        ),
+        //        HumanBodyBones.Spine => mul(
+        //            //mul(math.inverse(rkf.getrot(MmdBodyBones.下半身)), rkf.getrot(MmdBodyBones.上半身))
+        //            //rkf.getrot(MmdBodyBones.下半身2),
+        //            math.inverse(rkf.getrot(MmdBodyBones.下半身)),
+        //            rkf.getrot(MmdBodyBones.上半身)
+        //        ),
+
+
+        //        // 単一ボーンは switch の _ => で処理するのでコメントアウト
+
+        //        //HumanBodyBones.Chest =>
+        //        //    MmdBodyBones.上半身2,
+        //        //HumanBodyBones.Head =>
+        //        //    MmdBodyBones.頭,
+        //        //HumanBodyBones.Neck =>
+        //        //    MmdBodyBones.首,
+
+
+        //        HumanBodyBones.LeftShoulder => mul(
+        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
+        //            //rkf.getrot(MmdBodyBones.左肩2),
+        //            rkf.getrot(MmdBodyBones.左肩)
+        //        ),
+
+        //        HumanBodyBones.RightShoulder => mul(
+        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
+        //            //rkf.getrot(MmdBodyBones.右肩2),
+        //            rkf.getrot(MmdBodyBones.右肩)
+        //        ),
+
+        //        // 肩ボーンはいろいろあるみたいだけど、関係性がわからないからとりあえず無視
+
+        //        //HumanBodyBones.LeftShoulder => mul(
+        //        //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
+        //        //    rkf.getrot(MmdBodyBones.左肩P),
+        //        //    rkf.getrot(MmdBodyBones.左肩),
+        //        //    math.inverse(rkf.getrot(MmdBodyBones.左肩C))
+        //        //),
+
+        //        //HumanBodyBones.RightShoulder => mul(
+        //        //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
+        //        //    rkf.getrot(MmdBodyBones.右肩P),
+        //        //    rkf.getrot(MmdBodyBones.右肩),
+        //        //    math.inverse(rkf.getrot(MmdBodyBones.右肩C))
+        //        //),
+
+
+        //        HumanBodyBones.LeftUpperArm => mul(
+        //            rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasLeftSholder),
+        //            //downArmL(),
+        //            rkf.getrot(MmdBodyBones.左腕),
+        //            rkf.getrot(MmdBodyBones.左腕捩)
+        //        //rkf.getrot(MmdBodyBones.左腕捩),
+        //        //rkf.getrot(MmdBodyBones.左腕)//
+        //        ),
+
+        //        HumanBodyBones.RightUpperArm => mul(
+        //            rkf.getrotIfOptout(opt, HumanBodyBones.RightShoulder, !opt.HasRightSholder),
+        //            //downArmR(),,
+        //            rkf.getrot(MmdBodyBones.右腕),
+        //            rkf.getrot(MmdBodyBones.右腕捩)
+        //        //rkf.getrot(MmdBodyBones.右腕捩),
+        //        //rkf.getrot(MmdBodyBones.右腕)//
+        //        ),
+
+        //        // 腕のねじりは、１～３はメッシュ用にねじりを分散させた補間値っぽい
+        //        // 捩ボーンだけ考えればいいと思うんだけどどうなんだろ？
+        //        // （腕付け根に捩りを入れてしまうと、肩付近から回転してしまうし、肘に仕込むと前腕の捩りになってしまうので、腕と捩りは分割せざるを得ない、んだと思う）
+
+        //        HumanBodyBones.LeftLowerArm => mul(
+        //            ////rkf.getrot(MmdBodyBones.左腕捩1),
+        //            ////rkf.getrot(MmdBodyBones.左腕捩2),
+        //            ////rkf.getrot(MmdBodyBones.左腕捩3),
+        //            //rkf.getrot(MmdBodyBones.左腕捩),
+        //            //rkf.getrot(MmdBodyBones.左手捩),
+        //            rkf.getrot(MmdBodyBones.左ひじ)
+        //        //rkf.getrot(MmdBodyBones.左ひじ),
+        //        //rkf.getrot(MmdBodyBones.左腕捩)
+        //        ),
+
+        //        HumanBodyBones.RightLowerArm => mul(
+        //            ////rkf.getrot(MmdBodyBones.右腕捩1),
+        //            ////rkf.getrot(MmdBodyBones.右腕捩2),
+        //            ////rkf.getrot(MmdBodyBones.右腕捩3),
+        //            //rkf.getrot(MmdBodyBones.右腕捩),
+        //            //rkf.getrot(MmdBodyBones.右手捩),
+        //            rkf.getrot(MmdBodyBones.右ひじ)
+        //        //rkf.getrot(MmdBodyBones.右ひじ),
+        //        //rkf.getrot(MmdBodyBones.右腕捩)
+        //        ),
+
+        //        HumanBodyBones.LeftHand => mul(
+        //        //    rkf.getrot(MmdBodyBones.左手捩),
+        //        //    rkf.getrot(MmdBodyBones.左手首)
+        //        rkf.getrot(MmdBodyBones.左手首),
+        //        rkf.getrot(MmdBodyBones.左手捩)
+        //        ),
+
+        //        HumanBodyBones.RightHand => mul(
+        //        //rkf.getrot(MmdBodyBones.右手捩),
+        //        //rkf.getrot(MmdBodyBones.右手首)
+        //        rkf.getrot(MmdBodyBones.右手首),
+        //        rkf.getrot(MmdBodyBones.右手捩)
+        //        ),
+
+
+        //        //HumanBodyBones.LeftThumbProximal => mul(
+        //        //    downArmL(),
+        //        //    rkf.getrot(MmdBodyBones.左親指０)
+        //        //    ),
+        //        //HumanBodyBones.LeftThumbIntermediate => mul(
+        //        //    downArmL(),
+        //        //    rkf.getrot(MmdBodyBones.左親指１)
+        //        //    ),
+        //        //HumanBodyBones.LeftThumbDistal =>mul(
+        //        //    downArmL(),
+        //        //    rkf.getrot(MmdBodyBones.左親指２)
+        //        //    ),
+
+
+        //        ////HumanBodyBones.LeftUpperLeg =>
+        //        ////    MmdBodyBones.左足,
+        //        ////HumanBodyBones.LeftLowerLeg =>
+        //        ////    MmdBodyBones.左ひざ,
+        //        //HumanBodyBones.LeftFoot => mul(
+        //        //    rkf.getrot(MmdBodyBones.左足首)
+        //        ////rkf.getrot(MmdBodyBones.左足ＩＫ)
+        //        //),
+        //        //HumanBodyBones.LeftToes =>
+        //        //    rkf.getrot(MmdBodyBones.左つま先),
+
+        //        ////HumanBodyBones.RightUpperLeg =>
+        //        ////    MmdBodyBones.右足,
+        //        ////HumanBodyBones.RightLowerLeg =>
+        //        ////    MmdBodyBones.右ひざ,
+        //        //HumanBodyBones.RightFoot => mul(
+        //        //    rkf.getrot(MmdBodyBones.右足首)
+        //        ////rkf.getrot(MmdBodyBones.右足ＩＫ)
+        //        //),
+        //        //HumanBodyBones.RightToes =>
+        //        //    rkf.getrot(MmdBodyBones.右つま先),
+
+        //        _ =>
+        //            rkf.getrot(mmdbone),
+        //    };
+        //}
     }
 
 }

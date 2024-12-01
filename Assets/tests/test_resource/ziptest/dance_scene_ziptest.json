@@ -1,0 +1,21 @@
+{
+    "Audio": {
+        "AudioFilePath": "ポップキャンディ.mp3",
+        "Volume": 1.0
+    },
+    "BackGrounds": {
+      "main": {
+        "ModelFilePath": "神社橋配布用test.glb"
+      }
+    },
+    "Motions": {
+        "center": {
+            "Model": {
+                "ModelFilePath": "ぶいけっとにゃん.vrm"
+            },
+            "Animation": {
+                "AnimationFilePath": "step1.vmd"
+            }
+        }
+    }
+}

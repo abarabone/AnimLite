@@ -224,7 +224,6 @@
     - Sequential              ... １つずつロード
     - ParallelOpenSingleFile  ... 並列してロードするが、ファイルは１つだけ開く（ファイルマッピングを使用、android だと不安定かも、調査中）
     - ParallelOpenMultiFiles  ... 並列してロードし、ファイルはそれぞれ開く（そのぶんメモリを消費する）
-  - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
   - デフォルトは ParallelOpenMultiFiles
 - いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
 - 相対パスは、下記のように絶対パスに変換してロードする

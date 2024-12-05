@@ -9,6 +9,12 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2024.12.6
+- zip sequential mode と IArchive のフォールバックの整合性がとれてなかったので修正
+  - 並列ロードの時はセマフォで制御し、そうでないなら普通にロードされる
+- ソースの s-jis を utf-8 bom にした、今更過ぎる…
+- GameObject.InstantiateAsync を使うと vrm の spring bone で問題がでるようなのでやめた
+  
 2024.12.1
 - .json に記載した相対パスでは、.json のあるフォルダを起点にするようにした。そのほうが自然かなと…
   - 今までは一律で PathUnit.ParentPath が起点だった
@@ -103,7 +109,7 @@
 - .vmd 変換を高速化したい
 
 # なやみちゅう
-- zip 読み込みの時 android(quest3) で読めなくなったかも…調査中　文字コードかな　相対パス修正したらだめんなった
+- zip paralell open single file 読み込みの時 android(quest3) で落ちるようになった、file mapping のとこで落ちてる様子
 - 非同期と並列うまく扱えてない感　特に unity の Awaitable
 - 非同期とバックグラウンドスレッドを分けた関数にしようかな  
   ~~- xxxAsync() と xxxBg() とか？~~  

@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace AnimLite.Vrm
 
 
     /// <summary>
-    /// ‚u‚l‚c‚Ì•\î‚ğ‚u‚q‚l‚Ì•\î‚É•ÏŠ·‚·‚é‘Î‰•\ƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‰º‚µA‘Î‰«‘‚ğ\’z‚·‚éB
+    /// ï¼¶ï¼­ï¼¤ã®è¡¨æƒ…ã‚’ï¼¶ï¼²ï¼­ã®è¡¨æƒ…ã«å¤‰æ›ã™ã‚‹å¯¾å¿œè¡¨ãƒ†ã‚­ã‚¹ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿ä¸‹ã—ã€å¯¾å¿œè¾æ›¸ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
     /// </summary>
     public static partial class VrmParser
     {

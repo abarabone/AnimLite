@@ -1,4 +1,4 @@
-using AnimLite.DancePlayable;
+ï»¿using AnimLite.DancePlayable;
 using AnimLite.Vmd;
 using System;
 using System.Collections;
@@ -27,12 +27,7 @@ namespace AnimLite.Utility
     public static class DanceSceneLoader
     {
 
-        /// <summary>
-        /// true ‚Å‚ ‚ê‚ÎA“¯‚¶ zip “à‚Ìƒf[ƒ^ƒ[ƒh‚É‚Í‚P‚Â‚Ì ZipArchive ‚µ‚©ƒI[ƒvƒ“‚µ‚È‚¢B
-        /// ‚½‚¾‚µ‚»‚Ìê‡A•À—ñ“I‚Èƒ[ƒh‚Ís‚í‚ê‚È‚¢B
-        /// false ‚Å‚ ‚ê‚Îí‚É•À—ñ“I‚Èƒ[ƒh‚ğs‚¤‚ªA‚»‚ê‚¼‚ê•ÊŒÂ‚É ZipArchive ‚ğƒI[ƒvƒ“‚·‚éB
-        /// </summary>
-        //public static bool IsSeaquentialLoadingInZip = false;
+        public static bool UseSeaquentialLoading = false;
 
         public static ZipMode ZipLoaderMode = ZipMode.ParallelOpenMultiFiles; 
         public enum ZipMode
@@ -44,7 +39,7 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// FileStream ‚ÅŠ®‘S‚È”ñ“¯Šúƒ‚[ƒh‚ğg—p‚·‚éB‚½‚¾‚µƒTƒCƒY‚ª 3MB ˆÈã‚Ìƒtƒ@ƒCƒ‹‚Ì‚İB
+        /// FileStream ã§å®Œå…¨ãªéåŒæœŸãƒ¢ãƒ¼ãƒ‰ã‚’ä½¿ç”¨ã™ã‚‹ã€‚ãŸã ã—ã‚µã‚¤ã‚ºãŒ 3MB ä»¥ä¸Šã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ã¿ã€‚
         /// </summary>
         public static bool UseAsyncModeForFileStreamApi = false;
 
@@ -65,8 +60,10 @@ namespace AnimLite.Utility
                 _ when fullpath.IsZipArchive() || fullpath.IsZipEntry() =>
                     DanceSceneLoader.ZipLoaderMode switch
                     {
-                        ZipMode.Sequential =>
+                        ZipMode.Sequential when DanceSceneLoader.UseSeaquentialLoading =>
                             await fullpath.OpenZipArchiveSequentialAsync(queryString, fallback, ct),
+                        ZipMode.Sequential =>
+                            await fullpath.OpenZipArchiveSequentialConcurrentAsync(queryString, fallback, ct),
                         ZipMode.ParallelOpenSingleFile =>
                             await fullpath.OpenZipArchiveParallelAsync(queryString, fallback, ct),
                         ZipMode.ParallelOpenMultiFiles =>
@@ -89,7 +86,7 @@ namespace AnimLite.Utility
             this PathUnit fullpath, string extensionList)
         {
             if (fullpath.IsResource()) return ("", fullpath, "");
-            // ‚¢‚¸‚êƒAƒZƒbƒgƒoƒ“ƒhƒ‹H“I‚È‚à‚Ì‚ÌƒpƒX‚ğ‚©‚¦‚¹‚é‚æ‚¤‚É‚È‚è‚½‚¢
+            // ã„ãšã‚Œã‚¢ã‚»ãƒƒãƒˆãƒãƒ³ãƒ‰ãƒ«ï¼Ÿçš„ãªã‚‚ã®ã®ãƒ‘ã‚¹ã‚’ã‹ãˆã›ã‚‹ã‚ˆã†ã«ãªã‚ŠãŸã„
 
 
             var (path, queryString) = fullpath.DividToPathAndQueryString();
@@ -105,19 +102,19 @@ namespace AnimLite.Utility
                 .Where(ext => path.Value.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
                 .Any();
 
-            // ƒtƒHƒ‹ƒ_
+            // ãƒ•ã‚©ãƒ«ãƒ€
             if (!isFile)
             {
                 return (fullpath, "", "");
             }
 
-            // ƒtƒ@ƒCƒ‹
+            // ãƒ•ã‚¡ã‚¤ãƒ«
             {
-                // ‰º‹L‚¾‚Æ http://.../xx.xxx ‚Ì‚Æ‚«‚É / ‚ª \ ‚É•Ô‚ç‚ê‚Ä‚µ‚Ü‚¤‚Ì‚Åg‚¦‚È‚¢B‚µ‚©‚à // ‚Í \ ‚É‚È‚é
+                // ä¸‹è¨˜ã ã¨ http://.../xx.xxx ã®ã¨ãã« / ãŒ \ ã«è¿”ã‚‰ã‚Œã¦ã—ã¾ã†ã®ã§ä½¿ãˆãªã„ã€‚ã—ã‹ã‚‚ // ã¯ \ ã«ãªã‚‹
                 //var archivePath = Path.GetDirectoryName(path);
                 //var entryPath = Path.GetFileName(path).ToPath();
 
-                // / ‚Æ \ ‚ª¬İ‚µ‚Ä‚¢‚é‚©‚à’m‚ê‚È‚¢‚Ì‚Å—¼•û‚â‚é
+                // / ã¨ \ ãŒæ··åœ¨ã—ã¦ã„ã‚‹ã‹ã‚‚çŸ¥ã‚Œãªã„ã®ã§ä¸¡æ–¹ã‚„ã‚‹
                 var ix = path.Value.LastIndexOf('/');
                 var iy = path.Value.LastIndexOf('\\');
                 var i = math.max(ix, iy);
@@ -227,13 +224,9 @@ namespace AnimLite.Utility
         public static ValueTask<Order> BuildDanceGraphyOrderAsync(
             this DanceSetJson ds, VmdStreamDataCache cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         =>
-            archive switch
-            {
-                ZipArchiveSequential =>
-                    ds.BuildDanceGraphyOrderSequentialAsync(cache, archive, audioSource, ct),
-                _ =>
-                    ds.BuildDanceGraphyOrderParallelAsync(cache, archive, audioSource, ct),
-            };
+            DanceSceneLoader.UseSeaquentialLoading
+                ? ds.BuildDanceGraphyOrderSequentialAsync(cache, archive, audioSource, ct)
+                : ds.BuildDanceGraphyOrderParallelAsync(cache, archive, audioSource, ct);
 
 
 
@@ -401,7 +394,7 @@ namespace AnimLite.Utility
             return
                 define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
                 ??
-                // animation clip ‚ª face ‚âƒuƒŒƒ“ƒh‚ğ®”õ‚·‚é‚Ü‚Å‚Ìb’è
+                // animation clip ãŒ face ã‚„ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’æ•´å‚™ã™ã‚‹ã¾ã§ã®æš«å®š
                 await define.toMotionOrderAwait(model, ct);
         }
         //static async ValueTask<MotionOrder> buildMotionOrderParallelAsync(
@@ -446,7 +439,7 @@ namespace AnimLite.Utility
             return
                 define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
                 ??
-                // animation clip ‚ª face ‚âƒuƒŒƒ“ƒh‚ğ®”õ‚·‚é‚Ü‚Å‚Ìb’è
+                // animation clip ãŒ face ã‚„ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’æ•´å‚™ã™ã‚‹ã¾ã§ã®æš«å®š
                 await define.toMotionOrderAwait(model, ct);
         }
 
@@ -455,7 +448,7 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ‚Æ‚è‚ ‚¦‚¸‚´‚ñ‚Ä‚¢‚Å stocker ‚ ‚é‚È‚µ‚ÅƒLƒƒƒbƒVƒ…g‚¤‚©Œˆ‚ß‚é
+        /// ã¨ã‚Šã‚ãˆãšã–ã‚“ã¦ã„ã§ stocker ã‚ã‚‹ãªã—ã§ã‚­ãƒ£ãƒƒã‚·ãƒ¥ä½¿ã†ã‹æ±ºã‚ã‚‹
         /// </summary>
         static async ValueTask<Instance<GameObject>?> loadModelAsync(
             this VmdStreamDataCache stocker, PathUnit modelpath, IArchive? archive, CancellationToken ct)
@@ -509,7 +502,7 @@ namespace AnimLite.Utility
         static MotionOrder? toMotionOrder(
             this DanceMotionDefineJson define, VmdStreamData vmddata, VmdFaceMapping facemap, Instance<GameObject>? model)
         =>
-            // animation clip ‚ª face ‚âƒuƒŒƒ“ƒh‚ğ®”õ‚·‚é‚Ü‚Å‚Ìb’è
+            // animation clip ãŒ face ã‚„ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’æ•´å‚™ã™ã‚‹ã¾ã§ã®æš«å®š
             vmddata is not null
             ? new()
             //new()
@@ -535,7 +528,7 @@ namespace AnimLite.Utility
             : null;
             //;
             
-        // animation clip ‚ªƒLƒƒƒbƒVƒ…Aface ‚âƒuƒŒƒ“ƒh‚ğ®”õ‚·‚é‚Ü‚Å‚Ìb’è
+        // animation clip ãŒã‚­ãƒ£ãƒƒã‚·ãƒ¥ã€face ã‚„ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’æ•´å‚™ã™ã‚‹ã¾ã§ã®æš«å®š
         static async ValueTask<MotionOrderWithAnimationClip> toMotionOrderAwait(
             this DanceMotionDefineJson define, Instance<GameObject>? model, CancellationToken ct)
         =>
@@ -544,7 +537,7 @@ namespace AnimLite.Utility
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
 
-                // vmd ƒ[ƒh¸”s‚µ‚Ä‚½‚çAanimation clip ‚ğƒŠƒ\[ƒXƒ[ƒh‚·‚é
+                // vmd ãƒ­ãƒ¼ãƒ‰å¤±æ•—ã—ã¦ãŸã‚‰ã€animation clip ã‚’ãƒªã‚½ãƒ¼ã‚¹ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
                 AnimationClip = await(await define.Animation.AnimationFilePath.Paths
                         .DefaultIfEmpty("".ToPath())
                         .First()
@@ -561,10 +554,10 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// ƒI[ƒfƒBƒIƒNƒŠƒbƒvAƒ‚ƒfƒ‹ƒQ[ƒ€ƒIƒuƒWƒFƒNƒgAƒAƒjƒ[ƒVƒ‡ƒ“ƒXƒgƒŠ[ƒ€ƒf[ƒ^Aƒ{[ƒ“ƒf[ƒ^‚Ì‚¤‚¿A”jŠü‚ª•K—v‚ÈƒŠƒ\[ƒX‚¾‚¯”jŠü‚·‚éB
-        /// ƒ‚ƒfƒ‹‚ÉŠÖ‚µ‚Ä‚ÍAŒ»İƒAƒNƒeƒBƒu‚ÈƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚¾‚¯ Destroy() ‚·‚éB
-        /// ƒ‚ƒfƒ‹ƒXƒgƒbƒN‚É‚æ‚Á‚Ä”ñƒAƒNƒeƒBƒu‚É‚È‚Á‚Ä‚¢‚éê‡‚ÍADestroy() ‚³‚ê‚È‚¢B
-        /// ‚½‚¾‚µADestroy() ‚ª”½‰f‚³‚ê‚éƒ^ƒCƒ~ƒ“ƒO‚É‚Í’ˆÓ‚·‚é‚±‚ÆBi‚¨‚»‚ç‚­ Destory() ‚ÌŸ‚ÌƒtƒŒ[ƒ€‚©‚çj
+        /// ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã‚¯ãƒªãƒƒãƒ—ã€ãƒ¢ãƒ‡ãƒ«ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿ã€ãƒœãƒ¼ãƒ³ãƒ‡ãƒ¼ã‚¿ã®ã†ã¡ã€ç ´æ£„ãŒå¿…è¦ãªãƒªã‚½ãƒ¼ã‚¹ã ã‘ç ´æ£„ã™ã‚‹ã€‚
+        /// ãƒ¢ãƒ‡ãƒ«ã«é–¢ã—ã¦ã¯ã€ç¾åœ¨ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãªã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã ã‘ Destroy() ã™ã‚‹ã€‚
+        /// ãƒ¢ãƒ‡ãƒ«ã‚¹ãƒˆãƒƒã‚¯ã«ã‚ˆã£ã¦éã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã£ã¦ã„ã‚‹å ´åˆã¯ã€Destroy() ã•ã‚Œãªã„ã€‚
+        /// ãŸã ã—ã€Destroy() ãŒåæ˜ ã•ã‚Œã‚‹ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã«ã¯æ³¨æ„ã™ã‚‹ã“ã¨ã€‚ï¼ˆãŠãã‚‰ã Destory() ã®æ¬¡ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã‹ã‚‰ï¼‰
         /// </summary>
         static Func<ValueTask> buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrderBase[] motions) order) =>
             async () =>

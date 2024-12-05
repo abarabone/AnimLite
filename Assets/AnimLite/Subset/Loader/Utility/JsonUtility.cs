@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,28 +13,28 @@ namespace AnimLite.Utility
 {
 
 
-    // ���R���o�[�^�[�o����
-    // reader �̓g�[�N����ǂ݉�������
-    // �I�u�W�F�N�g�� { } �ɂ�����ꂽ���́A�z��� [ ] �ɂ�����ꂽ���́iJsonToken �񋓒l������΂��낢��킩��j
-    // ��������v���~�e�B�u
-    // �I�u�W�F�N�g����������ɉ߂��Ȃ�
-    // .Read() �̓J�[�\����i�߂�
-    // .Value �͌��݂̃g�[�N���𓾂�
-    // serializer.Deserialize(reader) �� reader �ŃI�u�W�F�N�g��v���~�e�B�u��ǂ݉���������������������́i���R�J�[�\���͐i�ށj
-    // �f�V���A���C�Y�̓J�[�\���� { �̈ʒu�ɂ���K�v������A�������� } �̈ʒu�ɂȂ��Ă���
-    // �֐��ɓ����Ă����Ƃ��� { �̈ʒu�ɂȂ��Ă���
+    // ＜コンバーター覚え＞
+    // reader はトークンを読み下すもの
+    // オブジェクトは { } にくくられたもの、配列は [ ] にくくられたもの（JsonToken 列挙値を見ればいろいろわかる）
+    // 文字列もプリミティブ
+    // オブジェクト名も文字列に過ぎない
+    // .Read() はカーソルを進める
+    // .Value は現在のトークンを得る
+    // serializer.Deserialize(reader) は reader でオブジェクトやプリミティブを読み下す処理を自動化するもの（当然カーソルは進む）
+    // デシリアライズはカーソルが { の位置にある必要があり、完了時は } の位置になっている
+    // 関数に入ってきたときは { の位置になっている
 
 
 
 
 
-    // �f�B�N�V���i�����L�[�� PopulateObject() �Ή��ɂ���R���o�[�^�[
-    // �E���C���h�J�[�h���܂ނƂ��́A�P�P�}�b�`���O���ēK������Ώ㏑������
-    // �E _ ����n�܂���͎̂��̉����Ȃ����A�ق��̃x�[�X�ɂ͂Ȃ肦��i���̎��͖��O���� _ �����O���ă}�b�`���O����j
-    // �E�܂��A���C���h�J�[�h���܂߂����̂̓}�b�`������̂��ׂẴx�[�X�ɂȂ肤��
-    // �E_ �͑��� _ �̃x�[�X�ɂ��Ȃ肤��
-    // �E�������O���ɂ�����̂̂݁i����܂łɎ��������ꂽ���̂Ƃ������Ɓj
-    // �E�����}�b�`����ꍇ�͍Ō�Ƀ}�b�`������̂��̗p����
+    // ディクショナリ同キーで PopulateObject() 対応にするコンバーター
+    // ・ワイルドカードを含むときは、１つ１つマッチングして適合すれば上書きする
+    // ・ _ から始まるものは実体化しないが、ほかのベースにはなりえる（その時は名前から _ を除外してマッチングする）
+    // ・また、ワイルドカードを含めたものはマッチするものすべてのベースになりうる
+    // ・_ は他の _ のベースにもなりうる
+    // ・ただし前方にあるもののみ（それまでに辞書化されたものということ）
+    // ・複数マッチする場合は最後にマッチするものを採用する
     public class DictionaryPopulativeConverter<TValue> : JsonConverter<Dictionary<string, TValue>>
         where TValue : class
     {
@@ -55,7 +55,7 @@ namespace AnimLite.Utility
             void deserialize_normal_entries_()
             {
                 var basekeys = new List<string>();
-                // ���L�͉��n�ɂȂ��� dance scene ���x�[�X�ɍ̗p����ꍇ�B�킩��ɂ����̂ł�߂�B�i����t�@�C�����ł̂ݏ㏑���E�x�[�X���s���Ƃ���j
+                // 下記は下地になった dance scene もベースに採用する場合。わかりにくいのでやめる。（同一ファイル内でのみ上書き・ベースを行うとする）
                 //var basekeys = dictionary.Keys
                 //    .Where(x => is_basekey_(x))
                 //    .Select(x => x)
@@ -240,10 +240,10 @@ namespace AnimLite.Utility
         }
     }
 
-    // ���O�t���z�񂪂ق������߂ɁA�킴�킴�������g���̂����ʂ��ȂƎv���A
-    // �L�[�o�����[�y�A�̔z�񂩂玫���Ɠ��� json �������o���R���o�[�^���l�������A
-    // ���� JObject �Ȃǂ̓����I�u�W�F�N�g�Ŏ������g���Ă����Ȃ��ƂɋC�Â��A�����ł�����c�ƂȂ���
-    // �n�b�V���e�[�u���A���S���Y���I�ɂ́A���������L�[�̔{�̃G���g�����m�ۂ��ďՓ˂�h���ł���悤�Ȃ̂ŁA����Ȃɖ��ʂɂ͊m�ۂ��Ȃ��͂�
+    // 名前付き配列がほしいために、わざわざ辞書を使うのも無駄だなと思い、
+    // キーバリューペアの配列から辞書と同じ json を書き出すコンバータも考えたが、
+    // 結局 JObject などの内部オブジェクトで辞書を使ってそうなことに気づき、辞書でいいや…となった
+    // ハッシュテーブルアルゴリズム的には、だいたいキーの倍のエントリを確保して衝突を防いでいるようなので、そんなに無駄には確保しないはず
     //public class KeyValuePairConverter<TKey, TValue> : JsonConverter<KeyValuePair<TKey, TValue>[]>
     //{
     //    public override void WriteJson(
@@ -280,7 +280,7 @@ namespace AnimLite.Utility
     //            }
     //        }
 
-    //        // existingValue �ɑ��݂��邪 keyValuePairs �ɂ͑��݂��Ȃ��L�[��ǉ�
+    //        // existingValue に存在するが keyValuePairs には存在しないキーを追加
     //        foreach (var kvp in existingValue!)
     //        {
     //            if (!keyValuePairs.Exists(pair => pair.Key!.Equals(kvp.Key)))
@@ -294,7 +294,7 @@ namespace AnimLite.Utility
     //}
 
 
-    // �Ȃ��Ԃ̃G���g���m�F�֐�
+    // ないぶのエントリ確認関数
     //static int GetCapacity<TKey, TValue>(this Dictionary<TKey, TValue> dictionary)
     //{
     //    FieldInfo fieldInfo = typeof(Dictionary<TKey, TValue>).GetField("entries", BindingFlags.NonPublic | BindingFlags.Instance);

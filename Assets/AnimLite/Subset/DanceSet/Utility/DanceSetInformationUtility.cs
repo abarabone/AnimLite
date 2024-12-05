@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,8 +69,8 @@ namespace AnimLite.DancePlayable
         {
             if (vrm.IsUnityNull()) return new InformationDefine
             {
-                Caption = "•s–¾",
-                Author = "•s–¾",
+                Caption = "ä¸æ˜",
+                Author = "ä¸æ˜",
             };
 
             var info = vrm!.Vrm.Meta;
@@ -78,7 +78,7 @@ namespace AnimLite.DancePlayable
             return new InformationDefine
             {
                 Caption = info.Name != "" ? info.Name : Path.GetFileNameWithoutExtension(md.ModelFilePath),
-                Author = string.Join("/", info.Authors.FirstOrDefault() ?? "ìÒ•s–¾"),
+                Author = string.Join("/", info.Authors.FirstOrDefault() ?? "ä½œè€…ä¸æ˜"),
                 Description = info.CopyrightInformation ?? "",
                 Url = info.ContactInformation ?? "",
             };
@@ -88,14 +88,14 @@ namespace AnimLite.DancePlayable
         {
             if (order.IsMotionBlank) return new InformationDefine
             {
-                Caption = "•s–¾",
-                Author = "ìÒ•s–¾",
+                Caption = "ä¸æ˜",
+                Author = "ä½œè€…ä¸æ˜",
             };
 
             return new InformationDefine
             {
                 Caption = Path.GetFileNameWithoutExtension(ad.AnimationFilePath.Paths.First()),
-                Author = "ìÒ•s–¾",
+                Author = "ä½œè€…ä¸æ˜",
                 Description = "",
                 Url = "",
             };
@@ -105,14 +105,14 @@ namespace AnimLite.DancePlayable
         {
             if (clip.IsUnityNull()) return new InformationDefine
             {
-                //Caption = "•s–¾",
-                //Author = "ìÒ•s–¾",
+                //Caption = "ä¸æ˜",
+                //Author = "ä½œè€…ä¸æ˜",
             };
 
             return new InformationDefine
             {
                 Caption = clip.name != "" ? clip.name : Path.GetFileNameWithoutExtension(ad.AudioFilePath),
-                Author = "ìÒ•s–¾",
+                Author = "ä½œè€…ä¸æ˜",
                 Description = "",
                 Url = "",
             };

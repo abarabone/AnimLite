@@ -1,12 +1,12 @@
-using System;
+ï»¿using System;
 
 namespace AnimLite
 {
 
 
     /// <summary>
-    /// ƒXƒgƒŠ[ƒ€‚ÉŠÖ‚·‚éƒf[ƒ^‚ğƒZƒbƒg‚É‚µ‚½\‘¢‘Ì
-    /// E‰ñ“]AˆÊ’uA•\îA‚²‚Æ‚Éì¬‚µ‚Äg—p‚·‚é
+    /// ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«é–¢ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆã«ã—ãŸæ§‹é€ ä½“
+    /// ãƒ»å›è»¢ã€ä½ç½®ã€è¡¨æƒ…ã€ã”ã¨ã«ä½œæˆã—ã¦ä½¿ç”¨ã™ã‚‹
     /// </summary>
     public struct StreamData<T> : IDisposable
         where T : unmanaged

@@ -1,4 +1,4 @@
-using AnimLite.DancePlayable;
+ï»¿using AnimLite.DancePlayable;
 using AnimLite.Vmd;
 using System;
 using System.Collections;
@@ -49,8 +49,8 @@ namespace AnimLite.Utility
                             await archive.GetEntryAsync(entrypath, s => DeserializeJsonAsync<T>(s, prevjson), ct),
                         _ =>
                             await archive.FindFirstEntryAsync(".json", s => DeserializeJsonAsync<T>(s, prevjson), ct),
-                        // .json ‚¾‚¯‚Í .zip ©‘Ì‚Ì entry path ‚ğQÆ‚·‚éB
-                        // ‘¼‚ÌƒƒfƒBƒA‚Å‚Í .json ‚É‹L‚³‚ê‚½ƒpƒX‚ğ entry path ‚Æ‰ğß‚·‚éB
+                        // .json ã ã‘ã¯ .zip è‡ªä½“ã® entry path ã‚’å‚ç…§ã™ã‚‹ã€‚
+                        // ä»–ã®ãƒ¡ãƒ‡ã‚£ã‚¢ã§ã¯ .json ã«è¨˜ã•ã‚ŒãŸãƒ‘ã‚¹ã‚’ entry path ã¨è§£é‡ˆã™ã‚‹ã€‚
                     });
 
                 if (json is not null)
@@ -64,7 +64,7 @@ namespace AnimLite.Utility
         }
 
         /// <summary>
-        /// ds ‚ğ“n‚³‚È‚¢ƒo[ƒWƒ‡ƒ“ 
+        /// ds ã‚’æ¸¡ã•ãªã„ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 
         /// </summary>
         public static ValueTask<T> LoadJsonAsync<T>(
             this IArchive archive, PathUnit path, CancellationToken ct) where T:new() =>
@@ -121,7 +121,7 @@ namespace AnimLite.Utility
         }
 
 
-        // System.Text.Json ‚ªˆê”Ê“I‚É‚È‚Á‚½‚ç•ÏX‚µ‚æ‚¤AƒRƒƒ“ƒg‚Æ‚©ƒfƒtƒHƒ‹ƒg’l‚Æ‚©
+        // System.Text.Json ãŒä¸€èˆ¬çš„ã«ãªã£ãŸã‚‰å¤‰æ›´ã—ã‚ˆã†ã€ã‚³ãƒ¡ãƒ³ãƒˆã¨ã‹ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã¨ã‹
         //static JsonSerializerOptions jsonOptions;
         //JsonLoader()
         //{

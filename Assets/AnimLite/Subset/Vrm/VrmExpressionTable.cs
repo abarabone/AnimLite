@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 
 namespace AnimLite.Vrm
 {
@@ -8,8 +8,8 @@ namespace AnimLite.Vrm
     {
 
         /// <summary>
-        /// ‚u‚q‚l•\î–¼‚Æ‚h‚c‚Ì‘Î‰•\B
-        /// ‚u‚q‚lƒo[ƒWƒ‡ƒ“ 0.x ‚Æ 1.x ‚Ì•\î–¼‚©‚çA1.x ‚Ì•\î‚h‚c‚ğæ“¾‚·‚éB 
+        /// ï¼¶ï¼²ï¼­è¡¨æƒ…åã¨ï¼©ï¼¤ã®å¯¾å¿œè¡¨ã€‚
+        /// ï¼¶ï¼²ï¼­ãƒãƒ¼ã‚¸ãƒ§ãƒ³ 0.x ã¨ 1.x ã®è¡¨æƒ…åã‹ã‚‰ã€1.x ã®è¡¨æƒ…ï¼©ï¼¤ã‚’å–å¾—ã™ã‚‹ã€‚ 
         /// </summary>
         public static Dictionary<VrmExpressionName, UniVRM10.ExpressionKey> FaceNameToExpressionId = new()
         {

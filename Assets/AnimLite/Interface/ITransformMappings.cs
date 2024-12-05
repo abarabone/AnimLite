@@ -1,4 +1,4 @@
-namespace AnimLite
+﻿namespace AnimLite
 {
     public interface ITransformMappings<TTf>
         where TTf : ITransformProxy

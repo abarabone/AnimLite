@@ -1,4 +1,4 @@
-using Unity.Mathematics;
+ï»¿using Unity.Mathematics;
 //using System.Diagnostics;
 //using UnityEngine.WSA;
 
@@ -42,7 +42,7 @@ namespace AnimLite
     public struct Loop : IKeyClipper
     {
 
-        int freq;// ‘S’·‚æ‚è‚àƒXƒgƒŠ[ƒ€’·‚ª’Z‚©‚Á‚½ê‡‚ÉAæ“ªƒL[‚ÌŠÔ‚ğŸƒ‹[ƒv‚Æ‚µ‚Ä•â³‚·‚é‚½‚ß‚É•K—v
+        int freq;// å…¨é•·ã‚ˆã‚Šã‚‚ã‚¹ãƒˆãƒªãƒ¼ãƒ é•·ãŒçŸ­ã‹ã£ãŸå ´åˆã«ã€å…ˆé ­ã‚­ãƒ¼ã®æ™‚é–“ã‚’æ¬¡ãƒ«ãƒ¼ãƒ—ã¨ã—ã¦è£œæ­£ã™ã‚‹ãŸã‚ã«å¿…è¦
 
         float offsetTime;
         float totalTime;

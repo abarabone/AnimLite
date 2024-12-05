@@ -1,4 +1,4 @@
-using System.Linq;
+ï»¿using System.Linq;
 using Unity.Mathematics;
 
 namespace AnimLite
@@ -30,8 +30,8 @@ namespace AnimLite
 
 
         /// <summary>
-        /// Œ»İ‚Ì‚ğXV‚·‚éB
-        /// ‚½‚¾‚µA0 ˆÈã‚ÉƒNƒŠƒbƒsƒ“ƒO‚³‚ê‚éB
+        /// ç¾åœ¨ã®æ™‚åˆ»ã‚’æ›´æ–°ã™ã‚‹ã€‚
+        /// ãŸã ã—ã€0 ä»¥ä¸Šã«ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã‚‹ã€‚
         /// </summary>
         public void ProceedTime(float deltaTime)
         {
@@ -42,8 +42,8 @@ namespace AnimLite
         }
 
         /// <summary>
-        /// Œ»İ‚Ì‚ğXV‚·‚éB
-        /// ‚½‚¾‚µA0 ˆÈã‚ÉƒNƒŠƒbƒsƒ“ƒO‚³‚ê‚éB
+        /// ç¾åœ¨ã®æ™‚åˆ»ã‚’æ›´æ–°ã™ã‚‹ã€‚
+        /// ãŸã ã—ã€0 ä»¥ä¸Šã«ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã‚‹ã€‚
         /// </summary>
         public void UpdateTime(float currentTime)
         {

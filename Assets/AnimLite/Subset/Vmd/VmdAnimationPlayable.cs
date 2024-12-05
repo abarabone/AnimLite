@@ -1,4 +1,4 @@
-using Unity.Burst;
+ï»¿using Unity.Burst;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -92,7 +92,7 @@ namespace AnimLite.Vmd
         //        //var angle = math.acos(drot.value.w);// acos(dot(rot, ident))
         //        //var sin = math.sin(angle);
         //        //var axis = math.normalize(drot.value.As_float3());// * math.rcp(sin);
-        //        drot.AsQuaternion().ToAngleAxis(out var angle, out var axis);// math g—p‚É‚È‚¨‚µ‚½‚¢
+        //        drot.AsQuaternion().ToAngleAxis(out var angle, out var axis);// math ä½¿ç”¨ã«ãªãŠã—ãŸã„
         //        angle = math.degrees(angle);
 
 
@@ -172,7 +172,7 @@ namespace AnimLite.Vmd
                 _ => getUseIk_(),
             };
 
-            anim.BindStreamTransform(anim.transform);// ƒoƒCƒ“ƒh‚µ‚È‚¢‚Æ rootMotionPosition ‚ªæ“¾‚Å‚«‚È‚¢—lq
+            anim.BindStreamTransform(anim.transform);// ãƒã‚¤ãƒ³ãƒ‰ã—ãªã„ã¨ rootMotionPosition ãŒå–å¾—ã§ããªã„æ§˜å­
 
             return new VmdAnimationJob<TPFinder, TRFinder>
             {
@@ -193,13 +193,13 @@ namespace AnimLite.Vmd
 
             (bool pos, bool rot) getUseIk_()
             {
-                var kneeRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.¶‚Ğ‚´].length;
-                var ankleRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.¶‘«ñ].length;
-                var footIkLengthL = pkf.Streams.Sections[(int)MmdBodyBones.¶‘«‚h‚j].length;
+                var kneeRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.å·¦ã²ã–].length;
+                var ankleRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.å·¦è¶³é¦–].length;
+                var footIkLengthL = pkf.Streams.Sections[(int)MmdBodyBones.å·¦è¶³ï¼©ï¼«].length;
 
-                var kneeRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.‰E‚Ğ‚´].length;
-                var ankleRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.‰E‘«ñ].length;
-                var footIkLengthR = pkf.Streams.Sections[(int)MmdBodyBones.‰E‘«‚h‚j].length;
+                var kneeRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.å³ã²ã–].length;
+                var ankleRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.å³è¶³é¦–].length;
+                var footIkLengthR = pkf.Streams.Sections[(int)MmdBodyBones.å³è¶³ï¼©ï¼«].length;
 
                 var usePosIk1 =
                     kneeRotLengthL < 3 & footIkLengthL > 2

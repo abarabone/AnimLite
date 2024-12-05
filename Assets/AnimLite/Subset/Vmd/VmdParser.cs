@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
@@ -21,8 +21,8 @@ namespace AnimLite.Vmd
     {
 
         /// <summary>
-        /// ’Ç‰Á‚·‚é
-        /// “¯‚¶ƒL[‚ª‚ ‚ê‚Î appenddata ‚Åã‘‚«‚·‚é
+        /// è¿½åŠ ã™ã‚‹
+        /// åŒã˜ã‚­ãƒ¼ãŒã‚ã‚Œã° appenddata ã§ä¸Šæ›¸ãã™ã‚‹
         /// </summary>
         public static VmdMotionData AppendOrOverwrite(this VmdMotionData basedata, VmdMotionData appenddata)
         {
@@ -188,7 +188,7 @@ namespace AnimLite.Vmd
             return q
                 .ToLookup(x => x.bonename, x => x.key)
                 //.Do(x => Debug.Log($"{x.Key.name} {x.Count()}"))
-                //.Do(x => { if (x.Key.name.EndsWith("‚h‚j") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
+                //.Do(x => { if (x.Key.name.EndsWith("ï¼©ï¼«") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
                 .ToDictionary(x => x.Key, x =>
                     x.OrderBy(x => x.time)
                     .ToArray())
@@ -222,7 +222,7 @@ namespace AnimLite.Vmd
             return q
                 .ToLookup(x => x.facename, x => x.key)
                 //.Do(x => Debug.Log($"{x.Key.name} {x.Count()}"))
-                //.Do(x => { if (x.Key.name.EndsWith("‚h‚j") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
+                //.Do(x => { if (x.Key.name.EndsWith("ï¼©ï¼«") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
                 .ToDictionary(x => x.Key, x =>
                     x.OrderBy(x => x.time)
                     .ToArray())
@@ -269,7 +269,7 @@ namespace AnimLite.Vmd
 
             return q
                 //.Do(x => Debug.Log($"{x.Key.name} {x.Count()}"))
-                //.Do(x => { if (x.Key.name.EndsWith("‚h‚j") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
+                //.Do(x => { if (x.Key.name.EndsWith("ï¼©ï¼«") || x.Key.name.EndsWith("IK")) Debug.Log($"{x.Key.name} {x.Count()}"); })
                 .ToArray()
                 ;
         }

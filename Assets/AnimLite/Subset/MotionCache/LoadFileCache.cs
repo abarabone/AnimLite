@@ -1,4 +1,4 @@
-
+ï»¿
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -45,7 +45,7 @@ namespace AnimLite.Vmd
             "created load file cache".ShowDebugLog();
         }
 
-        // Œ»óA‘¼‚©‚ç‚ÍŒÄ‚Î‚ê‚Ä‚È‚¢‚Í‚¸
+        // ç¾çŠ¶ã€ä»–ã‹ã‚‰ã¯å‘¼ã°ã‚Œã¦ãªã„ã¯ãš
         //[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Dispose()
         {
@@ -79,7 +79,7 @@ namespace AnimLite.Vmd
 
 
         /// <summary>
-        /// ƒNƒGƒŠƒXƒgƒŠƒ“ƒO‚ª‚Â‚¢‚Ä‚Ä‚à‚æ‚¢AƒA[ƒJƒCƒu‚ÌƒGƒ“ƒgƒŠ[‚Å‚à‚æ‚¢
+        /// ã‚¯ã‚¨ãƒªã‚¹ãƒˆãƒªãƒ³ã‚°ãŒã¤ã„ã¦ã¦ã‚‚ã‚ˆã„ã€ã‚¢ãƒ¼ã‚«ã‚¤ãƒ–ã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã§ã‚‚ã‚ˆã„
         /// </summary>
         public async Task<PathUnit> GetCachePathAsync(PathUnit srcpath, Stream stream, CancellationToken ct)
         {

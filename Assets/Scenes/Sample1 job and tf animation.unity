@@ -298,6 +298,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AliciaSolid (3)
       objectReference: {fileID: 0}
+    - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 148318917828882914, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_DirtyAABB
       value: 0
@@ -935,6 +939,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: AliciaSolid (0)
       objectReference: {fileID: 0}
+    - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 148318917828882914, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_DirtyAABB
       value: 0
@@ -1337,6 +1345,10 @@ PrefabInstance:
     - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_Name
       value: AliciaSolid (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 148318917828882914, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_DirtyAABB
@@ -1790,6 +1802,10 @@ PrefabInstance:
     - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_Name
       value: AliciaSolid (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: -1728013695380148634, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 148318917828882914, guid: b1491baa4e56fdd4b91dcce686da4420, type: 3}
       propertyPath: m_DirtyAABB

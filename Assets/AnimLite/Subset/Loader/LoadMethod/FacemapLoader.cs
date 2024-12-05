@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,14 +30,14 @@ namespace AnimLite.Utility
     //using AnimLite.Vmd;
 
     // todo
-    // ƒŠƒ\[ƒXAgameobject ‚Åƒ[ƒh‚Å‚«‚È‚©‚Á‚½‚ç .vrm ‚Åƒ[ƒh‚·‚é
+    // ãƒªã‚½ãƒ¼ã‚¹æ™‚ã€gameobject ã§ãƒ­ãƒ¼ãƒ‰ã§ããªã‹ã£ãŸã‚‰ .vrm ã§ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
 
 
     public static partial class VrmLoader
     {
 
         /// <summary>
-        /// ƒfƒtƒHƒ‹ƒg‚Ì facemap ‚ğ•Ô‚·B
+        /// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã® facemap ã‚’è¿”ã™ã€‚
         /// </summary>
         public static AsyncLazy<VmdFaceMapping> DefaultFacemampAsync { get; } =
             new AsyncLazy<VmdFaceMapping>(async () =>
@@ -89,9 +89,9 @@ namespace AnimLite.Utility
 
 
         /// <summary>
-        /// path ‚ªƒuƒ‰ƒ“ƒN c ƒfƒtƒHƒ‹ƒgƒŠƒ\[ƒXi‘¶İ‚µ‚È‚¯‚ê‚Î default ‚ª•Ô‚éj
-        /// as resourse     c ƒŠƒ\[ƒX
-        /// ‚»‚Ì‘¼          c ƒtƒ@ƒCƒ‹ or http
+        /// path ãŒãƒ–ãƒ©ãƒ³ã‚¯ â€¦ ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒªã‚½ãƒ¼ã‚¹ï¼ˆå­˜åœ¨ã—ãªã‘ã‚Œã° default ãŒè¿”ã‚‹ï¼‰
+        /// as resourse     â€¦ ãƒªã‚½ãƒ¼ã‚¹
+        /// ãã®ä»–          â€¦ ãƒ•ã‚¡ã‚¤ãƒ« or http
         /// </summary>
         public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>

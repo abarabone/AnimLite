@@ -1,4 +1,4 @@
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -46,16 +46,16 @@ namespace AnimLite.Vmd
             where TTf : ITransformProxy
         {
 
-            // humanoid �̏����|�[�Y�̒��S�� root �ɗ���悤�ŁA���̂��ʒu�͂��Ԃ� 1m * humanScale 
-            // �Ȃ̂Ŏd���Ȃ� hip �̈ʒu�� humanScale �Ō��ɖ߂����߂ɁA�����Őݒ肷��B
+            // humanoid の初期ポーズの中心が root に来るようで、そのｙ位置はたぶん 1m * humanScale 
+            // なので仕方なく hip の位置を humanScale で元に戻すために、ここで設定する。
             //var bodyInitialOffset = Vector3.up.As_float3() * anim.humanScale;
-            // ����L�̂悤�ɍl���Ă������A�ǂ��� hip �̍����ƍl���Ă悢�炵���B�Ȃ̂ŁA���L�̂悤�ɂ���B
+            // ↑上記のように考えていたが、どうも hip の高さと考えてよいらしい。なので、下記のようにする。
 
-            // mmd �� humanoid �̃X�P�[���� 80cm : 100cm ���炢
-            // 158cm �̃~�N�̌҈ʒu�����̂��炢�Ǝv����
-            // humanoid �� humanscale 1m �́Ahip �̈ʒu�炵���Ƃ̂���
+            // mmd と humanoid のスケール比 80cm : 100cm くらい
+            // 158cm のミクの股位置がそのくらいと思われる
+            // humanoid の humanscale 1m は、hip の位置らしいとのこと
             var bodyScale_ = bodyScale == 0
-                ? anim.humanScale * 0.8f// 0.8 �́A�~�N �� humaoid �␳
+                ? anim.humanScale * 0.8f// 0.8 は、ミク → humaoid 補正
                 : bodyScale * 0.8f;
 
             return new VmdBodyMotionOperator<TBone, TTf>
@@ -71,8 +71,8 @@ namespace AnimLite.Vmd
 
     }
 
-    // �l�l�c�̈ړ��f�[�^�́A�{�[���̃I�t�Z�b�g�͏������l���i�[����Ă���悤�Ɏv���B
-    // �Ȃ̂ŁA�Z���^�[ �� �����g �܂ł̍����́A�ړ��f�[�^�ɂ͔��f����Ă��Ȃ��ƍl����B
-    // �܂�A���ΓI�ړ��ʂ݂̂��f�[�^�ƂȂ��Ă���Aroot �ʒu�͑����̂܂܈ړ�������΂悢�A�ƍl����B
+    // ＭＭＤの移動データは、ボーンのオフセットは除いた値が格納されているように思う。
+    // なので、センター → 下半身 までの高さは、移動データには反映されていないと考える。
+    // つまり、相対的移動量のみがデータとなっており、root 位置は足元のまま移動させればよい、と考える。
 
 }

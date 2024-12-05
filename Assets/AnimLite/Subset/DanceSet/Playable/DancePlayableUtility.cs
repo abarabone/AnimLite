@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Audio;
 using UnityEngine.Playables;
@@ -19,15 +19,15 @@ namespace AnimLite.DancePlayable
     {
 
         /// <summary>
-        /// ’Pˆê‚Ì‚u‚l‚cƒ{ƒfƒBƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚é playable ƒOƒ‰ƒt‚ğì¬‚·‚éB
-        /// Ä¶‚Í Job ‚ğg—p‚·‚éBJob ‚Í playable ‚©‚ç‚È‚Ç‚Ìî•ñ‚ğ’¼Ú“I‚Éæ“¾‚Å‚«‚È‚¢‚Ì‚ÅA
-        /// •â•‚Æ‚µ‚ÄŠÔ‚ğXV‚·‚é playable ‚àì¬‚·‚éB
+        /// å˜ä¸€ã®ï¼¶ï¼­ï¼¤ãƒœãƒ‡ã‚£ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿã™ã‚‹ playable ã‚°ãƒ©ãƒ•ã‚’ä½œæˆã™ã‚‹ã€‚
+        /// å†ç”Ÿã¯ Job ã‚’ä½¿ç”¨ã™ã‚‹ã€‚Job ã¯ playable ã‹ã‚‰æ™‚åˆ»ãªã©ã®æƒ…å ±ã‚’ç›´æ¥çš„ã«å–å¾—ã§ããªã„ã®ã§ã€
+        /// è£œåŠ©ã¨ã—ã¦æ™‚é–“ã‚’æ›´æ–°ã™ã‚‹ playable ã‚‚ä½œæˆã™ã‚‹ã€‚
         /// </summary>
         public static void CreateVmdAnimationJobWithSyncScript<TJob>(
             this PlayableGraph graph,
             Animator anim, TJob job, StreamingTimer timer, float delay = 0, VmdFootIkMode footIkMode = VmdFootIkMode.auto)
                 where TJob : struct, IAnimationJob, IVmdAnimationJob
-            // •Ï”‚Å“n‚³‚ê‚½ job ‚ÍAƒWƒFƒlƒŠƒNƒX‚Ìê‡ burst ƒRƒ“ƒpƒCƒ‹‚É¸”s‚·‚é‚Æ‚©‘‚¢‚Ä‚ ‚Á‚½‹C‚ª‚µ‚½‚¯‚ÇA‘åä•v‚¾‚Á‚½
+            // å¤‰æ•°ã§æ¸¡ã•ã‚ŒãŸ job ã¯ã€ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹ã®å ´åˆ burst ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã«å¤±æ•—ã™ã‚‹ã¨ã‹æ›¸ã„ã¦ã‚ã£ãŸæ°—ãŒã—ãŸã‘ã©ã€å¤§ä¸ˆå¤«ã ã£ãŸ
         {
             if (anim.IsUnityNull()) return;
             var name_anim = $"{anim.name} Body Animator";
@@ -64,7 +64,7 @@ namespace AnimLite.DancePlayable
         }
 
         /// <summary>
-        /// ’Pˆê‚Ì‚u‚l‚cƒtƒFƒCƒXƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚é playable ƒOƒ‰ƒt‚ğì¬‚·‚éB
+        /// å˜ä¸€ã®ï¼¶ï¼­ï¼¤ãƒ•ã‚§ã‚¤ã‚¹ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿã™ã‚‹ playable ã‚°ãƒ©ãƒ•ã‚’ä½œæˆã™ã‚‹ã€‚
         /// </summary>
         public static void CreateVmdFaceAnimation(
             this PlayableGraph graph,
@@ -91,7 +91,7 @@ namespace AnimLite.DancePlayable
         }
 
         /// <summary>
-        /// ’Pˆê‚ÌƒAƒjƒ[ƒVƒ‡ƒ“ƒNƒŠƒbƒv‚ğÄ¶‚·‚é playable ƒOƒ‰ƒt‚ğì¬‚·‚éB
+        /// å˜ä¸€ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã‚¯ãƒªãƒƒãƒ—ã‚’å†ç”Ÿã™ã‚‹ playable ã‚°ãƒ©ãƒ•ã‚’ä½œæˆã™ã‚‹ã€‚
         /// </summary>
         public static void CreateClipAnimation(
             this PlayableGraph graph,
@@ -120,7 +120,7 @@ namespace AnimLite.DancePlayable
         }
 
         /// <summary>
-        /// ƒI[ƒfƒBƒIƒNƒŠƒbƒv‚ğÄ¶‚·‚é playable ƒOƒ‰ƒt‚ğì¬‚·‚éB
+        /// ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã‚¯ãƒªãƒƒãƒ—ã‚’å†ç”Ÿã™ã‚‹ playable ã‚°ãƒ©ãƒ•ã‚’ä½œæˆã™ã‚‹ã€‚
         /// </summary>
         public static void CreateAudio(
             this PlayableGraph graph,
@@ -157,7 +157,7 @@ namespace AnimLite.DancePlayable
             graph.Connect(playable_audio, 0, playable_reseter, 0);
             output.SetSourcePlayable(playable_reseter, 0);
 
-            //output.SetEvaluateOnSeek(true);// ‚È‚ñ‚¾‚ë‚¤‚±‚ê
+            //output.SetEvaluateOnSeek(true);// ãªã‚“ã ã‚ã†ã“ã‚Œ
         }
 
 

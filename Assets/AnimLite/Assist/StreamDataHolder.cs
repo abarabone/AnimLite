@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace AnimLite
 {
@@ -30,7 +30,7 @@ namespace AnimLite
 
 
 
-        // �ϊ� --------------------------------
+        // 変換 --------------------------------
 
         public KeyFinder<T, TKey, TClip, TProcedure, TCache, TIndex> ToKeyFinderWith<TKey, TClip, TProcedure>(StreamingTimer timer)
             where TKey : struct, IKey<T>, IKeyWithCache<TCache>, IKeyInterpolative<T>, IKeyCursor

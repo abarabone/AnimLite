@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +31,7 @@ namespace AnimLite.Utility
     using UniGLTF;
 
     // todo
-    // ƒŠƒ\[ƒXAgameobject ‚Åƒ[ƒh‚Å‚«‚È‚©‚Á‚½‚ç .vrm ‚Åƒ[ƒh‚·‚é
+    // ãƒªã‚½ãƒ¼ã‚¹æ™‚ã€gameobject ã§ãƒ­ãƒ¼ãƒ‰ã§ããªã‹ã£ãŸã‚‰ .vrm ã§ãƒ­ãƒ¼ãƒ‰ã™ã‚‹
 
 
     public static partial class VrmLoader
@@ -135,7 +135,7 @@ namespace AnimLite.Utility
         static async ValueTask<GameObject> convertGlbToModelAsync(this Stream s, CancellationToken ct)
         {
 
-            if (s.CanSeek)// ‚à‚Á‚Æ‚¤‚Ü‚¢‚±‚Æ‚Å‚«‚È‚¢‚©‚È‚Ÿc
+            if (s.CanSeek)// ã‚‚ã£ã¨ã†ã¾ã„ã“ã¨ã§ããªã„ã‹ãªãâ€¦
             {
                 return await convert_(s);
             }
@@ -185,7 +185,7 @@ namespace AnimLite.Utility
         static async ValueTask<GameObject> convertVrmToModelAsync(this Stream s, CancellationToken ct)
         {
 
-            if (s.CanSeek)// ‚à‚Á‚Æ‚¤‚Ü‚¢‚±‚Æ‚Å‚«‚È‚¢‚©‚È‚Ÿc
+            if (s.CanSeek)// ã‚‚ã£ã¨ã†ã¾ã„ã“ã¨ã§ããªã„ã‹ãªãâ€¦
             {
                 return await convert_(s);
             }
@@ -211,7 +211,7 @@ namespace AnimLite.Utility
             }
         }
 
-        // ƒvƒŒƒnƒuƒŠƒ\[ƒX‚ğ•Ô‚·
+        // ãƒ—ãƒ¬ãƒãƒ–ãƒªã‚½ãƒ¼ã‚¹ã‚’è¿”ã™
         static async ValueTask<GameObject> loadModelFromResourceAsync(this ResourceName name, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();

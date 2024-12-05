@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ‚Ì‚½‚ß
+using UnityEngine.Scripting;// [Preserve] ã®ãŸã‚
 using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
@@ -36,7 +36,7 @@ namespace AnimLite.Utility
         public static async ValueTask ReleaseOnMainThreadAsync<T>(this T asset) where T : UnityEngine.Object
         {
             await Awaitable.MainThreadAsync();
-            Addressables.Release(asset);        // ‚à‚µ‚©‚µ‚½‚çƒƒCƒ“ƒXƒŒƒbƒh‚¶‚á‚È‚­‚Ä‚à‚¢‚¢‚Ì‚©‚à
+            Addressables.Release(asset);        // ã‚‚ã—ã‹ã—ãŸã‚‰ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ã˜ã‚ƒãªãã¦ã‚‚ã„ã„ã®ã‹ã‚‚
         }
 
 
@@ -109,7 +109,7 @@ namespace AnimLite.Utility
 
 
     ///// <summary>
-    ///// Addressable ‚Åƒ[ƒh‚µ‚½ƒŠƒ\[ƒX‚ğ .Dispose() ‚ÅŠÇ—‚Å‚«‚é‚æ‚¤‚É‚·‚é
+    ///// Addressable ã§ãƒ­ãƒ¼ãƒ‰ã—ãŸãƒªã‚½ãƒ¼ã‚¹ã‚’ .Dispose() ã§ç®¡ç†ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
     ///// </summary>
     ///// <typeparam name="T"></typeparam>
     //public struct DisposbleWrapperForAddressables<T> : IDisposable
@@ -131,7 +131,7 @@ namespace AnimLite.Utility
     //            asset = asset,
     //        };
 
-    //    // •‰‰×‚æ‚è‚à‘‚«–¡‚ğ—Dæ‚·‚é—p
+    //    // è² è·ã‚ˆã‚Šã‚‚æ›¸ãå‘³ã‚’å„ªå…ˆã™ã‚‹ç”¨
     //    public static async ValueTask<DisposbleWrapperForAddressables<T>> AsDisposableAsync<T>(this Task<T> assetAsync)
     //        where T : UnityEngine.Object
     //    {

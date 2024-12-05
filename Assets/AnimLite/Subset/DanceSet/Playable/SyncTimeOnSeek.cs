@@ -1,15 +1,15 @@
-using UnityEngine.Playables;
+ï»¿using UnityEngine.Playables;
 using UnityEngine;
 
 namespace AnimLite.DancePlayable
 {
 
     /// <summary>
-    /// ‰º‹LğŒ‚ÅAÄ¶‚ğ‘£‚·iƒTƒEƒ“ƒh‚È‚ÇA©“®“I‚ÉƒV[ƒN‚ª”½‰f‚³‚ê‚È‚¢‚à‚Ì‚É“­‚«‚©‚¯‚ÄÄ¶‚ğ‘£‚·j
-    /// EƒV[ƒN‚µ‚½‚Æ‚«i graph.Evalute() ‚µ‚½‚Æ‚«j
-    /// Eƒ}ƒCƒiƒX‚©‚ç 0 ‚ğ’´‚¦‚½‚Æ‚«
-    /// EÄ¶ŠÔ‚ğ’´‚¦‚½•”•ª‚©‚çAÄ¶ŠÔ“à‚É–ß‚Á‚Ä‚«‚½‚Æ‚«
-    /// ‚Ä‚¢‚¤‚©‚à‚Á‚Æ‚¿‚á‚ñ‚Æ‚µ‚½‚â‚è•û’m‚è‚½‚¢Bplayable ˆÓ–¡‚í‚©‚ñ‚È‚·‚¬
+    /// ä¸‹è¨˜æ¡ä»¶ã§ã€å†ç”Ÿã‚’ä¿ƒã™ï¼ˆã‚µã‚¦ãƒ³ãƒ‰ãªã©ã€è‡ªå‹•çš„ã«ã‚·ãƒ¼ã‚¯ãŒåæ˜ ã•ã‚Œãªã„ã‚‚ã®ã«åƒãã‹ã‘ã¦å†ç”Ÿã‚’ä¿ƒã™ï¼‰
+    /// ãƒ»ã‚·ãƒ¼ã‚¯ã—ãŸã¨ãï¼ˆ graph.Evalute() ã—ãŸã¨ãï¼‰
+    /// ãƒ»ãƒã‚¤ãƒŠã‚¹ã‹ã‚‰ 0 ã‚’è¶…ãˆãŸã¨ã
+    /// ãƒ»å†ç”Ÿæ™‚é–“ã‚’è¶…ãˆãŸéƒ¨åˆ†ã‹ã‚‰ã€å†ç”Ÿæ™‚é–“å†…ã«æˆ»ã£ã¦ããŸã¨ã
+    /// ã¦ã„ã†ã‹ã‚‚ã£ã¨ã¡ã‚ƒã‚“ã¨ã—ãŸã‚„ã‚Šæ–¹çŸ¥ã‚ŠãŸã„ã€‚playable æ„å‘³ã‚ã‹ã‚“ãªã™ã
     /// </summary>
     public class SyncTimeOnSeek : PlayableBehaviour
     {
@@ -59,7 +59,7 @@ namespace AnimLite.DancePlayable
         //    //Debug.Log($"{preFrameTime} : {currentTime} / {endTime} ... {info.evaluationType}");
         //    if (isEvaluted || isOverZero || isBackFromEnd)
         //    {
-        //        src.SetTime(playable.GetTime());// ‚±‚ê‚â‚é‚Æ‰¹‚ªo‚éi‚à‚Á‚Æ‚¿‚á‚ñ‚Æ‚µ‚½‚â‚è•û’m‚è‚½‚¢j
+        //        src.SetTime(playable.GetTime());// ã“ã‚Œã‚„ã‚‹ã¨éŸ³ãŒå‡ºã‚‹ï¼ˆã‚‚ã£ã¨ã¡ã‚ƒã‚“ã¨ã—ãŸã‚„ã‚Šæ–¹çŸ¥ã‚ŠãŸã„ï¼‰
         //        //Debug.Log($"set time : {src.GetTime()}");
         //    }
 
@@ -79,7 +79,7 @@ namespace AnimLite.DancePlayable
             if (isEvaluted || isOverZero || isBackFromEnd)
             {
                 var src = playable.GetInput(0);
-                src.SetTime(currentTime);// ‚±‚ê‚â‚é‚Æ‰¹‚ªo‚éi‚à‚Á‚Æ‚¿‚á‚ñ‚Æ‚µ‚½‚â‚è•û’m‚è‚½‚¢j
+                src.SetTime(currentTime);// ã“ã‚Œã‚„ã‚‹ã¨éŸ³ãŒå‡ºã‚‹ï¼ˆã‚‚ã£ã¨ã¡ã‚ƒã‚“ã¨ã—ãŸã‚„ã‚Šæ–¹çŸ¥ã‚ŠãŸã„ï¼‰
                 //Debug.Log($"set time : {currentTime}");
                 playable.SetInputWeight(0, 1.0f);
                 //this.asrc.time = (float)currentTime * 0.5f;

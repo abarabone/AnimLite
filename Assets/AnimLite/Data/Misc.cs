@@ -1,4 +1,4 @@
-//using static Unity.VisualScripting.AnnotationUtility;
+﻿//using static Unity.VisualScripting.AnnotationUtility;
 
 namespace AnimLite
 {

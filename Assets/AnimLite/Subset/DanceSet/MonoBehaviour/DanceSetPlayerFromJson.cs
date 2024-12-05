@@ -1,4 +1,4 @@
-using System.Linq;
+ï»¿using System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -34,7 +34,7 @@ namespace AnimLite.DancePlayable
         DanceGraphy2 graphy;
 
         public PlayableGraph? Graph => this.graphy?.graph;
-        public float? TotalTime => this.graphy?.TotalTime;// b’è
+        public float? TotalTime => this.graphy?.TotalTime;// æš«å®š
 
 
         [SerializeField]
@@ -42,7 +42,7 @@ namespace AnimLite.DancePlayable
 
 
 
-        public SemaphoreSlim DanceSemapho { get; } = new SemaphoreSlim(1, 1);
+        public SemaphoreSlim DanceSemapho { get; } = new (1);
 
         CancellationTokenSource cts;
 
@@ -60,6 +60,8 @@ namespace AnimLite.DancePlayable
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
+                    await Task.Yield();
+
                     using var x = await this.JsonFiles.LoadDanceSceneAsync(ct);
                     var order = await x.dancescene.BuildDanceGraphyOrderAsync(this.Cache, x.archive, this.AudioSource, ct);
 
@@ -110,7 +112,7 @@ namespace AnimLite.DancePlayable
                     .ForEach(x =>
                     {
                         x.Model?.Value?.GetComponent<UniVRM10.Vrm10Instance>()?.AdjustLootAt(Camera.main.transform);
-                        x.FaceRenderer?.AdjustBbox(x.Model?.Value?.GetComponent<Animator>());
+                        //x.FaceRenderer?.AdjustBbox(x.Model?.Value?.GetComponent<Animator>());
                     });
             }
         }
@@ -122,7 +124,7 @@ namespace AnimLite.DancePlayable
                 this.cts?.Cancel();
 
                 "disable start".ShowDebugLog();
-                using (await this.DanceSemapho.WaitAsyncDisposable(default))// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ª”jŠü‚³‚ê‚Ä‚àA‰ğ•ú‚Í‚â‚èØ‚Á‚Ä‚Ù‚µ‚¢‚Ì‚Å Token ‚Í default
+                using (await this.DanceSemapho.WaitAsyncDisposable(default))// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç ´æ£„ã•ã‚Œã¦ã‚‚ã€è§£æ”¾ã¯ã‚„ã‚Šåˆ‡ã£ã¦ã»ã—ã„ã®ã§ Token ã¯ default
                 {
                     //await (this.Cache?.HideAndDestroyModelAsync() ?? default);
 

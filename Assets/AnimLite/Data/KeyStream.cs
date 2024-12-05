@@ -1,19 +1,19 @@
-using System;
+﻿using System;
 using Unity.Collections;
 
 namespace AnimLite
 {
     /// <summary>
-    /// Burst �Ή����l���� NativeArray ���g�p�����L�[�t���[���f�[�^�\���́B
-    /// �L�[�t���[���̓X�g���[���Ƃ��ă{�[�����Ƃɂ܂Ƃ܂��Ă��邪�A
-    /// ���ׂĂP�̔z��ɋl�ߍ���ł���B�i��]�A�ʒu�A�\��ʁj
-    /// ���o�����߂ɂ́A�����\���́iVmdStreamIndex�j���K�v�ƂȂ�B
+    /// Burst 対応を考慮し NativeArray を使用したキーフレームデータ構造体。
+    /// キーフレームはストリームとしてボーンごとにまとまっているが、
+    /// すべて１つの配列に詰め込んでいる。（回転、位置、表情別）
+    /// 取り出すためには、索引構造体（VmdStreamIndex）が必要となる。
     /// </summary>
 
 
     /// <summary>
-    /// ��]�A�ʒu�A�\��A�̊e�L�[�f�[�^���l�߂邽�߂̍\���́B
-    /// �L�[�͎��ԂƂP�΂P�őΉ�����B
+    /// 回転、位置、表情、の各キーデータを詰めるための構造体。
+    /// キーは時間と１対１で対応する。
     /// </summary>
     public struct KeyStreamsInOneArray<T> : IDisposable
         where T : unmanaged
@@ -30,7 +30,7 @@ namespace AnimLite
 
 
     /// <summary>
-    /// �X�g���[�����Ƃ̋�Ԃ�񋓂���B
+    /// ストリームごとの区間を列挙する。
     /// </summary>
     public struct KeyStreamSections : IDisposable
     {

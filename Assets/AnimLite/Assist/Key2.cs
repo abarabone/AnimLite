@@ -1,4 +1,4 @@
-using Unity.Mathematics;
+Ôªøusing Unity.Mathematics;
 
 namespace AnimLite
 {
@@ -243,7 +243,7 @@ namespace AnimLite
             };
             var d = newCursor.TimeTo - newCursor.TimeFrom;
             //newcursor.FromToTimeRate = 1.0f / math.select(d, 1.0f, d == 0.0f);
-            newCursor.FromToTimeRate = math.select(1.0f / d, 0.0f, prevCursor.IndexTo == newCursor.IndexTo);// Nan èoÇÈÇ∆évÇ§Ç™ÇæÇ¢Ç∂ÇÂÇ‘ÇæÇÎ
+            newCursor.FromToTimeRate = math.select(1.0f / d, 0.0f, prevCursor.IndexTo == newCursor.IndexTo);// Nan Âá∫„Çã„Å®ÊÄù„ÅÜ„Åå„Å†„ÅÑ„Åò„Çá„Å∂„Å†„Çç
             //if (d == 0)
             //    Debug.Log($"{(Vmd.MmdBodyBones)istream} {newcursor.TimeFrom} {newcursor.TimeTo} {newcursor.FromToTimeRate} {d}");
 

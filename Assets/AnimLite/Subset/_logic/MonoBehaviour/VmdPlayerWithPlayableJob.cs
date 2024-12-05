@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Playables;
 using System;
 
@@ -28,32 +28,32 @@ namespace AnimLite.Samples
 
         async Awaitable Start()
         {
-            // ƒtƒ@ƒCƒ‹‚©‚çƒf[ƒ^‚ğ“Ç‚İ‰º‚·
+            // ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ä¸‹ã™
             var vmdpath = this.VmdFilePath;
             var facemap = this.FaceMappingFilePath;
             var vmdStreamData = await VmdLoader.LoadVmdExAsync(vmdpath, this.destroyCancellationToken);
             var faceMapping = await VrmLoader.LoadFaceMapExAsync(facemap, this.destroyCancellationToken);
 
-            // ƒf[ƒ^‚ğ—˜—p‚Å‚«‚éŒ`®‚É•ÏŠ·‚·‚é
+            // ãƒ‡ãƒ¼ã‚¿ã‚’åˆ©ç”¨ã§ãã‚‹å½¢å¼ã«å¤‰æ›ã™ã‚‹
             using var rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
             using var pos_data = vmdStreamData.bodyKeyStreams.CreatePositionData();
             using var face_data = vmdStreamData.faceKeyStreams.CreateFaceData(faceMapping);
 
-            // ƒf[ƒ^ƒAƒNƒZƒX‚ğ‚‘¬‰»‚·‚é‚½‚ß‚Ìõˆø‚ğì¬‚·‚é
+            // ãƒ‡ãƒ¼ã‚¿ã‚¢ã‚¯ã‚»ã‚¹ã‚’é«˜é€ŸåŒ–ã™ã‚‹ãŸã‚ã®ç´¢å¼•ã‚’ä½œæˆã™ã‚‹
             using var rot_index = rot_data.CreateIndex(indexBlockLength: 100);
             using var pos_index = pos_data.CreateIndex(indexBlockLength: 100);
             using var face_index = face_data.CreateIndex(indexBlockLength: 100);
 
-            // ŠÔ”ÍˆÍ‚È‚Ç‚Ìî•ñ‚ğ‚Á‚½ƒ^ƒCƒ}[‚ğì¬‚·‚é
+            // æ™‚é–“ç¯„å›²ãªã©ã®æƒ…å ±ã‚’æŒã£ãŸã‚¿ã‚¤ãƒãƒ¼ã‚’ä½œæˆã™ã‚‹
             var timer = new StreamingTimer(rot_data.GetLastKeyTime());
 
-            // Forward ‚Å—˜—p‚·‚éƒL[ƒLƒƒƒbƒVƒ…ƒoƒbƒtƒ@‚ğ¶¬‚·‚é
+            // Forward ã§åˆ©ç”¨ã™ã‚‹ã‚­ãƒ¼ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹
             using var rot_cache = rot_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulRot>(timer);
             using var pos_cache = pos_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulPos>(timer);
             using var face_cache = face_data.ToKey2CacheFactory().CreateCacheWithInitialize<Clamp, Key2NearestShift>(timer);
 
 
-            // ƒqƒ…[ƒ}ƒmƒCƒhƒ‚ƒfƒ‹‚Ìî•ñ‚ğ\’z‚·‚é
+            // ãƒ’ãƒ¥ãƒ¼ãƒãƒã‚¤ãƒ‰ãƒ¢ãƒ‡ãƒ«ã®æƒ…å ±ã‚’æ§‹ç¯‰ã™ã‚‹
             using var bone = this.anim.BuildVmdPlayableJobTransformMappings();
             var face = faceMapping.BuildStreamingFace();
             //var face = this.faceRenderer.sharedMesh.BuildStreamingFace(faceMapping);
@@ -61,9 +61,9 @@ namespace AnimLite.Samples
 
 
 
-            // ƒL[ŒŸõƒIƒuƒWƒFƒNƒg‚ğ\’z‚·‚é
-            // ƒWƒFƒlƒŠƒNƒX‚É‚æ‚èuƒL[•âŠÔ•û®AŠÔ‚ÌƒNƒŠƒbƒv•û–@v‚ğw’è‚Å‚«‚é
-            // iŒŸõ•û–@‚Í job ‚Ì’†‚ÅAAbsolute ‚Æ Forward ‚ğ“K‹Xg‚¢•ª‚¯‚é‚æ‚¤‚É‚È‚Á‚Ä‚¢‚éj
+            // ã‚­ãƒ¼æ¤œç´¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ§‹ç¯‰ã™ã‚‹
+            // ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹ã«ã‚ˆã‚Šã€Œã‚­ãƒ¼è£œé–“æ–¹å¼ã€æ™‚é–“ã®ã‚¯ãƒªãƒƒãƒ—æ–¹æ³•ã€ã‚’æŒ‡å®šã§ãã‚‹
+            // ï¼ˆæ¤œç´¢æ–¹æ³•ã¯ job ã®ä¸­ã§ã€Absolute ã¨ Forward ã‚’é©å®œä½¿ã„åˆ†ã‘ã‚‹ã‚ˆã†ã«ãªã£ã¦ã„ã‚‹ï¼‰
 
             var rotKeyFinder = rot_data
                 .ToKeyFinder(rot_cache, rot_index)
@@ -79,7 +79,7 @@ namespace AnimLite.Samples
 
 
 
-            // ƒvƒŒƒCƒAƒuƒ‹‚ÌƒOƒ‰ƒt‚ğ\’z‚µ‚ÄÄ¶‚·‚é
+            // ãƒ—ãƒ¬ã‚¤ã‚¢ãƒ–ãƒ«ã®ã‚°ãƒ©ãƒ•ã‚’æ§‹ç¯‰ã—ã¦å†ç”Ÿã™ã‚‹
 
             var graph = PlayableGraph.Create(name + " anim");
 

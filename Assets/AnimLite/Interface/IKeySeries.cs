@@ -1,4 +1,4 @@
-namespace AnimLite
+ï»¿namespace AnimLite
 {
 
 
@@ -30,7 +30,7 @@ namespace AnimLite
 
 
         /// <summary>
-        /// Ÿ‚É’l‚ğæ“¾‚·‚é‚Æ‚«‚É’²®‚·‚é
+        /// æ¬¡ã«å€¤ã‚’å–å¾—ã™ã‚‹ã¨ãã«èª¿æ•´ã™ã‚‹
         /// </summary>
         T AdjustNext(T p0, T p1) => p1;
     }
@@ -51,7 +51,7 @@ namespace AnimLite
 
 
 
-    // ƒCƒ“ƒ^[ƒtƒF[ƒX‚ÌƒfƒtƒHƒ‹ƒgÀ‘•‚Å Burst ‚ªŒø‚©‚È‚¢‚Á‚Û‚¢‚Ì‚ÅAc”O‚¾‚ª–v
+    // ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå®Ÿè£…ã§ Burst ãŒåŠ¹ã‹ãªã„ã£ã½ã„ã®ã§ã€æ®‹å¿µã ãŒæ²¡
 
     //public interface IKey<T, TCache, TKey> : IKeyCursor
     //    where T:unmanaged
@@ -76,7 +76,7 @@ namespace AnimLite
 
 
     //    /// <summary>
-    //    /// Ÿ‚É’l‚ğæ“¾‚·‚é‚Æ‚«‚É’²®‚·‚é
+    //    /// æ¬¡ã«å€¤ã‚’å–å¾—ã™ã‚‹ã¨ãã«èª¿æ•´ã™ã‚‹
     //    /// </summary>
     //    T AdjustNext(T p0, T p1) => p1;
     //}

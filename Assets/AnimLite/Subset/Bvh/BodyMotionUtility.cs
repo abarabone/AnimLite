@@ -1,4 +1,4 @@
-using AnimLite.Utility;
+﻿using AnimLite.Utility;
 using AnimLite.Vmd;
 using Unity.Mathematics;
 

@@ -1,11 +1,11 @@
-using Unity.Mathematics;
+ï»¿using Unity.Mathematics;
 
 namespace AnimLite
 {
 
 
-    ////    // ‚Å‚«‚ê‚Î Key ‚Æ Interpolation ‚ğ•ª‚¯‚½‚¢‚ñ‚¾‚ªAw’è‚·‚éƒWƒFƒlƒŠƒNƒXŒ^‚ª‘‚¦‚é‚Ì‚Å‘Ã‹¦AIKeyInterpolation ‚Íg‚Á‚Ä‚È‚¢
-    ////    // c# ‚ÌƒWƒFƒlƒŠƒNƒX‚Í‚à‚¤­‚µ©—R“x‚Ù‚µ‚¢
+    ////    // ã§ãã‚Œã° Key ã¨ Interpolation ã‚’åˆ†ã‘ãŸã„ã‚“ã ãŒã€æŒ‡å®šã™ã‚‹ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹å‹ãŒå¢—ãˆã‚‹ã®ã§å¦¥å”ã€IKeyInterpolation ã¯ä½¿ã£ã¦ãªã„
+    ////    // c# ã®ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹ã¯ã‚‚ã†å°‘ã—è‡ªç”±åº¦ã»ã—ã„
 
     ////    public struct None<T> : IKeyInterpolation<T>
     ////        where T : unmanaged
@@ -14,7 +14,7 @@ namespace AnimLite
 
 
     ////    /// <summary>
-    ////    /// ‚²‚­•’Ê‚Ì‚Q’l‚ÌüŒ^•âŠÔi‚¾‚Æv‚¤j
+    ////    /// ã”ãæ™®é€šã®ï¼’å€¤ã®ç·šå‹è£œé–“ï¼ˆã ã¨æ€ã†ï¼‰
     ////    /// </summary>
     ////    public struct LeapPosition : IKeyInterpolation<float4>
     ////    {

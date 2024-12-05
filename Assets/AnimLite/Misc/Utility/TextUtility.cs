@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ namespace AnimLite.Utility
             ;
 
         /// <summary>
-        /// �ׂ����_�̒��ӁF # �͐�������
+        /// ・ｽﾗゑｿｽ・ｽ・ｽ・ｽ_・ｽﾌ抵ｿｽ・ｽﾓ： # ・ｽﾍ撰ｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
         /// </summary>
         public static Wildcard ToWildcard(this string s)
         {

@@ -1,4 +1,4 @@
-//using System;
+ï»¿//using System;
 //using System.Collections;
 //using System.Collections.Generic;
 using System.Linq;
@@ -76,9 +76,9 @@ namespace AnimLite.Utility
 
 
     //    /// <summary>
-    //    /// streamdata ‚Æ facemap ‚ğƒLƒƒƒbƒVƒ…‚·‚é
-    //    /// facemap ’PˆÊ‚Å“à•”«‘‚ª‚ ‚èAstreamdata ‚ğ“o˜^‚·‚é
-    //    /// facemap ‚àˆê“x‚¾‚¯‚Ì‚İƒ[ƒh‚³‚êAƒLƒƒƒbƒVƒ…‚³‚ê‚é
+    //    /// streamdata ã¨ facemap ã‚’ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã™ã‚‹
+    //    /// facemap å˜ä½ã§å†…éƒ¨è¾æ›¸ãŒã‚ã‚Šã€streamdata ã‚’ç™»éŒ²ã™ã‚‹
+    //    /// facemap ã‚‚ä¸€åº¦ã ã‘ã®ã¿ãƒ­ãƒ¼ãƒ‰ã•ã‚Œã€ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã•ã‚Œã‚‹
     //    /// </summary>
     //    [Serializable]
     //    public class VmdCacheDictionary

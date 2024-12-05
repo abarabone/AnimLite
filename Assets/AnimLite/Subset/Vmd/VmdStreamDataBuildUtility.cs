@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System;
 using System.Linq;
 using Unity.Mathematics;
@@ -13,22 +13,22 @@ namespace AnimLite.Vmd
 
 
     /// <summary>
-    /// ‚u‚l‚c‚©‚çæ“¾‚µ‚½ƒf[ƒ^‚ğA‰ñ“]AˆÚ“®A•\î‚Ì StreamData<T> ‚É•ÏŠ·‚·‚éB
+    /// ï¼¶ï¼­ï¼¤ã‹ã‚‰å–å¾—ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’ã€å›è»¢ã€ç§»å‹•ã€è¡¨æƒ…ã® StreamData<T> ã«å¤‰æ›ã™ã‚‹ã€‚
     /// </summary>
     public static class VmdStreamDataBuildExtension
     {
 
 
         /// <summary>
-        /// StreamData ‚ğƒrƒ‹ƒh‚·‚éB
-        /// ”CˆÓƒtƒH[ƒ}ƒbƒg‚Ìƒ{[ƒ“–¼‚©‚çAMmdBodyBones ‚Ì‚h‚c‚Éƒ}ƒbƒv‚³‚ê‚éB
-        /// ‘Î‰ƒ{[ƒ“‚ª‚È‚¢•”ˆÊ‚ÍAempty keys ‚ªŠi”[‚³‚ê‚éB
+        /// StreamData ã‚’ãƒ“ãƒ«ãƒ‰ã™ã‚‹ã€‚
+        /// ä»»æ„ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ãƒœãƒ¼ãƒ³åã‹ã‚‰ã€MmdBodyBones ã®ï¼©ï¼¤ã«ãƒãƒƒãƒ—ã•ã‚Œã‚‹ã€‚
+        /// å¯¾å¿œãƒœãƒ¼ãƒ³ãŒãªã„éƒ¨ä½ã¯ã€empty keys ãŒæ ¼ç´ã•ã‚Œã‚‹ã€‚
         /// </summary>
         public static StreamData<quaternion> CreateRotationData(
             this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)
         {
             // dict<name, keys> -> (id, keys)[]
-            // •\‹L‚ä‚ê‚à‹zû‚·‚éi‘SŠp”¼ŠpAŠ¿šˆá‚¢A•\‹Lˆá‚¢‚È‚Çj
+            // è¡¨è¨˜ã‚†ã‚Œã‚‚å¸åã™ã‚‹ï¼ˆå…¨è§’åŠè§’ã€æ¼¢å­—é•ã„ã€è¡¨è¨˜é•ã„ãªã©ï¼‰
             var qNameToId =
                 from x in nameToStream//.Do(x => Debug.Log($"{x.Key.name}:{x.Count()}"))
                 let boneid = VmdBone.MmdBoneNameToId.TryGetOrDefault(x.Key, MmdBodyBones.nobone)
@@ -44,8 +44,8 @@ namespace AnimLite.Vmd
             Debug.Log(string.Join(", ", src.Select(x => $"{x.boneid}:{x.keys.Count()}")));
 #endif
 
-            // MmdBodyBones ‚Ì‡”Ô’Ê‚è‚É•À‚Ñ•Ï‚¦‚éB
-            // ‘Î‰ƒ{[ƒ“‚ª‚È‚¢ê‡‚ÍAempty ‚ğ¶¬‚·‚éB
+            // MmdBodyBones ã®é †ç•ªé€šã‚Šã«ä¸¦ã³å¤‰ãˆã‚‹ã€‚
+            // å¯¾å¿œãƒœãƒ¼ãƒ³ãŒãªã„å ´åˆã¯ã€empty ã‚’ç”Ÿæˆã™ã‚‹ã€‚
             var qNormalizeOrder =
                 from x in Enumerable.Range(0, (int)MmdBodyBones.length)
                 join y in src on (MmdBodyBones)x equals y.boneid into ys
@@ -59,7 +59,7 @@ namespace AnimLite.Vmd
                 .Select(x => x.keys)
                 .ToArray();
 
-            // stream data ‚Æ‚µ‚Äƒrƒ‹ƒh‚·‚é
+            // stream data ã¨ã—ã¦ãƒ“ãƒ«ãƒ‰ã™ã‚‹
             return new StreamData<quaternion>
             {
                 KeyStreams = rotsrc.BuildKeyData(key => key.rot, key => key.time, defaultKey: VmdBodyMotionKey.Identity),
@@ -80,12 +80,12 @@ namespace AnimLite.Vmd
 
             var qPosSrc = new[]
             {
-                tonai_("‘S‚Ä‚Ìe"),
-                tonai_("ƒZƒ“ƒ^["),
-                tonai_("ƒOƒ‹[ƒu"),
-                tonai_("‰º”¼g"),
-                tonai_("¶‘«‚h‚j", "¶‘«IK"),
-                tonai_("‰E‘«‚h‚j", "‰E‘«IK"),
+                tonai_("å…¨ã¦ã®è¦ª"),
+                tonai_("ã‚»ãƒ³ã‚¿ãƒ¼"),
+                tonai_("ã‚°ãƒ«ãƒ¼ãƒ–"),
+                tonai_("ä¸‹åŠèº«"),
+                tonai_("å·¦è¶³ï¼©ï¼«", "å·¦è¶³IK"),
+                tonai_("å³è¶³ï¼©ï¼«", "å³è¶³IK"),
             };
 
             var sections = qPosSrc.BuildSectionData(defaultKey: VmdBodyMotionKey.Identity);
@@ -104,8 +104,8 @@ namespace AnimLite.Vmd
 
 
         /// <summary>
-        /// Eƒ}ƒbƒsƒ“ƒOƒe[ƒuƒ‹‚É‹LÚ‚³‚ê‚½•\î‚Ì‚İA‹LÚ‚³‚ê‚½‡‚É
-        /// E‘Î‰‚ª‚È‚¢ê‡‚Í‹ó
+        /// ãƒ»ãƒãƒƒãƒ”ãƒ³ã‚°ãƒ†ãƒ¼ãƒ–ãƒ«ã«è¨˜è¼‰ã•ã‚ŒãŸè¡¨æƒ…ã®ã¿ã€è¨˜è¼‰ã•ã‚ŒãŸé †ã«
+        /// ãƒ»å¯¾å¿œãŒãªã„å ´åˆã¯ç©º
         /// </summary>
         public static StreamData<float> CreateFaceData(
             this Dictionary<VmdFaceName, VmdFaceKey[]> nameToStream, VmdFaceMapping facemap)

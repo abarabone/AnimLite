@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 using Unity.VisualScripting;
@@ -12,7 +12,7 @@ namespace AnimLite.Utility
     {
 
 
-        // ResetToStancePose() ‚ÌŒã‚É hips ‚¾‚¯ local ‚ğƒZƒbƒg‚·‚éA‚Å‚à‘åä•v‚¾‚Á‚½‚ªAí‚É‘åä•v‚©M‚¶‚«‚ê‚È‚¢‚Ì‚Å‘S•”‚â‚é 
+        // ResetToStancePose() ã®å¾Œã« hips ã ã‘ local ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ã€ã§ã‚‚å¤§ä¸ˆå¤«ã ã£ãŸãŒã€å¸¸ã«å¤§ä¸ˆå¤«ã‹ä¿¡ã˜ãã‚Œãªã„ã®ã§å…¨éƒ¨ã‚„ã‚‹ 
         public static void ResetPose(this Animator anim)
         {
             var avatar = anim.avatar;
@@ -33,7 +33,7 @@ namespace AnimLite.Utility
                 if (!isExists) continue;
 
                 //skelton.name.ShowDebugLog();//
-                tf.SetLocalPositionAndRotation(skelton.position, skelton.rotation);// ÄŒvZ‚Æ‚©‘–‚é‚ñ‚¾‚ë‚¤‚©c
+                tf.SetLocalPositionAndRotation(skelton.position, skelton.rotation);// å†è¨ˆç®—ã¨ã‹èµ°ã‚‹ã‚“ã ã‚ã†ã‹â€¦
             }
         }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -11,16 +11,16 @@ namespace AnimLite.Vmd
 
 
     /// <summary>
-    /// �u�l�c����ǂ݉������f�[�^���A�L�[�X�g���[���f�[�^�ɐ��`����B
-    /// �L�[�X�g���[���f�[�^�́A�S�X�g���[���i�{�f�B�̑S���ʁj���P�܂Ƃ߂ɂ����z��ƁA
-    /// �X�g���[���i���ʁj���Ƃ͈̔͂��i�[�����z��̂Q�̃f�[�^����Ȃ�B
+    /// ＶＭＤから読み下したデータを、キーストリームデータに整形する。
+    /// キーストリームデータは、全ストリーム（ボディの全部位）を１まとめにした配列と、
+    /// ストリーム（部位）ごとの範囲を格納した配列の２つのデータからなる。
     /// </summary>
     public static class VmdStreamBuildExtension
     {
 
 
         /// <summary>
-        /// �Z�N�V�����͍Ō�Ƀf�t�H���g�L�[��ǉ�����̂ŁA�{�[�������P����
+        /// セクションは最後にデフォルトキーを追加するので、ボーン数より１つ多い
         /// </summary>
         public static KeyStreamSections BuildSectionData<TKey>(
             this IEnumerable<IEnumerable<TKey>> streamsList, TKey defaultKey = default)

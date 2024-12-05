@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ‚Ì‚½‚ß
+using UnityEngine.Scripting;// [Preserve] ã®ãŸã‚
 using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
@@ -27,12 +27,12 @@ namespace AnimLite.Utility
 
 
 
-    // (Unity) Android ‚Å HttpClient ‚Å’ÊM‚·‚é‚ÆƒCƒ“ƒ^[ƒlƒbƒgŒ ŒÀ‚ª©“®‚Å‚Â‚©‚È‚¢–â‘è
+    // (Unity) Android ã§ HttpClient ã§é€šä¿¡ã™ã‚‹ã¨ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¨©é™ãŒè‡ªå‹•ã§ã¤ã‹ãªã„å•é¡Œ
     // https://ikorin2.hatenablog.jp/entry/2024/03/30/025946
     [Preserve]
     internal sealed class MarkerForInternet : UnityWebRequest { }
-    // ã‹L‚ÌƒR[ƒh‚ğ‚Ç‚±‚©‚É‘‚¢‚Ä‚¨‚¯‚ÎAUnityWebRequest ‚ğg‚Á‚Ä‚¢‚é”»’è‚É‚È‚èA©“®‚ÅƒCƒ“ƒ^[ƒlƒbƒgŒ ŒÀ‚ğ‚Â‚¯‚Ä‚­‚ê‚éB
-    // UnityWebRequest ‚ğŒp³‚µ‚½ƒNƒ‰ƒX‚ğ’è‹`‚µ‚Ä‚¨‚¢‚ÄAPreserve ‘®«‚ğg‚Á‚Ä IL2CPP ‚ÅÁ‚¦‚È‚¢‚æ‚¤‚É‚µ‚½B
+    // ä¸Šè¨˜ã®ã‚³ãƒ¼ãƒ‰ã‚’ã©ã“ã‹ã«æ›¸ã„ã¦ãŠã‘ã°ã€UnityWebRequest ã‚’ä½¿ã£ã¦ã„ã‚‹åˆ¤å®šã«ãªã‚Šã€è‡ªå‹•ã§ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒƒãƒˆæ¨©é™ã‚’ã¤ã‘ã¦ãã‚Œã‚‹ã€‚
+    // UnityWebRequest ã‚’ç¶™æ‰¿ã—ãŸã‚¯ãƒ©ã‚¹ã‚’å®šç¾©ã—ã¦ãŠã„ã¦ã€Preserve å±æ€§ã‚’ä½¿ã£ã¦ IL2CPP ã§æ¶ˆãˆãªã„ã‚ˆã†ã«ã—ãŸã€‚
 
 
 
@@ -61,7 +61,7 @@ namespace AnimLite.Utility
 
 
 
-        // Œ»óA‚Ç‚±‚©‚ç‚àŒÄ‚Î‚ê‚Ä‚È‚¢‚Í‚¸
+        // ç¾çŠ¶ã€ã©ã“ã‹ã‚‰ã‚‚å‘¼ã°ã‚Œã¦ãªã„ã¯ãš
         public static void Dispose()
         {
             if (HttpLoader.Client is null) return;

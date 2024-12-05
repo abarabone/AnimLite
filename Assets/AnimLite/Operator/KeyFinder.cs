@@ -1,4 +1,4 @@
-namespace AnimLite
+﻿namespace AnimLite
 {
 
 
@@ -62,7 +62,7 @@ namespace AnimLite
 
 
 
-        // �ϊ� --------------------------------
+        // 変換 --------------------------------
 
         public KeyFinderWithoutProcedure<T, TKey, TClip, TCache, TIndex> With<TKey, TClip>()
             where TKey : struct, IKey<T>, IKeyWithCache<TCache>, IKeyInterpolative<T>, IKeyCursor

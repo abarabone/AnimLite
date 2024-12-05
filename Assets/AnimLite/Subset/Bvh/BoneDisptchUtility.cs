@@ -1,4 +1,4 @@
-using Unity.Collections;
+ï»¿using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -106,7 +106,7 @@ namespace AnimLite
 
 
         /// <summary>
-        /// Šî–{“I‚É human bone id ‚Æ stream id ‚Í“¯‚¶@strem id ‚Í last bone ‚ÌŒã‚ë‚É“Æ©”Ô†‚ğ’Ç‰Á‚Å‚«‚é
+        /// åŸºæœ¬çš„ã« human bone id ã¨ stream id ã¯åŒã˜ã€€strem id ã¯ last bone ã®å¾Œã‚ã«ç‹¬è‡ªç•ªå·ã‚’è¿½åŠ ã§ãã‚‹
         /// </summary>
         public static quaternion AccumulateStreamRotation<TFinder>(//, TTF>(
             this TFinder rkf, OptionalBoneChecker opt, HumanBodyBones humanbone)//, int streamId)

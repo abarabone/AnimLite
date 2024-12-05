@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine.Playables;
 
 namespace AnimLite.DancePlayable
@@ -27,8 +27,8 @@ namespace AnimLite.DancePlayable
         //    cur.SetDuration(src.GetDuration());
         //}
 
-        public override void PrepareFrame(Playable playable, FrameData info)// ‚±‚ê‚¾‚Æ—ˆ‚éAoutput ‚Ìí—Ş‚É‚æ‚éH
-        //public override void ProcessFrame(Playable playable, FrameData info, object playerData)// —ˆ‚È‚¢A‚È‚ñ‚ÅH
+        public override void PrepareFrame(Playable playable, FrameData info)// ã“ã‚Œã ã¨æ¥ã‚‹ã€output ã®ç¨®é¡ã«ã‚ˆã‚‹ï¼Ÿ
+        //public override void ProcessFrame(Playable playable, FrameData info, object playerData)// æ¥ãªã„ã€ãªã‚“ã§ï¼Ÿ
         {
             //var currentTime = playable.GetInput(0).GetTime();
             var currentTime = playable.GetTime();

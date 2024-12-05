@@ -1,4 +1,4 @@
-using Unity.Collections;
+ï»¿using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -81,24 +81,24 @@ namespace AnimLite.Vmd
             {
 
                 HumanBodyBones.LastBone =>
-                    //kf.p.get((int)MmdBodyBones.ƒZƒ“ƒ^[).As3() * 0.1f,
+                    //kf.p.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼).As3() * 0.1f,
 
-                    //math.rotate(math.inverse(math.mul(rkf.get((int)MmdBodyBones.ƒOƒ‹[ƒu), rkf.get((int)MmdBodyBones.ƒZƒ“ƒ^[))), pkf.get((int)MmdBodyBones.‘S‚Ä‚Ìe).To3()) *0.1f +
-                    //math.rotate(math.inverse(rkf.get((int)MmdBodyBones.ƒOƒ‹[ƒu)), pkf.get((int)MmdBodyBones.ƒZƒ“ƒ^[).To3()) * 0.1f +
-                    //pkf.get((int)MmdBodyBones.ƒOƒ‹[ƒu).To3() * 0.1f,
+                    //math.rotate(math.inverse(math.mul(rkf.get((int)MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–), rkf.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼))), pkf.get((int)MmdBodyBones.å…¨ã¦ã®è¦ª).To3()) *0.1f +
+                    //math.rotate(math.inverse(rkf.get((int)MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–)), pkf.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼).To3()) * 0.1f +
+                    //pkf.get((int)MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–).To3() * 0.1f,
 
-                    //kf.p.get((int)MmdBodyBones.‘S‚Ä‚Ìe).As3() * 0.1f +
-                    //math.rotate(kf.r.get((int)MmdBodyBones.ƒZƒ“ƒ^[), kf.p.get((int)MmdBodyBones.ƒZƒ“ƒ^[).As3()) * 0.1f +
-                    //math.rotate(mul(kf.r.get((int)MmdBodyBones.ƒOƒ‹[ƒu), kf.r.get((int)MmdBodyBones.ƒZƒ“ƒ^[)), kf.p.get((int)MmdBodyBones.ƒOƒ‹[ƒu).As3()) * 0.1f,
+                    //kf.p.get((int)MmdBodyBones.å…¨ã¦ã®è¦ª).As3() * 0.1f +
+                    //math.rotate(kf.r.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼), kf.p.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼).As3()) * 0.1f +
+                    //math.rotate(mul(kf.r.get((int)MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–), kf.r.get((int)MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼)), kf.p.get((int)MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–).As3()) * 0.1f,
 
-                    //pkf.getpos(MmdBodyBones.‘S‚Ä‚Ìe).As3() * 0.1f +
+                    //pkf.getpos(MmdBodyBones.å…¨ã¦ã®è¦ª).As3() * 0.1f +
                     a() * 0.1f,
 
                 HumanBodyBones.Hips =>
-                    pkf.getpos(MmdBodyBones.‰º”¼g).As3() * 0.1f,
+                    pkf.getpos(MmdBodyBones.ä¸‹åŠèº«).As3() * 0.1f,
 
                 HumanBodyBones.Spine =>
-                    pkf.getpos(MmdBodyBones.ã”¼g).As3() * 0.1f,
+                    pkf.getpos(MmdBodyBones.ä¸ŠåŠèº«).As3() * 0.1f,
 
                 _ => default,
             };
@@ -106,9 +106,9 @@ namespace AnimLite.Vmd
             float3 a()
             {
                 var arr = new NativeArray<MmdBodyBones>(3, Allocator.Temp);
-                arr[0] = MmdBodyBones.‘S‚Ä‚Ìe;
-                arr[1] = MmdBodyBones.ƒZƒ“ƒ^[;
-                arr[2] = MmdBodyBones.ƒOƒ‹[ƒu;
+                arr[0] = MmdBodyBones.å…¨ã¦ã®è¦ª;
+                arr[1] = MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼;
+                arr[2] = MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–;
                 var pos = (pkf, rkf).transform<TPFinder, TRFinder>(arr);
                 arr.Dispose();
                 return pos;
@@ -172,151 +172,151 @@ namespace AnimLite.Vmd
             {
 
                 HumanBodyBones.LastBone => mul(
-                    rkf.getrot(MmdBodyBones.‘S‚Ä‚Ìe),
-                    rkf.getrot(MmdBodyBones.ƒZƒ“ƒ^[),
-                    rkf.getrot(MmdBodyBones.ƒOƒ‹[ƒu)
+                    rkf.getrot(MmdBodyBones.å…¨ã¦ã®è¦ª),
+                    rkf.getrot(MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼),
+                    rkf.getrot(MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–)
                 ),
 
                 HumanBodyBones.Hips => accumulate(
-                    //rkf.getrot(MmdBodyBones.ƒZƒ“ƒ^[),
-                    //rkf.getrot(MmdBodyBones.ƒOƒ‹[ƒu),
-                    rkf.getrot(MmdBodyBones.‰º”¼g)
-                //kh.(MmdBodyBones.‰º”¼g2)
+                    //rkf.getrot(MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼),
+                    //rkf.getrot(MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–),
+                    rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)
+                //kh.(MmdBodyBones.ä¸‹åŠèº«2)
                 ),
                 HumanBodyBones.Spine => accumulate(
-                    //accumulate(math.inverse(rkf.getrot(MmdBodyBones.‰º”¼g)), rkf.getrot(MmdBodyBones.ã”¼g))
-                    //rkf.getrot(MmdBodyBones.‰º”¼g2),
-                    //math.inverse(rkf.getrot(MmdBodyBones.‰º”¼g)),
-                    rkf.getrot(MmdBodyBones.ã”¼g),
-                    math.inverse(rkf.getrot(MmdBodyBones.‰º”¼g))
+                    //accumulate(math.inverse(rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)), rkf.getrot(MmdBodyBones.ä¸ŠåŠèº«))
+                    //rkf.getrot(MmdBodyBones.ä¸‹åŠèº«2),
+                    //math.inverse(rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)),
+                    rkf.getrot(MmdBodyBones.ä¸ŠåŠèº«),
+                    math.inverse(rkf.getrot(MmdBodyBones.ä¸‹åŠèº«))
                 ),
 
 
-                // ’Pˆêƒ{[ƒ“‚Í switch ‚Ì _ => ‚Åˆ—‚·‚é‚Ì‚ÅƒRƒƒ“ƒgƒAƒEƒg
+                // å˜ä¸€ãƒœãƒ¼ãƒ³ã¯ switch ã® _ => ã§å‡¦ç†ã™ã‚‹ã®ã§ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆ
 
                 //HumanBodyBones.Chest =>
-                //    MmdBodyBones.ã”¼g2,
+                //    MmdBodyBones.ä¸ŠåŠèº«2,
                 //HumanBodyBones.Head =>
-                //    MmdBodyBones.“ª,
+                //    MmdBodyBones.é ­,
                 //HumanBodyBones.Neck =>
-                //    MmdBodyBones.ñ,
+                //    MmdBodyBones.é¦–,
 
 
                 HumanBodyBones.LeftShoulder => accumulate(
-                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ‚É‚ ‚½‚é mmd ƒ{[ƒ“‚Í‚È‚³‚»‚¤‚È‚Ì‚Å–¢İ’èAƒoƒO‚é
-                    //rkf.getrot(MmdBodyBones.¶Œ¨2),
-                    rkf.getrot(MmdBodyBones.¶Œ¨)
+                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ã«ã‚ãŸã‚‹ mmd ãƒœãƒ¼ãƒ³ã¯ãªã•ãã†ãªã®ã§æœªè¨­å®šã€ãƒã‚°ã‚‹
+                    //rkf.getrot(MmdBodyBones.å·¦è‚©2),
+                    rkf.getrot(MmdBodyBones.å·¦è‚©)
                 ),
 
                 HumanBodyBones.RightShoulder => accumulate(
-                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ‚É‚ ‚½‚é mmd ƒ{[ƒ“‚Í‚È‚³‚»‚¤‚È‚Ì‚Å–¢İ’èAƒoƒO‚é
-                    //rkf.getrot(MmdBodyBones.‰EŒ¨2),
-                    rkf.getrot(MmdBodyBones.‰EŒ¨)
+                    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ã«ã‚ãŸã‚‹ mmd ãƒœãƒ¼ãƒ³ã¯ãªã•ãã†ãªã®ã§æœªè¨­å®šã€ãƒã‚°ã‚‹
+                    //rkf.getrot(MmdBodyBones.å³è‚©2),
+                    rkf.getrot(MmdBodyBones.å³è‚©)
                 ),
 
-                // Œ¨ƒ{[ƒ“‚Í‚¢‚ë‚¢‚ë‚ ‚é‚İ‚½‚¢‚¾‚¯‚ÇAŠÖŒW«‚ª‚í‚©‚ç‚È‚¢‚©‚ç‚Æ‚è‚ ‚¦‚¸–³‹
+                // è‚©ãƒœãƒ¼ãƒ³ã¯ã„ã‚ã„ã‚ã‚ã‚‹ã¿ãŸã„ã ã‘ã©ã€é–¢ä¿‚æ€§ãŒã‚ã‹ã‚‰ãªã„ã‹ã‚‰ã¨ã‚Šã‚ãˆãšç„¡è¦–
 
                 //HumanBodyBones.LeftShoulder => accumulate(
                 //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
-                //    rkf.getrot(MmdBodyBones.¶Œ¨P),
-                //    rkf.getrot(MmdBodyBones.¶Œ¨),
-                //    math.inverse(rkf.getrot(MmdBodyBones.¶Œ¨C))
+                //    rkf.getrot(MmdBodyBones.å·¦è‚©P),
+                //    rkf.getrot(MmdBodyBones.å·¦è‚©),
+                //    math.inverse(rkf.getrot(MmdBodyBones.å·¦è‚©C))
                 //),
 
                 //HumanBodyBones.RightShoulder => accumulate(
                 //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
-                //    rkf.getrot(MmdBodyBones.‰EŒ¨P),
-                //    rkf.getrot(MmdBodyBones.‰EŒ¨),
-                //    math.inverse(rkf.getrot(MmdBodyBones.‰EŒ¨C))
+                //    rkf.getrot(MmdBodyBones.å³è‚©P),
+                //    rkf.getrot(MmdBodyBones.å³è‚©),
+                //    math.inverse(rkf.getrot(MmdBodyBones.å³è‚©C))
                 //),
 
 
                 HumanBodyBones.LeftUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasLeftSholder),
                     //downArmL(),
-                    rkf.getrot(MmdBodyBones.¶˜r€),
-                    rkf.getrot(MmdBodyBones.¶˜r)
+                    rkf.getrot(MmdBodyBones.å·¦è…•æ©),
+                    rkf.getrot(MmdBodyBones.å·¦è…•)
                 ),
 
                 HumanBodyBones.RightUpperArm => accumulate(
                     rkf.getrotIfOptout(opt, HumanBodyBones.RightShoulder, !opt.HasRightSholder),
                     //downArmR(),,
-                    rkf.getrot(MmdBodyBones.‰E˜r€),
-                    rkf.getrot(MmdBodyBones.‰E˜r)
+                    rkf.getrot(MmdBodyBones.å³è…•æ©),
+                    rkf.getrot(MmdBodyBones.å³è…•)
                 ),
 
-                // ˜r‚Ì‚Ë‚¶‚è‚ÍA‚P`‚R‚ÍƒƒbƒVƒ…—p‚É‚Ë‚¶‚è‚ğ•ªU‚³‚¹‚½•âŠÔ’l‚Á‚Û‚¢
-                // €ƒ{[ƒ“‚¾‚¯l‚¦‚ê‚Î‚¢‚¢‚Æv‚¤‚ñ‚¾‚¯‚Ç‚Ç‚¤‚È‚ñ‚¾‚ëH
-                // i˜r•t‚¯ª‚É€‚è‚ğ“ü‚ê‚Ä‚µ‚Ü‚¤‚ÆAŒ¨•t‹ß‚©‚ç‰ñ“]‚µ‚Ä‚µ‚Ü‚¤‚µA•I‚Éd‚Ş‚Æ‘O˜r‚Ì€‚è‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅA˜r‚Æ€‚è‚Í•ªŠ„‚¹‚´‚é‚ğ“¾‚È‚¢A‚ñ‚¾‚Æv‚¤j
+                // è…•ã®ã­ã˜ã‚Šã¯ã€ï¼‘ï½ï¼“ã¯ãƒ¡ãƒƒã‚·ãƒ¥ç”¨ã«ã­ã˜ã‚Šã‚’åˆ†æ•£ã•ã›ãŸè£œé–“å€¤ã£ã½ã„
+                // æ©ãƒœãƒ¼ãƒ³ã ã‘è€ƒãˆã‚Œã°ã„ã„ã¨æ€ã†ã‚“ã ã‘ã©ã©ã†ãªã‚“ã ã‚ï¼Ÿ
+                // ï¼ˆè…•ä»˜ã‘æ ¹ã«æ©ã‚Šã‚’å…¥ã‚Œã¦ã—ã¾ã†ã¨ã€è‚©ä»˜è¿‘ã‹ã‚‰å›è»¢ã—ã¦ã—ã¾ã†ã—ã€è‚˜ã«ä»•è¾¼ã‚€ã¨å‰è…•ã®æ©ã‚Šã«ãªã£ã¦ã—ã¾ã†ã®ã§ã€è…•ã¨æ©ã‚Šã¯åˆ†å‰²ã›ã–ã‚‹ã‚’å¾—ãªã„ã€ã‚“ã ã¨æ€ã†ï¼‰
 
                 HumanBodyBones.LeftLowerArm => accumulate(
-                    ////rkf.getrot(MmdBodyBones.¶˜r€1),
-                    ////rkf.getrot(MmdBodyBones.¶˜r€2),
-                    ////rkf.getrot(MmdBodyBones.¶˜r€3),
-                    //rkf.getrot(MmdBodyBones.¶˜r€),
-                    //rkf.getrot(MmdBodyBones.¶è€),
-                    rkf.getrot(MmdBodyBones.¶‚Ğ‚¶)
-                    //rkf.getrot(MmdBodyBones.¶‚Ğ‚¶),
-                    //rkf.getrot(MmdBodyBones.¶˜r€)
+                    ////rkf.getrot(MmdBodyBones.å·¦è…•æ©1),
+                    ////rkf.getrot(MmdBodyBones.å·¦è…•æ©2),
+                    ////rkf.getrot(MmdBodyBones.å·¦è…•æ©3),
+                    //rkf.getrot(MmdBodyBones.å·¦è…•æ©),
+                    //rkf.getrot(MmdBodyBones.å·¦æ‰‹æ©),
+                    rkf.getrot(MmdBodyBones.å·¦ã²ã˜)
+                    //rkf.getrot(MmdBodyBones.å·¦ã²ã˜),
+                    //rkf.getrot(MmdBodyBones.å·¦è…•æ©)
                 ),
 
                 HumanBodyBones.RightLowerArm => accumulate(
-                    ////rkf.getrot(MmdBodyBones.‰E˜r€1),
-                    ////rkf.getrot(MmdBodyBones.‰E˜r€2),
-                    ////rkf.getrot(MmdBodyBones.‰E˜r€3),
-                    //rkf.getrot(MmdBodyBones.‰E˜r€),
-                    //rkf.getrot(MmdBodyBones.‰Eè€),
-                    rkf.getrot(MmdBodyBones.‰E‚Ğ‚¶)
-                    //rkf.getrot(MmdBodyBones.‰E‚Ğ‚¶),
-                    //rkf.getrot(MmdBodyBones.‰E˜r€)
+                    ////rkf.getrot(MmdBodyBones.å³è…•æ©1),
+                    ////rkf.getrot(MmdBodyBones.å³è…•æ©2),
+                    ////rkf.getrot(MmdBodyBones.å³è…•æ©3),
+                    //rkf.getrot(MmdBodyBones.å³è…•æ©),
+                    //rkf.getrot(MmdBodyBones.å³æ‰‹æ©),
+                    rkf.getrot(MmdBodyBones.å³ã²ã˜)
+                    //rkf.getrot(MmdBodyBones.å³ã²ã˜),
+                    //rkf.getrot(MmdBodyBones.å³è…•æ©)
                 ),
 
                 HumanBodyBones.LeftHand => accumulate(
-                    rkf.getrot(MmdBodyBones.¶è€),
-                    rkf.getrot(MmdBodyBones.¶èñ)
+                    rkf.getrot(MmdBodyBones.å·¦æ‰‹æ©),
+                    rkf.getrot(MmdBodyBones.å·¦æ‰‹é¦–)
                 ),
 
                 HumanBodyBones.RightHand => accumulate(
-                    rkf.getrot(MmdBodyBones.‰Eè€),
-                    rkf.getrot(MmdBodyBones.‰Eèñ)
+                    rkf.getrot(MmdBodyBones.å³æ‰‹æ©),
+                    rkf.getrot(MmdBodyBones.å³æ‰‹é¦–)
                 ),
 
 
                 //HumanBodyBones.LeftThumbProximal => accumulate(
                 //    downArmL(),
-                //    rkf.getrot(MmdBodyBones.¶ew‚O)
+                //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼)
                 //    ),
                 //HumanBodyBones.LeftThumbIntermediate => accumulate(
                 //    downArmL(),
-                //    rkf.getrot(MmdBodyBones.¶ew‚P)
+                //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼‘)
                 //    ),
                 //HumanBodyBones.LeftThumbDistal =>accumulate(
                 //    downArmL(),
-                //    rkf.getrot(MmdBodyBones.¶ew‚Q)
+                //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼’)
                 //    ),
 
 
                 ////HumanBodyBones.LeftUpperLeg =>
-                ////    MmdBodyBones.¶‘«,
+                ////    MmdBodyBones.å·¦è¶³,
                 ////HumanBodyBones.LeftLowerLeg =>
-                ////    MmdBodyBones.¶‚Ğ‚´,
+                ////    MmdBodyBones.å·¦ã²ã–,
                 //HumanBodyBones.LeftFoot => accumulate(
-                //    rkf.getrot(MmdBodyBones.¶‘«ñ)
-                ////rkf.getrot(MmdBodyBones.¶‘«‚h‚j)
+                //    rkf.getrot(MmdBodyBones.å·¦è¶³é¦–)
+                ////rkf.getrot(MmdBodyBones.å·¦è¶³ï¼©ï¼«)
                 //),
                 //HumanBodyBones.LeftToes =>
-                //    rkf.getrot(MmdBodyBones.¶‚Â‚Üæ),
+                //    rkf.getrot(MmdBodyBones.å·¦ã¤ã¾å…ˆ),
 
                 ////HumanBodyBones.RightUpperLeg =>
-                ////    MmdBodyBones.‰E‘«,
+                ////    MmdBodyBones.å³è¶³,
                 ////HumanBodyBones.RightLowerLeg =>
-                ////    MmdBodyBones.‰E‚Ğ‚´,
+                ////    MmdBodyBones.å³ã²ã–,
                 //HumanBodyBones.RightFoot => accumulate(
-                //    rkf.getrot(MmdBodyBones.‰E‘«ñ)
-                ////rkf.getrot(MmdBodyBones.‰E‘«‚h‚j)
+                //    rkf.getrot(MmdBodyBones.å³è¶³é¦–)
+                ////rkf.getrot(MmdBodyBones.å³è¶³ï¼©ï¼«)
                 //),
                 //HumanBodyBones.RightToes =>
-                //    rkf.getrot(MmdBodyBones.‰E‚Â‚Üæ),
+                //    rkf.getrot(MmdBodyBones.å³ã¤ã¾å…ˆ),
 
                 _ =>
                     rkf.getrot(mmdbone),
@@ -335,158 +335,158 @@ namespace AnimLite.Vmd
         //    {
 
         //        HumanBodyBones.LastBone => mul(
-        //            rkf.getrot(MmdBodyBones.‘S‚Ä‚Ìe),
-        //            rkf.getrot(MmdBodyBones.ƒZƒ“ƒ^[),
-        //            rkf.getrot(MmdBodyBones.ƒOƒ‹[ƒu)
+        //            rkf.getrot(MmdBodyBones.å…¨ã¦ã®è¦ª),
+        //            rkf.getrot(MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼),
+        //            rkf.getrot(MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–)
         //        ),
 
         //        HumanBodyBones.Hips => mul(
-        //            //rkf.getrot(MmdBodyBones.ƒZƒ“ƒ^[),
-        //            //rkf.getrot(MmdBodyBones.ƒOƒ‹[ƒu),
-        //            rkf.getrot(MmdBodyBones.‰º”¼g)
-        //        //kh.(MmdBodyBones.‰º”¼g2)
+        //            //rkf.getrot(MmdBodyBones.ã‚»ãƒ³ã‚¿ãƒ¼),
+        //            //rkf.getrot(MmdBodyBones.ã‚°ãƒ«ãƒ¼ãƒ–),
+        //            rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)
+        //        //kh.(MmdBodyBones.ä¸‹åŠèº«2)
         //        ),
         //        HumanBodyBones.Spine => mul(
-        //            //mul(math.inverse(rkf.getrot(MmdBodyBones.‰º”¼g)), rkf.getrot(MmdBodyBones.ã”¼g))
-        //            //rkf.getrot(MmdBodyBones.‰º”¼g2),
-        //            math.inverse(rkf.getrot(MmdBodyBones.‰º”¼g)),
-        //            rkf.getrot(MmdBodyBones.ã”¼g)
+        //            //mul(math.inverse(rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)), rkf.getrot(MmdBodyBones.ä¸ŠåŠèº«))
+        //            //rkf.getrot(MmdBodyBones.ä¸‹åŠèº«2),
+        //            math.inverse(rkf.getrot(MmdBodyBones.ä¸‹åŠèº«)),
+        //            rkf.getrot(MmdBodyBones.ä¸ŠåŠèº«)
         //        ),
 
 
-        //        // ’Pˆêƒ{[ƒ“‚Í switch ‚Ì _ => ‚Åˆ—‚·‚é‚Ì‚ÅƒRƒƒ“ƒgƒAƒEƒg
+        //        // å˜ä¸€ãƒœãƒ¼ãƒ³ã¯ switch ã® _ => ã§å‡¦ç†ã™ã‚‹ã®ã§ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆ
 
         //        //HumanBodyBones.Chest =>
-        //        //    MmdBodyBones.ã”¼g2,
+        //        //    MmdBodyBones.ä¸ŠåŠèº«2,
         //        //HumanBodyBones.Head =>
-        //        //    MmdBodyBones.“ª,
+        //        //    MmdBodyBones.é ­,
         //        //HumanBodyBones.Neck =>
-        //        //    MmdBodyBones.ñ,
+        //        //    MmdBodyBones.é¦–,
 
 
         //        HumanBodyBones.LeftShoulder => mul(
-        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ‚É‚ ‚½‚é mmd ƒ{[ƒ“‚Í‚È‚³‚»‚¤‚È‚Ì‚Å–¢İ’èAƒoƒO‚é
-        //            //rkf.getrot(MmdBodyBones.¶Œ¨2),
-        //            rkf.getrot(MmdBodyBones.¶Œ¨)
+        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ã«ã‚ãŸã‚‹ mmd ãƒœãƒ¼ãƒ³ã¯ãªã•ãã†ãªã®ã§æœªè¨­å®šã€ãƒã‚°ã‚‹
+        //            //rkf.getrot(MmdBodyBones.å·¦è‚©2),
+        //            rkf.getrot(MmdBodyBones.å·¦è‚©)
         //        ),
 
         //        HumanBodyBones.RightShoulder => mul(
-        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ‚É‚ ‚½‚é mmd ƒ{[ƒ“‚Í‚È‚³‚»‚¤‚È‚Ì‚Å–¢İ’èAƒoƒO‚é
-        //            //rkf.getrot(MmdBodyBones.‰EŒ¨2),
-        //            rkf.getrot(MmdBodyBones.‰EŒ¨)
+        //            //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest ã«ã‚ãŸã‚‹ mmd ãƒœãƒ¼ãƒ³ã¯ãªã•ãã†ãªã®ã§æœªè¨­å®šã€ãƒã‚°ã‚‹
+        //            //rkf.getrot(MmdBodyBones.å³è‚©2),
+        //            rkf.getrot(MmdBodyBones.å³è‚©)
         //        ),
 
-        //        // Œ¨ƒ{[ƒ“‚Í‚¢‚ë‚¢‚ë‚ ‚é‚İ‚½‚¢‚¾‚¯‚ÇAŠÖŒW«‚ª‚í‚©‚ç‚È‚¢‚©‚ç‚Æ‚è‚ ‚¦‚¸–³‹
+        //        // è‚©ãƒœãƒ¼ãƒ³ã¯ã„ã‚ã„ã‚ã‚ã‚‹ã¿ãŸã„ã ã‘ã©ã€é–¢ä¿‚æ€§ãŒã‚ã‹ã‚‰ãªã„ã‹ã‚‰ã¨ã‚Šã‚ãˆãšç„¡è¦–
 
         //        //HumanBodyBones.LeftShoulder => mul(
         //        //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
-        //        //    rkf.getrot(MmdBodyBones.¶Œ¨P),
-        //        //    rkf.getrot(MmdBodyBones.¶Œ¨),
-        //        //    math.inverse(rkf.getrot(MmdBodyBones.¶Œ¨C))
+        //        //    rkf.getrot(MmdBodyBones.å·¦è‚©P),
+        //        //    rkf.getrot(MmdBodyBones.å·¦è‚©),
+        //        //    math.inverse(rkf.getrot(MmdBodyBones.å·¦è‚©C))
         //        //),
 
         //        //HumanBodyBones.RightShoulder => mul(
         //        //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),
-        //        //    rkf.getrot(MmdBodyBones.‰EŒ¨P),
-        //        //    rkf.getrot(MmdBodyBones.‰EŒ¨),
-        //        //    math.inverse(rkf.getrot(MmdBodyBones.‰EŒ¨C))
+        //        //    rkf.getrot(MmdBodyBones.å³è‚©P),
+        //        //    rkf.getrot(MmdBodyBones.å³è‚©),
+        //        //    math.inverse(rkf.getrot(MmdBodyBones.å³è‚©C))
         //        //),
 
 
         //        HumanBodyBones.LeftUpperArm => mul(
         //            rkf.getrotIfOptout(opt, HumanBodyBones.LeftShoulder, !opt.HasLeftSholder),
         //            //downArmL(),
-        //            rkf.getrot(MmdBodyBones.¶˜r),
-        //            rkf.getrot(MmdBodyBones.¶˜r€)
-        //        //rkf.getrot(MmdBodyBones.¶˜r€),
-        //        //rkf.getrot(MmdBodyBones.¶˜r)//
+        //            rkf.getrot(MmdBodyBones.å·¦è…•),
+        //            rkf.getrot(MmdBodyBones.å·¦è…•æ©)
+        //        //rkf.getrot(MmdBodyBones.å·¦è…•æ©),
+        //        //rkf.getrot(MmdBodyBones.å·¦è…•)//
         //        ),
 
         //        HumanBodyBones.RightUpperArm => mul(
         //            rkf.getrotIfOptout(opt, HumanBodyBones.RightShoulder, !opt.HasRightSholder),
         //            //downArmR(),,
-        //            rkf.getrot(MmdBodyBones.‰E˜r),
-        //            rkf.getrot(MmdBodyBones.‰E˜r€)
-        //        //rkf.getrot(MmdBodyBones.‰E˜r€),
-        //        //rkf.getrot(MmdBodyBones.‰E˜r)//
+        //            rkf.getrot(MmdBodyBones.å³è…•),
+        //            rkf.getrot(MmdBodyBones.å³è…•æ©)
+        //        //rkf.getrot(MmdBodyBones.å³è…•æ©),
+        //        //rkf.getrot(MmdBodyBones.å³è…•)//
         //        ),
 
-        //        // ˜r‚Ì‚Ë‚¶‚è‚ÍA‚P`‚R‚ÍƒƒbƒVƒ…—p‚É‚Ë‚¶‚è‚ğ•ªU‚³‚¹‚½•âŠÔ’l‚Á‚Û‚¢
-        //        // €ƒ{[ƒ“‚¾‚¯l‚¦‚ê‚Î‚¢‚¢‚Æv‚¤‚ñ‚¾‚¯‚Ç‚Ç‚¤‚È‚ñ‚¾‚ëH
-        //        // i˜r•t‚¯ª‚É€‚è‚ğ“ü‚ê‚Ä‚µ‚Ü‚¤‚ÆAŒ¨•t‹ß‚©‚ç‰ñ“]‚µ‚Ä‚µ‚Ü‚¤‚µA•I‚Éd‚Ş‚Æ‘O˜r‚Ì€‚è‚É‚È‚Á‚Ä‚µ‚Ü‚¤‚Ì‚ÅA˜r‚Æ€‚è‚Í•ªŠ„‚¹‚´‚é‚ğ“¾‚È‚¢A‚ñ‚¾‚Æv‚¤j
+        //        // è…•ã®ã­ã˜ã‚Šã¯ã€ï¼‘ï½ï¼“ã¯ãƒ¡ãƒƒã‚·ãƒ¥ç”¨ã«ã­ã˜ã‚Šã‚’åˆ†æ•£ã•ã›ãŸè£œé–“å€¤ã£ã½ã„
+        //        // æ©ãƒœãƒ¼ãƒ³ã ã‘è€ƒãˆã‚Œã°ã„ã„ã¨æ€ã†ã‚“ã ã‘ã©ã©ã†ãªã‚“ã ã‚ï¼Ÿ
+        //        // ï¼ˆè…•ä»˜ã‘æ ¹ã«æ©ã‚Šã‚’å…¥ã‚Œã¦ã—ã¾ã†ã¨ã€è‚©ä»˜è¿‘ã‹ã‚‰å›è»¢ã—ã¦ã—ã¾ã†ã—ã€è‚˜ã«ä»•è¾¼ã‚€ã¨å‰è…•ã®æ©ã‚Šã«ãªã£ã¦ã—ã¾ã†ã®ã§ã€è…•ã¨æ©ã‚Šã¯åˆ†å‰²ã›ã–ã‚‹ã‚’å¾—ãªã„ã€ã‚“ã ã¨æ€ã†ï¼‰
 
         //        HumanBodyBones.LeftLowerArm => mul(
-        //            ////rkf.getrot(MmdBodyBones.¶˜r€1),
-        //            ////rkf.getrot(MmdBodyBones.¶˜r€2),
-        //            ////rkf.getrot(MmdBodyBones.¶˜r€3),
-        //            //rkf.getrot(MmdBodyBones.¶˜r€),
-        //            //rkf.getrot(MmdBodyBones.¶è€),
-        //            rkf.getrot(MmdBodyBones.¶‚Ğ‚¶)
-        //        //rkf.getrot(MmdBodyBones.¶‚Ğ‚¶),
-        //        //rkf.getrot(MmdBodyBones.¶˜r€)
+        //            ////rkf.getrot(MmdBodyBones.å·¦è…•æ©1),
+        //            ////rkf.getrot(MmdBodyBones.å·¦è…•æ©2),
+        //            ////rkf.getrot(MmdBodyBones.å·¦è…•æ©3),
+        //            //rkf.getrot(MmdBodyBones.å·¦è…•æ©),
+        //            //rkf.getrot(MmdBodyBones.å·¦æ‰‹æ©),
+        //            rkf.getrot(MmdBodyBones.å·¦ã²ã˜)
+        //        //rkf.getrot(MmdBodyBones.å·¦ã²ã˜),
+        //        //rkf.getrot(MmdBodyBones.å·¦è…•æ©)
         //        ),
 
         //        HumanBodyBones.RightLowerArm => mul(
-        //            ////rkf.getrot(MmdBodyBones.‰E˜r€1),
-        //            ////rkf.getrot(MmdBodyBones.‰E˜r€2),
-        //            ////rkf.getrot(MmdBodyBones.‰E˜r€3),
-        //            //rkf.getrot(MmdBodyBones.‰E˜r€),
-        //            //rkf.getrot(MmdBodyBones.‰Eè€),
-        //            rkf.getrot(MmdBodyBones.‰E‚Ğ‚¶)
-        //        //rkf.getrot(MmdBodyBones.‰E‚Ğ‚¶),
-        //        //rkf.getrot(MmdBodyBones.‰E˜r€)
+        //            ////rkf.getrot(MmdBodyBones.å³è…•æ©1),
+        //            ////rkf.getrot(MmdBodyBones.å³è…•æ©2),
+        //            ////rkf.getrot(MmdBodyBones.å³è…•æ©3),
+        //            //rkf.getrot(MmdBodyBones.å³è…•æ©),
+        //            //rkf.getrot(MmdBodyBones.å³æ‰‹æ©),
+        //            rkf.getrot(MmdBodyBones.å³ã²ã˜)
+        //        //rkf.getrot(MmdBodyBones.å³ã²ã˜),
+        //        //rkf.getrot(MmdBodyBones.å³è…•æ©)
         //        ),
 
         //        HumanBodyBones.LeftHand => mul(
-        //        //    rkf.getrot(MmdBodyBones.¶è€),
-        //        //    rkf.getrot(MmdBodyBones.¶èñ)
-        //        rkf.getrot(MmdBodyBones.¶èñ),
-        //        rkf.getrot(MmdBodyBones.¶è€)
+        //        //    rkf.getrot(MmdBodyBones.å·¦æ‰‹æ©),
+        //        //    rkf.getrot(MmdBodyBones.å·¦æ‰‹é¦–)
+        //        rkf.getrot(MmdBodyBones.å·¦æ‰‹é¦–),
+        //        rkf.getrot(MmdBodyBones.å·¦æ‰‹æ©)
         //        ),
 
         //        HumanBodyBones.RightHand => mul(
-        //        //rkf.getrot(MmdBodyBones.‰Eè€),
-        //        //rkf.getrot(MmdBodyBones.‰Eèñ)
-        //        rkf.getrot(MmdBodyBones.‰Eèñ),
-        //        rkf.getrot(MmdBodyBones.‰Eè€)
+        //        //rkf.getrot(MmdBodyBones.å³æ‰‹æ©),
+        //        //rkf.getrot(MmdBodyBones.å³æ‰‹é¦–)
+        //        rkf.getrot(MmdBodyBones.å³æ‰‹é¦–),
+        //        rkf.getrot(MmdBodyBones.å³æ‰‹æ©)
         //        ),
 
 
         //        //HumanBodyBones.LeftThumbProximal => mul(
         //        //    downArmL(),
-        //        //    rkf.getrot(MmdBodyBones.¶ew‚O)
+        //        //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼)
         //        //    ),
         //        //HumanBodyBones.LeftThumbIntermediate => mul(
         //        //    downArmL(),
-        //        //    rkf.getrot(MmdBodyBones.¶ew‚P)
+        //        //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼‘)
         //        //    ),
         //        //HumanBodyBones.LeftThumbDistal =>mul(
         //        //    downArmL(),
-        //        //    rkf.getrot(MmdBodyBones.¶ew‚Q)
+        //        //    rkf.getrot(MmdBodyBones.å·¦è¦ªæŒ‡ï¼’)
         //        //    ),
 
 
         //        ////HumanBodyBones.LeftUpperLeg =>
-        //        ////    MmdBodyBones.¶‘«,
+        //        ////    MmdBodyBones.å·¦è¶³,
         //        ////HumanBodyBones.LeftLowerLeg =>
-        //        ////    MmdBodyBones.¶‚Ğ‚´,
+        //        ////    MmdBodyBones.å·¦ã²ã–,
         //        //HumanBodyBones.LeftFoot => mul(
-        //        //    rkf.getrot(MmdBodyBones.¶‘«ñ)
-        //        ////rkf.getrot(MmdBodyBones.¶‘«‚h‚j)
+        //        //    rkf.getrot(MmdBodyBones.å·¦è¶³é¦–)
+        //        ////rkf.getrot(MmdBodyBones.å·¦è¶³ï¼©ï¼«)
         //        //),
         //        //HumanBodyBones.LeftToes =>
-        //        //    rkf.getrot(MmdBodyBones.¶‚Â‚Üæ),
+        //        //    rkf.getrot(MmdBodyBones.å·¦ã¤ã¾å…ˆ),
 
         //        ////HumanBodyBones.RightUpperLeg =>
-        //        ////    MmdBodyBones.‰E‘«,
+        //        ////    MmdBodyBones.å³è¶³,
         //        ////HumanBodyBones.RightLowerLeg =>
-        //        ////    MmdBodyBones.‰E‚Ğ‚´,
+        //        ////    MmdBodyBones.å³ã²ã–,
         //        //HumanBodyBones.RightFoot => mul(
-        //        //    rkf.getrot(MmdBodyBones.‰E‘«ñ)
-        //        ////rkf.getrot(MmdBodyBones.‰E‘«‚h‚j)
+        //        //    rkf.getrot(MmdBodyBones.å³è¶³é¦–)
+        //        ////rkf.getrot(MmdBodyBones.å³è¶³ï¼©ï¼«)
         //        //),
         //        //HumanBodyBones.RightToes =>
-        //        //    rkf.getrot(MmdBodyBones.‰E‚Â‚Üæ),
+        //        //    rkf.getrot(MmdBodyBones.å³ã¤ã¾å…ˆ),
 
         //        _ =>
         //            rkf.getrot(mmdbone),

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,33 +50,33 @@ namespace AnimLite.Bvh
 
 
         // bvh
-        // �E���W�n�A���W�̈Ӗ��A��]�������ׂĂ��C�ӂ炵��
-        // �E���W�n�͊e�v�f�̔��]�ŏC���ł���
-        // �@- unity �͍���n�A�E��n�� bvh �Ȃ�ǂꂩ�̎��𔽓]����B
-        // �@�@hierachy �̈ʒu�֌W�����āA
-        // �@�@> �������������Ă���Ȃ� y ���v���X
-        // �@�@> �E���Ȃǂ̕������v���X�Ȃ� x �v���X���E
-        // �@�@> �ܐ�̕��������Ȃ� z ���v���X
-        // �@�@�Ȃǔ��f����
-        // �E���W�̈Ӗ��� Hip �𓮂����Ă݂āA�Ȃ�ƂȂ��� xyz �� �����������s ���Ƃ킩����
-        // �E��]������ unity �͍��˂��ŁA���� inverse ���K�v�������̂ŁA�E�˂��炵��
-        // �@- ��]�������t�ɂ���ɂ� inverse ����΂悳����
-        // �@- bvh �� YRotation XRotation ZRotation �Ȃǂ� hierarchy �\�L���ɉ�]�����āA�Ō�� inverse ����΂悢�݂���
+        // ・座標系、座標の意味、回転方向すべてが任意らしい
+        // ・座標系は各要素の反転で修正できる
+        // 　- unity は左手系、右手系の bvh ならどれかの軸を反転する。
+        // 　　hierachy の位置関係を見て、
+        // 　　> 頭方向が増えているなら y がプラス
+        // 　　> 右肩などの方向がプラスなら x プラスが右
+        // 　　> 爪先の方向が正なら z がプラス
+        // 　　など判断した
+        // ・座標の意味は Hip を動かしてみて、なんとなくで xyz が 水平垂直奥行 だとわかった
+        // ・回転方向は unity は左ねじで、今回 inverse が必要だったので、右ねじらしい
+        // 　- 回転方向を逆にするには inverse すればよさそう
+        // 　- bvh の YRotation XRotation ZRotation などの hierarchy 表記順に回転させて、最後に inverse すればよいみたい
 
-        // �����Ƃ������Ղ�������Ȃ�
-        // �E���W�n�̕␳�̂��߁Axyz ���Ƃɐ���
-        // �E��]�����̕␳�̂��߁A�E�˂��Ȃ� inverse
-        // �Exyz �̈Ӗ��Ƃ��āA�V���b�t��������΂Ȃ��悢
+        // ちゃんとしたおぷしょんつけるなら
+        // ・座標系の補正のため、xyz ごとに正負
+        // ・回転方向の補正のため、右ねじなら inverse
+        // ・xyz の意味として、シャッフルもつければなおよい
 
-        // ��]�� humanoid tf local �ɂ��ꂽ�畁�ʂɉ�]�ł���
+        // 回転は humanoid tf local にいれたら普通に回転できた
 
 
 
 
         /// <summary>
-        /// ��] stream data ���r���h����B
-        /// �C�Ӄt�H�[�}�b�g�̃{�[��������AHumanBodyBones �̂h�c�Ƀ}�b�v�����B
-        /// �Ή��{�[�����Ȃ����ʂ́Aempty keys ���i�[�����B
+        /// 回転 stream data をビルドする。
+        /// 任意フォーマットのボーン名から、HumanBodyBones のＩＤにマップされる。
+        /// 対応ボーンがない部位は、empty keys が格納される。
         /// </summary>
         public static StreamData<quaternion> CreateRotationData2(
             this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream, Dictionary<VmdBoneName, HumanBodyBones> logicalToPhysicalBones)
@@ -96,8 +96,8 @@ namespace AnimLite.Bvh
             Debug.Log(string.Join(", ", src.Select(x => $"{x.boneid}:{x.keys.Count()}")));
 #endif
 
-            // MmdBodyBones �̏��Ԓʂ�ɕ��ѕς���B
-            // �Ή��{�[�����Ȃ��ꍇ�́Aempty �𐶐�����B
+            // MmdBodyBones の順番通りに並び変える。
+            // 対応ボーンがない場合は、empty を生成する。
             var qOrderNormalize =
                 from targetid in Enumerable.Range(0, (int)HumanBodyBones.LastBone)
                 join thisid in src on (HumanBodyBones)targetid equals thisid.boneid into ys
@@ -111,7 +111,7 @@ namespace AnimLite.Bvh
                 .Select(x => x.keys)
                 .ToArray();
 
-            // stream data �Ƃ��ăr���h����
+            // stream data としてビルドする
             return new StreamData<quaternion>
             {
                 KeyStreams = rotsrc.BuildKeyData(key => key.rot, key => key.time, defaultKey: VmdBodyMotionKey.Identity),
@@ -120,8 +120,8 @@ namespace AnimLite.Bvh
         }
 
         /// <summary>
-        /// �ʒu stream data ���r���h����B
-        /// �Ώۂ̓��[�g�{�[���P����
+        /// 位置 stream data をビルドする。
+        /// 対象はルートボーン１つだけ
         /// </summary>
         public static StreamData<float4> CreatePositionData2(
             this Dictionary<VmdBoneName, VmdBodyMotionKey[]> nameToStream)

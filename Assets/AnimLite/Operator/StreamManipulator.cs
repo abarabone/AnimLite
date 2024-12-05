@@ -1,4 +1,4 @@
-using Unity.Collections;
+ï»¿using Unity.Collections;
 
 namespace AnimLite
 {
@@ -55,7 +55,7 @@ namespace AnimLite
         /// <summary>
         /// 
         /// </summary>
-        public (int ikey, float nexttime, T key) GetValueAndNextTime<TClip>(int ikey, TClip c = default)// ”pŽ~—\’è
+        public (int ikey, float nexttime, T key) GetValueAndNextTime<TClip>(int ikey, TClip c = default)// å»ƒæ­¢äºˆå®š
             where TClip : IKeyClipper
         {
             var next = this.GetTime<TClip>(ikey + 1, c);

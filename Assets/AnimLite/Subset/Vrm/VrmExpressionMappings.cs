@@ -1,4 +1,4 @@
-namespace AnimLite.Vrm
+﻿namespace AnimLite.Vrm
 {
     public struct VrmExpressionMappings// : IDisposable
     {

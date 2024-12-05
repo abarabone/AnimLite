@@ -1,4 +1,4 @@
-//using AnimLite.DancePlayable;
+ï»¿//using AnimLite.DancePlayable;
 //using AnimLite.Vmd;
 //using System;
 //using System.Collections;
@@ -86,7 +86,7 @@
 //    public static class JsonConverter
 //    {
 
-//        // json ‚ð data ‰»‚·‚éBç’·‚È‚Ì‚Å‚È‚ñ‚Æ‚©‚Å‚«‚È‚¢‚©‚È‚Ÿc ¨@”pŽ~‚·‚é
+//        // json ã‚’ data åŒ–ã™ã‚‹ã€‚å†—é•·ãªã®ã§ãªã‚“ã¨ã‹ã§ããªã„ã‹ãªãâ€¦ â†’ã€€å»ƒæ­¢ã™ã‚‹
 //        public static DanceSetDefineData ToData(this DanceSetJson json) =>
 //            new()
 //            {
@@ -194,7 +194,7 @@
 //                    .ToArrayAsync()
 //                ;
 
-//            // ‚Ç‚¤‚à ziparchive ‚Íƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‚É‘Î‰ž‚µ‚Ä‚È‚¢‚Á‚Û‚¢‚Ì‚ÅAŽb’è“I‚É”ñ“¯Šú—ñ‹“‚Å‘Î‰žB‚È‚ñ‚Æ‚©‚È‚ç‚ñ‚©H
+//            // ã©ã†ã‚‚ ziparchive ã¯ãƒžãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰ã«å¯¾å¿œã—ã¦ãªã„ã£ã½ã„ã®ã§ã€æš«å®šçš„ã«éžåŒæœŸåˆ—æŒ™ã§å¯¾å¿œã€‚ãªã‚“ã¨ã‹ãªã‚‰ã‚“ã‹ï¼Ÿ
 //            var morders = archive == null
 //                ? await ds.Motions
 //                    .Select(motion => Task.Run(() => motion.buildMotionOrderAsync(archive, cache, ct)))

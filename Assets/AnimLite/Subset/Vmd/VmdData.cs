@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
@@ -39,8 +39,8 @@ namespace AnimLite.Vmd
 
 
     /// <summary>
-    /// �L�[���ƃL�[�t���[���z��̎���
-    /// �L�[�t���[���́A���Ԃƈʒu�E��]�̃Z�b�g
+    /// キー名とキーフレーム配列の辞書
+    /// キーフレームは、時間と位置・回転のセット
     /// </summary>
     public struct VmdMotionData
     {
@@ -106,37 +106,37 @@ namespace AnimLite.Vmd
 
 
         /// <summary>
-        /// �܂��u�l�c����p�[�X����Ă��Ȃ���� true ��Ԃ��B
-        /// �p�[�X����Ă���ꍇ�́A�f�[�^����ł� false ��Ԃ��B
+        /// まだＶＭＤからパースされていなければ true を返す。
+        /// パースされている場合は、データが空でも false を返す。
         /// </summary>
         public static bool IsUnload(this VmdMotionData vmddata) => vmddata.bodyKeyStreams is null;
 
         /// <summary>
-        /// �܂��u�l�c����p�[�X����Ă��Ȃ���� true ��Ԃ��B
-        /// �p�[�X����Ă���ꍇ�́A�f�[�^����ł� false ��Ԃ��B
+        /// まだＶＭＤからパースされていなければ true を返す。
+        /// パースされている場合は、データが空でも false を返す。
         /// </summary>
         public static bool IsUnload(this VmdCameraData vmddata) => vmddata.cameraKeyStream is null;
 
 
 
         /// <summary>
-        /// body ���[�V�����f�[�^�̃X�g���[�����P�ł������Ă���� true ��Ԃ��B
-        /// �e�X�g���[�����̃L�[�� 0 �ł��A���݂��Ă���΃X�g���[���Ƃ��ĔF�߂�B
-        /// bodyKeyStreams �� null �Ȃ� false ��Ԃ����A�p�[�X��ɂ� null �ɂȂ邱�Ƃ͂Ȃ��B
+        /// body モーションデータのストリームを１つでも持っていれば true を返す。
+        /// 各ストリーム内のキーが 0 でも、存在していればストリームとして認める。
+        /// bodyKeyStreams が null なら false を返すが、パース後には null になることはない。
         /// </summary>
         public static bool HasBodyData(this VmdMotionData vmddata) => vmddata.bodyKeyStreams?.Any() ?? false;
 
         /// <summary>
-        /// face ���[�V�����f�[�^�̃X�g���[�����P�ł������Ă���� true ��Ԃ��B
-        /// �e�X�g���[�����̃L�[�� 0 �ł��A���݂��Ă���΃X�g���[���Ƃ��ĔF�߂�B
-        /// faceKeyStreams �� null �Ȃ� false ��Ԃ����A�p�[�X��ɂ� null �ɂȂ邱�Ƃ͂Ȃ��B
+        /// face モーションデータのストリームを１つでも持っていれば true を返す。
+        /// 各ストリーム内のキーが 0 でも、存在していればストリームとして認める。
+        /// faceKeyStreams が null なら false を返すが、パース後には null になることはない。
         /// </summary>
         public static bool HasFaceData(this VmdMotionData vmddata) => vmddata.faceKeyStreams?.Any() ?? false;
 
         /// <summary>
-        /// camera �X�g���[�����̃L�[�� 1 �ȏ�ł���� true ��Ԃ��B
-        /// �L�[�� 0 �ł���� false ��Ԃ��B
-        /// cameraKeyStream �� null �Ȃ� false ��Ԃ����A�p�[�X��ɂ� null �ɂȂ邱�Ƃ͂Ȃ��B
+        /// camera ストリーム内のキーが 1 以上であれば true を返す。
+        /// キーが 0 であれば false を返す。
+        /// cameraKeyStream が null なら false を返すが、パース後には null になることはない。
         /// </summary>
         public static bool HasCameraKey(this VmdCameraData vmddata) => vmddata.cameraKeyStream?.Any() ?? false;
 

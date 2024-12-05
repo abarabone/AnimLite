@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace AnimLite.Utility
 
 
     /// <summary>
-    /// Eprototype ‚ÉƒŠƒ\[ƒX‚ğ•Û
+    /// ãƒ»prototype ã«ãƒªã‚½ãƒ¼ã‚¹ã‚’ä¿æŒ
     /// </summary>
     public class Resource<T> : IPrototype<T>
         where T : UnityEngine.Object

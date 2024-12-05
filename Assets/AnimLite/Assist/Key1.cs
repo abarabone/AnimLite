@@ -1,4 +1,4 @@
-namespace AnimLite
+ï»¿namespace AnimLite
 {
     /// <summary>
     /// 
@@ -8,7 +8,7 @@ namespace AnimLite
         public int CurrentIndex;
 
         public float TimeFrom { get; set; }
-        //public float TimeFrom => float.NegativeInfinity;// ‚Å‚¢‚¢‚Ì‚©‚ÈH © ƒ_ƒAƒ‰ƒXƒg’l‚Å–³ŒÀƒ‹[ƒv‚É‚È‚é
+        //public float TimeFrom => float.NegativeInfinity;// ã§ã„ã„ã®ã‹ãªï¼Ÿ â† ãƒ€ãƒ¡ã€ãƒ©ã‚¹ãƒˆå€¤ã§ç„¡é™ãƒ«ãƒ¼ãƒ—ã«ãªã‚‹
         public float TimeTo { get; set; }
     }
 

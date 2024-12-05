@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -34,7 +34,7 @@ namespace AnimLite.Vmd
     //    }
     //}
     /// <summary>
-    /// Žb’è
+    /// æš«å®š
     /// </summary>
     public class VmdStreamData : IDisposable
     {
@@ -155,7 +155,7 @@ namespace AnimLite.Vmd
         }
 
 
-        // Žb’è
+        // æš«å®š
         public static VmdStreamData BuildVmdStreamData(this VmdCameraData srcvmdData)
         {
             var rot_data = srcvmdData.cameraKeyStream.CreateCameraData(key => key.rot);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,8 +28,8 @@ namespace AnimLite.Vmd
 
 
         /// <summary>
-        /// ���łɃ��[�h�ς݂̃��f���ł���΁A���̕�����Ԃ��B
-        /// ����ł���΃��f�������[�h���ĕԂ��B
+        /// すでにロード済みのモデルであれば、その複製を返す。
+        /// 初回であればモデルをロードして返す。
         /// </summary>
         public async Task<GameObject> GetOrLoadAsync(PathUnit path, IArchive archive, CancellationToken ct)
         {
@@ -54,12 +54,12 @@ namespace AnimLite.Vmd
         }
 
         /// <summary>
-        /// �X�g�b�N���ꂽ�Q�[���I�u�W�F�N�g�i���łɔj�����ꂽ���̂������j�ɂ��āA�Œ�P�����c���Ă��Ƃ͔j������B
-        /// �܂� MaxStockModelLength �𒴂����ꍇ�A�Â����̂���j������B
-        /// ��ɂȂ��� ModelStockerHolder �́A���������菜���B
-        /// �܂��A�V�[����Ŋ��� Destroy() ����Ă�����̂Ɋւ��ẮA�X�g�b�N���珜�O����Y�������������B
-        /// ����ɂ��X�g�b�N�����I�u�W�F�N�g���Ȃ��Ȃ��Ă��A�܂��V�K���[�h�ΏۂɂȂ邾���B
-        /// �������ADestroy() �����f�����^�C�~���O�ɂ͒��ӂ��邱�ƁB�i�����炭 Destory() �̎��̃t���[������j
+        /// ストックされたゲームオブジェクト（すでに破棄されたものを除く）について、最低１つだけ残してあとは破棄する。
+        /// また MaxStockModelLength を超えた場合、古いものから破棄する。
+        /// 空になった ModelStockerHolder は、辞書から取り除く。
+        /// また、シーン上で既に Destroy() されているものに関しては、ストックから除外されズレが解消される。
+        /// それによりストックされるオブジェクトがなくなっても、また新規ロード対象になるだけ。
+        /// ただし、Destroy() が反映されるタイミングには注意すること。（おそらく Destory() の次のフレームから）
         /// </summary>
         public async ValueTask TrimGameObjectsAsync()
         {
@@ -89,7 +89,7 @@ namespace AnimLite.Vmd
                         .Where(model => !model.IsUnityNull())
                         .ToArray();
 
-                    prevList.Clear();// �K�v�Ȃ�����
+                    prevList.Clear();// 必要ないかも
                     if (models.Length == 0) $"model length 0 : {prevList.FirstOrDefault()?.name}".ShowDebugLog();
                     if (models.Length == 0) continue;
 

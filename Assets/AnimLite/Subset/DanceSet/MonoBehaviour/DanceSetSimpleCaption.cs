@@ -1,4 +1,4 @@
-using System.Linq;
+Ôªøusing System.Linq;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -94,7 +94,7 @@ namespace AnimLite.DancePlayable
             {
                 var title = ds.AudioInformation.Caption;
                 var author = ds.AudioInformation.Author != ""
-                    ? $"äyã»ÅF{ds.AudioInformation.Author}"// {ds.AudioInformation.Url}"
+                    ? $"Ê•ΩÊõ≤Ôºö{ds.AudioInformation.Author}"// {ds.AudioInformation.Url}"
                     : "";
 
                 this.AudioInfo.text = $"{title}\r\n<indent=1em><size=10%>\r\n<size=50%>{author}";
@@ -107,14 +107,14 @@ namespace AnimLite.DancePlayable
                         .Select(x =>
                         {
                             var caption = "<size=100%><indent=0>" +
-                                string.Join("Å@/Å@<size=80%>", x.ModelInformation.Caption, x.AnimationInformation.Caption);
+                                string.Join("„ÄÄ/„ÄÄ<size=80%>", x.ModelInformation.Caption, x.AnimationInformation.Caption);
 
                             var model = x.ModelInformation.Author != ""
-                                ? $"ë¢å`ÅF{x.ModelInformation.Author}"// {x.ModelInformation.Url}"
+                                ? $"ÈÄ†ÂΩ¢Ôºö{x.ModelInformation.Author}"// {x.ModelInformation.Url}"
                                 : "";
 
                             var anim = x.AnimationInformation.Author != ""
-                                ? $"êUïtÅF{x.AnimationInformation.Author}"// {x.AnimationInformation.Url}"
+                                ? $"ÊåØ‰ªòÔºö{x.AnimationInformation.Author}"// {x.AnimationInformation.Url}"
                                 : "";
 
                             var author = string.Join("\r\n", new[]

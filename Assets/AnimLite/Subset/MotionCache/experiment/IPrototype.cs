@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,46 +35,46 @@ namespace AnimLite.Utility
 
     public enum PrototypeReleaseMode
     {
-        NoRelease,      // �Q�ƃJ�E���g�� 0 �ɂȂ��Ă�������Ȃ�
-        AutoRelease,    // �Q�ƃJ�E���g�� 0 �ɂȂ�����������
+        NoRelease,      // 参照カウントが 0 になっても解放しない
+        AutoRelease,    // 参照カウントが 0 になったら解放する
     }
 
 
 
 
 
-    // �L���b�V���������ꍇ
-    // �E�ЂȌ^��ێ����A���� url �Ȃ�C���X�^���X���쐬
-    // �E�ЂȌ^�͖����I�ɔj������܂Ŏc��
+    // キャッシュをつかう場合
+    // ・ひな型を保持しつつ、同じ url ならインスタンスを作成
+    // ・ひな型は明示的に破棄するまで残る
 
-    // ����Ȃ��ꍇ
-    // �E�ЂȌ^�ƃC���X�^���X���P�΂P�ŕێ����A�j������
-    // �E�C���X�^���X�����ێ����Ĕj������΁A�����łЂȌ^���j�������
+    // つかわない場合
+    // ・ひな型とインスタンスを１対１で保持し、破棄する
+    // ・インスタンスだけ保持して破棄すれば、自動でひな型も破棄される
 
-    // ���f��
-    // �E�C���X�^���X���Ƃɕ���
+    // モデル
+    // ・インスタンスごとに複製
     // audio clip
-    // �E�������Ȃ�
-    // �Ewww load �� destroy�Aresource �� release
+    // ・複製しない
+    // ・www load は destroy、resource は release
     // animaton clip
-    // �E�������Ȃ�
-    // �Eresource �̂�
+    // ・複製しない
+    // ・resource のみ
     // anim stream
-    // �E�X�g���[���f�[�^�Ƀr���h���ĕێ�
-    // �E�ꕔ���[�N�������āA�󂢃R�s�[���쐬
+    // ・ストリームデータにビルドして保持
+    // ・一部ワーク生成して、浅いコピーを作成
 
 
-    // �E�������Ƀ}�l�[�W���[�ɓo�^���Ă����A�j�����邩�ۂ��̔��莞�Ƀ��[�v�� .AsUnityNull() ����
-    // �@�E���R�� Destroy() �ł���
-    // �@�E�s�x�� release �`�F�b�N�͖���
-    // �@�Eunityobject �łȂ���΂ł��Ȃ�
+    // ・複製時にマネージャーに登録していき、破棄するか否かの判定時にループで .AsUnityNull() する
+    // 　・自由に Destroy() できる
+    // 　・都度の release チェックは無理
+    // 　・unityobject でなければできない
 
-    // �E�j���p�I�u�W�F�N�g�Ń��b�v����
-    //   �E�Ƃ�܂킵������
+    // ・破棄用オブジェクトでラップする
+    //   ・とりまわしが悪い
 
-    // �Egameobject �ɔj���p�̃X�N���v�g���d����
-    //   �E�������̂͂ǂ��Ȃ̂�
-    // �@�Eclip �ɂ͖����E
+    // ・gameobject に破棄用のスクリプトを仕込む
+    //   ・手を入れるのはどうなのか
+    // 　・clip には無理・
 
 
 

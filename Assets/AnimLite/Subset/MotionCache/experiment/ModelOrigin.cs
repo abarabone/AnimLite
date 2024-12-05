@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +23,14 @@ namespace AnimLite.Utility
 
 
     /// <summary>
-    /// æ“¾
-    /// EÅ‰‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‚P‚Âƒ[ƒh‚µA”ñƒAƒNƒeƒBƒu‰»‚·‚é
-    /// E‚»‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ–{‘Ì‚Æ‚µAprototype ‚Æ‚·‚é
-    /// Eprototype ‚ª‹ó‚¢‚Ä‚¢‚ê‚ÎƒCƒ“ƒXƒ^ƒ“ƒX‚Æ‚µ‚Äg—p‚·‚é
-    /// Eprototype ‚ªg—p’†‚È‚ç•¡»‚ğ“n‚·
-    /// ”jŠü
-    /// E•¡»‚È‚ç destory
-    /// Eprototype ‚È‚ç”ñƒAƒNƒeƒBƒu‰»
+    /// å–å¾—
+    /// ãƒ»æœ€åˆã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ï¼‘ã¤ãƒ­ãƒ¼ãƒ‰ã—ã€éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–ã™ã‚‹
+    /// ãƒ»ãã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’æœ¬ä½“ã¨ã—ã€prototype ã¨ã™ã‚‹
+    /// ãƒ»prototype ãŒç©ºã„ã¦ã„ã‚Œã°ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã¨ã—ã¦ä½¿ç”¨ã™ã‚‹
+    /// ãƒ»prototype ãŒä½¿ç”¨ä¸­ãªã‚‰è¤‡è£½ã‚’æ¸¡ã™
+    /// ç ´æ£„
+    /// ãƒ»è¤‡è£½ãªã‚‰ destory
+    /// ãƒ»prototype ãªã‚‰éã‚¢ã‚¯ãƒ†ã‚£ãƒ–åŒ–
     /// </summary>
     public class ModelOrigin : IPrototype<GameObject>
     {
@@ -68,7 +68,8 @@ namespace AnimLite.Utility
             async ValueTask<GameObject> instantateAsync_()
             {
                 await Awaitable.MainThreadAsync();
-                return( await GameObject.InstantiateAsync(this.prototype))[0];
+                //return(await GameObject.InstantiateAsync(this.prototype))[0];/*// vrm ã®å ´åˆã€éåŒæœŸã ã¨å•é¡Œã‚ã‚‹ã¿ãŸã„*/
+                return GameObject.Instantiate(this.prototype);
             }
         }
 

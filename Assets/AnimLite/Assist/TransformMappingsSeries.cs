@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -7,9 +7,9 @@ using UnityEngine.Jobs;
 namespace AnimLite
 {
     /// <summary>
-    /// ƒ‚ƒfƒ‹‚²‚Æ‚É‚Â
-    /// Eƒ{[ƒ“‚²‚Æ‚ÉA‘Î‰‚·‚éƒXƒgƒŠ[ƒ€‚ÌƒCƒ“ƒfƒbƒNƒX‚ğ‚Â
-    /// Eƒ‚ƒfƒ‹‚Ìƒqƒ…[ƒ}ƒmƒCƒhŠK‘w‚É‘¶İ‚·‚éƒ{[ƒ“‚Ì‚İ
+    /// ãƒ¢ãƒ‡ãƒ«ã”ã¨ã«æŒã¤
+    /// ãƒ»ãƒœãƒ¼ãƒ³ã”ã¨ã«ã€å¯¾å¿œã™ã‚‹ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒã¤
+    /// ãƒ»ãƒ¢ãƒ‡ãƒ«ã®ãƒ’ãƒ¥ãƒ¼ãƒãƒã‚¤ãƒ‰éšå±¤ã«å­˜åœ¨ã™ã‚‹ãƒœãƒ¼ãƒ³ã®ã¿
     /// </summary>
     public struct TransformHandleMappings : ITransformMappings<TfHandle>, IDisposable
     {
@@ -33,9 +33,9 @@ namespace AnimLite
     }
 
     /// <summary>
-    /// ƒ‚ƒfƒ‹‚²‚Æ‚É‚Â
-    /// Eƒ{[ƒ“‚²‚Æ‚ÉA‘Î‰‚·‚éƒXƒgƒŠ[ƒ€‚ÌƒCƒ“ƒfƒbƒNƒX‚ğ‚Â
-    /// Eƒ‚ƒfƒ‹‚Ìƒqƒ…[ƒ}ƒmƒCƒhŠK‘w‚É‘¶İ‚·‚éƒ{[ƒ“‚Ì‚İ
+    /// ãƒ¢ãƒ‡ãƒ«ã”ã¨ã«æŒã¤
+    /// ãƒ»ãƒœãƒ¼ãƒ³ã”ã¨ã«ã€å¯¾å¿œã™ã‚‹ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒã¤
+    /// ãƒ»ãƒ¢ãƒ‡ãƒ«ã®ãƒ’ãƒ¥ãƒ¼ãƒãƒã‚¤ãƒ‰éšå±¤ã«å­˜åœ¨ã™ã‚‹ãƒœãƒ¼ãƒ³ã®ã¿
     /// </summary>
     public struct TransformMappings : ITransformMappings<Tf>
     {
@@ -107,8 +107,8 @@ namespace AnimLite
     /// </summary>
     public struct BoneRotationInitialPose
     {
-        public quaternion RotLocalize;  // ¶‚©‚ç‚©‚¯‚é
-        public quaternion RotGlobalize; // ‰E‚©‚ç‚©‚¯‚é
+        public quaternion RotLocalize;  // å·¦ã‹ã‚‰ã‹ã‘ã‚‹
+        public quaternion RotGlobalize; // å³ã‹ã‚‰ã‹ã‘ã‚‹
     }
 
 

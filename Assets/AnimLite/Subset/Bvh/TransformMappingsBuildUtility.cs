@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -13,8 +13,8 @@ namespace AnimLite
 
 
     /// <summary>
-    /// ƒXƒgƒŠ[ƒ€i•”ˆÊ‚¨‚æ‚Ñƒ{[ƒ“‚É“™‚µ‚¢j‚Ì‚h‚c‚Æ unity Transform ‚ğƒƒ“ƒZƒbƒg‚É‚µ‚½\‘¢‘Ì‚Ì”z—ñ‚ğ\’z‚·‚éB
-    /// ƒ‚[ƒVƒ‡ƒ“‚ğÄ¶‚·‚éÛ‚ÍA”z—ñ—v‘f‚ğ‚P‚Â‚¸‚Â“K—p‚µ‚Ä‚¢‚¯‚Î‚æ‚¢B
+    /// ã‚¹ãƒˆãƒªãƒ¼ãƒ ï¼ˆéƒ¨ä½ãŠã‚ˆã³ãƒœãƒ¼ãƒ³ã«ç­‰ã—ã„ï¼‰ã®ï¼©ï¼¤ã¨ unity Transform ã‚’ãƒ¯ãƒ³ã‚»ãƒƒãƒˆã«ã—ãŸæ§‹é€ ä½“ã®é…åˆ—ã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
+    /// ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ã‚’å†ç”Ÿã™ã‚‹éš›ã¯ã€é…åˆ—è¦ç´ ã‚’ï¼‘ã¤ãšã¤é©ç”¨ã—ã¦ã„ã‘ã°ã‚ˆã„ã€‚
     /// </summary>
     public static class TransformMappingsExtension
     {
@@ -123,7 +123,7 @@ namespace AnimLite
 
 
         /////// <summary>
-        /////// ƒXƒvƒŠƒ“ƒOƒ{[ƒ“‚ÌˆÊ’u‚ğAƒ{[ƒ“‚Ì deuniform ‘O‚ÌƒƒbƒVƒ…‚Æ‚Ì‘Š‘ÎŠÖŒWˆÊ’u‚É–ß‚·
+        /////// ã‚¹ãƒ—ãƒªãƒ³ã‚°ãƒœãƒ¼ãƒ³ã®ä½ç½®ã‚’ã€ãƒœãƒ¼ãƒ³ã® deuniform å‰ã®ãƒ¡ãƒƒã‚·ãƒ¥ã¨ã®ç›¸å¯¾é–¢ä¿‚ä½ç½®ã«æˆ»ã™
         /////// </summary>
         ////public static void DeUniformSpringBones(
         ////    this Animator anim, Dictionary<string, DeUniformingBone> dict)

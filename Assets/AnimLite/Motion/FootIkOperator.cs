@@ -1,4 +1,4 @@
-using AnimLite.Utility;
+ï»¿using AnimLite.Utility;
 using AnimLite.Vmd;
 using System.Linq;
 using Unity.Collections;
@@ -60,8 +60,8 @@ namespace AnimLite.IK
                 where TStream : ITransformStreamSource<TTf>
                 where TPFinder : IKeyFinder<float4>
         {
-            var ikPosL = pkf.getpos(MmdBodyBones.¶‘«‚h‚j).As3() * 0.1f * op.bodyScale + op.footIkOffsetL;
-            var ikPosR = pkf.getpos(MmdBodyBones.‰E‘«‚h‚j).As3() * 0.1f * op.bodyScale + op.footIkOffsetR;
+            var ikPosL = pkf.getpos(MmdBodyBones.å·¦è¶³ï¼©ï¼«).As3() * 0.1f * op.bodyScale + op.footIkOffsetL;
+            var ikPosR = pkf.getpos(MmdBodyBones.å³è¶³ï¼©ï¼«).As3() * 0.1f * op.bodyScale + op.footIkOffsetR;
 
             var posL = math.rotate(rootrot, ikPosL) + rootpos;
             var posR = math.rotate(rootrot, ikPosR) + rootpos;
@@ -79,8 +79,8 @@ namespace AnimLite.IK
                 where TStream : ITransformStreamSource<TTf>
                 where TRFinder : IKeyFinder<quaternion>
         {
-            var lfikr = rkf.getrot(MmdBodyBones.¶‘«‚h‚j);
-            var rfikr = rkf.getrot(MmdBodyBones.‰E‘«‚h‚j);
+            var lfikr = rkf.getrot(MmdBodyBones.å·¦è¶³ï¼©ï¼«);
+            var rfikr = rkf.getrot(MmdBodyBones.å³è¶³ï¼©ï¼«);
 
             var lr = math.mul(rootrot, lfikr);
             var rr = math.mul(rootrot, rfikr);
@@ -104,21 +104,21 @@ namespace AnimLite.IK
             where TBone : ITransformMappings<TTf>
             where TTf : ITransformProxy, new()
         {
-            // mmd ‚Æ humanoid ‚ÌƒXƒP[ƒ‹”ä 80cm : 100cm ‚­‚ç‚¢
-            // 158cm ‚Ìƒ~ƒN‚ÌŒÒˆÊ’u‚ª‚»‚Ì‚­‚ç‚¢‚Æv‚í‚ê‚é
-            // humanoid ‚Ì humanscale 1m ‚ÍAhip ‚ÌˆÊ’u‚ç‚µ‚¢‚Æ‚Ì‚±‚Æ
+            // mmd ã¨ humanoid ã®ã‚¹ã‚±ãƒ¼ãƒ«æ¯” 80cm : 100cm ãã‚‰ã„
+            // 158cm ã®ãƒŸã‚¯ã®è‚¡ä½ç½®ãŒãã®ãã‚‰ã„ã¨æ€ã‚ã‚Œã‚‹
+            // humanoid ã® humanscale 1m ã¯ã€hip ã®ä½ç½®ã‚‰ã—ã„ã¨ã®ã“ã¨
             var bodyScale_ = bodyScale == 0
-                ? anim.humanScale * 0.8f// 0.8 ‚ÍAƒ~ƒN ¨ humaoid •â³
+                ? anim.humanScale * 0.8f// 0.8 ã¯ã€ãƒŸã‚¯ â†’ humaoid è£œæ­£
                 : bodyScale * 0.8f;
 
             var tfanim = anim.transform;
 
-            // ‘«‚h‚jˆÊ’u•â³‚Ì’²®B‘ÌŠi‚ğl—¶‚µ‚½’l‚É•â³‚·‚éB
-            var footLpos = anim.GetBoneTransform(HumanBodyBones.LeftFoot).position - tfanim.position;   // ƒ‹[ƒg‚©‚ç‚Ì‘«ˆÊ’u
+            // è¶³ï¼©ï¼«ä½ç½®è£œæ­£ã®èª¿æ•´ã€‚ä½“æ ¼ã‚’è€ƒæ…®ã—ãŸå€¤ã«è£œæ­£ã™ã‚‹ã€‚
+            var footLpos = anim.GetBoneTransform(HumanBodyBones.LeftFoot).position - tfanim.position;   // ãƒ«ãƒ¼ãƒˆã‹ã‚‰ã®è¶³ä½ç½®
             var footRpos = anim.GetBoneTransform(HumanBodyBones.RightFoot).position - tfanim.position;
-            var footIkOffsetL = tfanim.InverseTransformVector(footLpos);                                // ƒ[ƒJƒ‹ˆÊ’u‚É‚È‚¨‚·iŒü‚«‰ñ“]‚ğ‰Â”\‚É‚·‚é‚½‚ßj
+            var footIkOffsetL = tfanim.InverseTransformVector(footLpos);                                // ãƒ­ãƒ¼ã‚«ãƒ«ä½ç½®ã«ãªãŠã™ï¼ˆå‘ãå›è»¢ã‚’å¯èƒ½ã«ã™ã‚‹ãŸã‚ï¼‰
             var footIkOffsetR = tfanim.InverseTransformVector(footRpos);
-            // vmd ‚É‚Í‘Š‘ÎˆÊ’u‚µ‚©‹L˜^‚³‚ê‚È‚¢‚Æ„‘ª‚³‚ê‚é‚Ì‚ÅA‰Šúƒ|[ƒY‚Å‚Ì‘«‚ÌˆÊ’u‚Í‚±‚¿‚ç‚Å—pˆÓ‚·‚é•K—v‚ª‚ ‚éB
+            // vmd ã«ã¯ç›¸å¯¾ä½ç½®ã—ã‹è¨˜éŒ²ã•ã‚Œãªã„ã¨æ¨æ¸¬ã•ã‚Œã‚‹ã®ã§ã€åˆæœŸãƒãƒ¼ã‚ºã§ã®è¶³ã®ä½ç½®ã¯ã“ã¡ã‚‰ã§ç”¨æ„ã™ã‚‹å¿…è¦ãŒã‚ã‚‹ã€‚
 
             return new FootIkOperator<TTf>
             {

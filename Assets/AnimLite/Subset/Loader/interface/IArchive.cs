@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ÇÃÇΩÇﬂ
+using UnityEngine.Scripting;// [Preserve] „ÅÆ„Åü„ÇÅ
 using System.Net.Http;
 using System.IO.Compression;
 using System.Text;
@@ -27,8 +27,8 @@ namespace AnimLite.Utility
     // 
 
     /// <summary>
-    /// êeÇ .Dispose() Ç∑ÇÈÇ∆ÅAFallbackArchive Ç‡ .Dispose() Ç≥ÇÍÇÈÅB
-    /// ÇΩÇæÇµ Fallback Ç≥ÇÍÇƒÇ¢ÇÈë§Ç≈ .Dispose() ÇµÇƒÇ‡ñ‚ëËÇ»Ç¢ÅB
+    /// Ë¶™„Çí .Dispose() „Åô„Çã„Å®„ÄÅFallbackArchive „ÇÇ .Dispose() „Åï„Çå„Çã„ÄÇ
+    /// „Åü„Å†„Åó Fallback „Åï„Çå„Å¶„ÅÑ„ÇãÂÅ¥„Åß .Dispose() „Åó„Å¶„ÇÇÂïèÈ°å„Å™„ÅÑ„ÄÇ
     /// </summary>
     public interface IArchive : IDisposable
     {
@@ -136,7 +136,7 @@ namespace AnimLite.Utility.experimental2
     //    public T Unpack<T>(PathUnit entryPath, Func<Stream, T> loadAction)
     //    {
     //        using var view = mmf.CreateViewStream(0, 0, MemoryMappedFileAccess.Read);
-    //        using var zip = new ZipArchive(view, ZipArchiveMode.Read, leaveOpen: false, LocalEncoding.sjis);
+    //        using var zip = new ZipArchive(view, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
     //        return zip.Unzip(entryPath, loadAction);
     //    }
@@ -147,7 +147,7 @@ namespace AnimLite.Utility.experimental2
     //    public ZipArchiveSequencial(PathUnit archivepath, IArchive fallback = null)
     //    {
     //        this.stream = archivepath.OpenReadFileStream();
-    //        this.zip = new ZipArchive(this.stream, ZipArchiveMode.Read, leaveOpen: false, LocalEncoding.sjis);
+    //        this.zip = new ZipArchive(this.stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
     //        this.FallbackArchive = fallback;
     //    }
 

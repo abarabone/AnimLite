@@ -1,4 +1,4 @@
-using Unity.Mathematics;
+ï»¿using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
@@ -66,36 +66,36 @@ namespace AnimLite.Samples
         {
             try
             {
-                // ƒtƒ@ƒCƒ‹‚©‚çƒf[ƒ^‚ğ“Ç‚İ‰º‚·
+                // ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿ä¸‹ã™
                 var bvh = this.BvhFilePath.ParseBvh();
                 var vmdStreamData = Bvh.BvhParser.BvhToVmdMotionData(bvh);
 
-                // ƒf[ƒ^‚ğ—˜—p‚Å‚«‚éŒ`®‚É•ÏŠ·‚·‚é
+                // ãƒ‡ãƒ¼ã‚¿ã‚’åˆ©ç”¨ã§ãã‚‹å½¢å¼ã«å¤‰æ›ã™ã‚‹
                 this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData2(BvhParser.LogicalToPhysicalBones);
                 this.pos_data = vmdStreamData.bodyKeyStreams.CreatePositionData2();
 
-                // ƒf[ƒ^ƒAƒNƒZƒX‚ğ‚‘¬‰»‚·‚é‚½‚ß‚Ìõˆø‚ğì¬‚·‚é
+                // ãƒ‡ãƒ¼ã‚¿ã‚¢ã‚¯ã‚»ã‚¹ã‚’é«˜é€ŸåŒ–ã™ã‚‹ãŸã‚ã®ç´¢å¼•ã‚’ä½œæˆã™ã‚‹
                 this.rot_index = rot_data.CreateIndex(indexBlockLength: 100);
                 this.pos_index = pos_data.CreateIndex(indexBlockLength: 100);
 
-                // Forward ‚Å—˜—p‚·‚éƒL[ƒLƒƒƒbƒVƒ…ƒoƒbƒtƒ@‚ğ¶¬‚·‚é
+                // Forward ã§åˆ©ç”¨ã™ã‚‹ã‚­ãƒ¼ã‚­ãƒ£ãƒƒã‚·ãƒ¥ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã™ã‚‹
                 this.rot_cache = rot_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulRot>(timer);
                 this.pos_cache = pos_data.ToKey4CacheFactory().CreateCacheWithInitialize<Clamp, Key4CatmulPos>(timer);
 
-                // ”jŠü—p‚É‚Ü‚Æ‚ß‚Ä‚¨‚­
+                // ç ´æ£„ç”¨ã«ã¾ã¨ã‚ã¦ãŠã
                 this.disposabes = new DisposableBag
                 {
                     this.rot_data.ToHolderWith(this.rot_cache, this.rot_index),
                     this.pos_data.ToHolderWith(this.pos_cache, this.pos_index),
                 };
 
-                // ŠÔ”ÍˆÍ‚È‚Ç‚Ìî•ñ‚ğ‚Á‚½ƒ^ƒCƒ}[‚ğì¬‚·‚é
+                // æ™‚é–“ç¯„å›²ãªã©ã®æƒ…å ±ã‚’æŒã£ãŸã‚¿ã‚¤ãƒãƒ¼ã‚’ä½œæˆã™ã‚‹
                 this.timer = new StreamingTimer(rot_data.GetLastKeyTime());
 
-                // ƒqƒ…[ƒ}ƒmƒCƒhƒ‚ƒfƒ‹‚Ìî•ñ‚ğ\’z‚·‚é
+                // ãƒ’ãƒ¥ãƒ¼ãƒãƒã‚¤ãƒ‰ãƒ¢ãƒ‡ãƒ«ã®æƒ…å ±ã‚’æ§‹ç¯‰ã™ã‚‹
                 this.bone = this.anim.BuildTransformMappings();
 
-                //// ‚u‚l‚c‚ğÄ¶‚Ì‚½‚ß‚Ìî•ñ‚ğ\’z‚·‚é
+                //// ï¼¶ï¼­ï¼¤ã‚’å†ç”Ÿã®ãŸã‚ã®æƒ…å ±ã‚’æ§‹ç¯‰ã™ã‚‹
                 this.bodyOperator = this.anim.ToBodyTransformMotionOperator(this.bone);
                 //this.footOperator = this.anim.ToFootIkTransformOperator(this.bone);
                 //this.faceOperator = this.anim.ToVrmExpressionOperator(this.face);
@@ -113,12 +113,12 @@ namespace AnimLite.Samples
             if (this.disposabes == null) return;
 
 
-            // ƒ^ƒCƒ}[‚ği‚ß‚é
+            // ã‚¿ã‚¤ãƒãƒ¼ã‚’é€²ã‚ã‚‹
             this.timer.ProceedTime(Time.deltaTime);
 
 
-            // ƒL[ŒŸõƒIƒuƒWƒFƒNƒg‚ğ\’z‚·‚é
-            // ƒWƒFƒlƒŠƒNƒX‚É‚æ‚èuƒL[•âŠÔ•û®AŠÔ‚ÌƒNƒŠƒbƒv•û–@AŒŸõ•û–@v‚ğw’è‚Å‚«‚é
+            // ã‚­ãƒ¼æ¤œç´¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ§‹ç¯‰ã™ã‚‹
+            // ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹ã«ã‚ˆã‚Šã€Œã‚­ãƒ¼è£œé–“æ–¹å¼ã€æ™‚é–“ã®ã‚¯ãƒªãƒƒãƒ—æ–¹æ³•ã€æ¤œç´¢æ–¹æ³•ã€ã‚’æŒ‡å®šã§ãã‚‹
 
             var posKeyFinder = this.pos_data
                 .ToKeyFinder(this.pos_cache, this.pos_index)
@@ -129,7 +129,7 @@ namespace AnimLite.Samples
                 .With<Key4CatmulRot, Clamp, Forward>(this.timer);
 
 
-            // ‚u‚l‚c‚ğÄ¶‚·‚éiƒL[‚ğŒŸõ‚µAŒvZ‚µ‚Ä Transform ‚É‘‚«o‚·j
+            // ï¼¶ï¼­ï¼¤ã‚’å†ç”Ÿã™ã‚‹ï¼ˆã‚­ãƒ¼ã‚’æ¤œç´¢ã—ã€è¨ˆç®—ã—ã¦ Transform ã«æ›¸ãå‡ºã™ï¼‰
             var tfAnim = this.anim.transform;
             this.bodyOperator.SetLocalMotions(posKeyFinder, rotKeyFinder);
         }

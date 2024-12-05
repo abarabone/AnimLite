@@ -1,4 +1,4 @@
-
+ï»¿
 
 using System;
 using System.Collections;
@@ -16,7 +16,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ‚Ì‚½‚ß
+using UnityEngine.Scripting;// [Preserve] ã®ãŸã‚
 using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
@@ -44,8 +44,8 @@ namespace AnimLite.Utility
                 return default;
             }
             catch (UnityEngine.AddressableAssets.InvalidKeyException e)
-            // ‚È‚º‚©‚±‚êƒLƒƒƒbƒ`‚Å‚«‚½‚½‚ß‚µ‚ª‚È‚¢AƒRƒ“ƒ\[ƒ‹‚Éí‚ÉƒGƒ‰[‚Å•\¦‚³‚ê‚Ä‚µ‚Ü‚¤
-            // ‚µ‚©‚à‚»‚Ì‚Ü‚Üæ‚Éi‚ñ‚Å‚é‹C‚ª‚·‚éA‚Ù‚ñ‚Æ‚É—áŠO‚Å‚Ä‚ñ‚Ì‚±‚êH
+            // ãªãœã‹ã“ã‚Œã‚­ãƒ£ãƒƒãƒã§ããŸãŸã‚ã—ãŒãªã„ã€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã«å¸¸ã«ã‚¨ãƒ©ãƒ¼ã§è¡¨ç¤ºã•ã‚Œã¦ã—ã¾ã†
+            // ã—ã‹ã‚‚ãã®ã¾ã¾å…ˆã«é€²ã‚“ã§ã‚‹æ°—ãŒã™ã‚‹ã€ã»ã‚“ã¨ã«ä¾‹å¤–ã§ã¦ã‚“ã®ã“ã‚Œï¼Ÿ
             {
                 e.showWarning();
                 return default;
@@ -56,7 +56,7 @@ namespace AnimLite.Utility
                 return default;
             }
             catch (ArgumentNullException e)
-            // ƒŠƒ\[ƒXƒ[ƒh¸”s‚É stream ‚ª null ‚Å”­¶Bstream ‚ğó‚¯‚éŠÖ”‚Å‚Í‚¶‚«‚½‚¢‚¯‚Ç‚Ü‚ ‚¢‚¢‚©
+            // ãƒªã‚½ãƒ¼ã‚¹ãƒ­ãƒ¼ãƒ‰å¤±æ•—æ™‚ã« stream ãŒ null ã§ç™ºç”Ÿã€‚stream ã‚’å—ã‘ã‚‹é–¢æ•°ã§ã¯ã˜ããŸã„ã‘ã©ã¾ã‚ã„ã„ã‹
             {
                 e.showWarning();
                 return default;
@@ -84,8 +84,8 @@ namespace AnimLite.Utility
                 return default;
             }
             catch (UnityEngine.AddressableAssets.InvalidKeyException e)
-            // ‚È‚º‚©‚±‚êƒLƒƒƒbƒ`‚Å‚«‚½‚½‚ß‚µ‚ª‚È‚¢AƒRƒ“ƒ\[ƒ‹‚Éí‚ÉƒGƒ‰[‚Å•\¦‚³‚ê‚Ä‚µ‚Ü‚¤
-            // ‚µ‚©‚à‚»‚Ì‚Ü‚Üæ‚Éi‚ñ‚Å‚é‹C‚ª‚·‚éA‚Ù‚ñ‚Æ‚É—áŠO‚Å‚Ä‚ñ‚Ì‚±‚êH
+            // ãªãœã‹ã“ã‚Œã‚­ãƒ£ãƒƒãƒã§ããŸãŸã‚ã—ãŒãªã„ã€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã«å¸¸ã«ã‚¨ãƒ©ãƒ¼ã§è¡¨ç¤ºã•ã‚Œã¦ã—ã¾ã†
+            // ã—ã‹ã‚‚ãã®ã¾ã¾å…ˆã«é€²ã‚“ã§ã‚‹æ°—ãŒã™ã‚‹ã€ã»ã‚“ã¨ã«ä¾‹å¤–ã§ã¦ã‚“ã®ã“ã‚Œï¼Ÿ
             {
                 e.showWarning();
                 return default;
@@ -96,7 +96,7 @@ namespace AnimLite.Utility
                 return default;
             }
             catch (ArgumentNullException e)
-            // ƒŠƒ\[ƒXƒ[ƒh¸”s‚É stream ‚ª null ‚Å”­¶Bstream ‚ğó‚¯‚éŠÖ”‚Å‚Í‚¶‚«‚½‚¢‚¯‚Ç‚Ü‚ ‚¢‚¢‚©
+            // ãƒªã‚½ãƒ¼ã‚¹ãƒ­ãƒ¼ãƒ‰å¤±æ•—æ™‚ã« stream ãŒ null ã§ç™ºç”Ÿã€‚stream ã‚’å—ã‘ã‚‹é–¢æ•°ã§ã¯ã˜ããŸã„ã‘ã©ã¾ã‚ã„ã„ã‹
             {
                 e.showWarning();
                 return default;
@@ -130,14 +130,14 @@ namespace AnimLite.Utility
 
 
 
-        // ReadAsync() ‚È‚Ç‚Ì”ñ“¯Šúƒƒ\ƒbƒh‚ÍATask.Run() ‚Ì”ñ“¯Šú‚Æ“¯‚¶‚ç‚µ‚¢i‚f‚t‚hƒXƒŒƒbƒh‚ğƒuƒƒbƒN‚³‚¹‚È‚¢‚È‚Ç‚ÌˆÓ–¡‚µ‚©‚È‚¢j
-        // ‚¾‚ª‚±‚¿‚ç‚Ì•û‚ªˆ³“|“I‚É‚Í‚â‚¢A‚È‚º‚¾‚ë‚¤ciƒhƒLƒ…ƒƒ“ƒg‚É‚Í¬‚³‚¢ƒtƒ@ƒCƒ‹‚Å‚Í•s—˜‚Æ‚Í‚ ‚Á‚½‚ªj
+        // ReadAsync() ãªã©ã®éåŒæœŸãƒ¡ã‚½ãƒƒãƒ‰ã¯ã€Task.Run() ã®éåŒæœŸã¨åŒã˜ã‚‰ã—ã„ï¼ˆï¼§ï¼µï¼©ã‚¹ãƒ¬ãƒƒãƒ‰ã‚’ãƒ–ãƒ­ãƒƒã‚¯ã•ã›ãªã„ãªã©ã®æ„å‘³ã—ã‹ãªã„ï¼‰
+        // ã ãŒã“ã¡ã‚‰ã®æ–¹ãŒåœ§å€’çš„ã«ã¯ã‚„ã„ã€ãªãœã ã‚ã†â€¦ï¼ˆãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆã«ã¯å°ã•ã„ãƒ•ã‚¡ã‚¤ãƒ«ã§ã¯ä¸åˆ©ã¨ã¯ã‚ã£ãŸãŒï¼‰
         public static Stream OpenReadFileStream(this PathUnit fullpath) =>
                 //new FileStream(path, FileMode.Open, FileAccess.Read);
                 new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: false);
 
 
-        // ‚¿‚á‚ñ‚Æ‚µ‚½ I/O ‚Ì”ñ“¯Šú‚É‚È‚é‚ªA‚à‚Ì‚É‚æ‚Á‚Ä‚Í‚©‚È‚è’x‚­‚È‚é‚æ‚¤‚¾
+        // ã¡ã‚ƒã‚“ã¨ã—ãŸ I/O ã®éåŒæœŸã«ãªã‚‹ãŒã€ã‚‚ã®ã«ã‚ˆã£ã¦ã¯ã‹ãªã‚Šé…ããªã‚‹ã‚ˆã†ã 
         public static Stream OpenAsyncReadFileStream(this PathUnit fullpath)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -147,13 +147,13 @@ namespace AnimLite.Utility
         }
 
 
-        public static Stream OpenReadStream(this PathUnit path) =>
+        public static Stream OpenReadFileStreamEx(this PathUnit path) =>
             DanceSceneLoader.UseAsyncModeForFileStreamApi
             &&
-            new FileInfo(path).Length >= 3 * 1024 * 1024// ƒTƒCƒY‚Éª‹’‚Í‚È‚¢‚ª 3MB ‚Æ‚µ‚½
+            new FileInfo(path).Length >= 3 * 1024 * 1024// ã‚µã‚¤ã‚ºã«æ ¹æ‹ ã¯ãªã„ãŒ 3MB ã¨ã—ãŸ
                 ? path.OpenAsyncReadFileStream()
                 : path.OpenReadFileStream();
-        //‚â‚Á‚Ï‚è”ñ“¯Šú“Ç‚İ‚İ‚É‚·‚é‚Æ’´d‚­‚È‚é‹C‚ª‚·‚é
+        //ã‚„ã£ã±ã‚ŠéåŒæœŸèª­ã¿è¾¼ã¿ã«ã™ã‚‹ã¨è¶…é‡ããªã‚‹æ°—ãŒã™ã‚‹
 
 
 
@@ -162,9 +162,9 @@ namespace AnimLite.Utility
             {
                 var x when x.IsHttp() =>
                     //await fullpath.LoadFromWebAsync(ct),
-                    await fullpath.GetCachePathAsync(WebLoaderUtility.LoadFromWebAsync, ct).Await(OpenReadStream),
+                    await fullpath.GetCachePathAsync(WebLoaderUtility.LoadFromWebAsync, ct).Await(OpenReadFileStreamEx),
                 _ =>
-                    fullpath.OpenReadStream(),
+                    fullpath.OpenReadFileStreamEx(),
             };
 
 
@@ -175,13 +175,13 @@ namespace AnimLite.Utility
         =>
             fullpath.ToResourceName() switch
             {
-                var resname when resname != "" =>   // ƒŠƒ\[ƒX‚Å‚Í .zip ‚ğƒTƒ|[ƒg‚µ‚È‚¢
+                var resname when resname != "" =>   // ãƒªã‚½ãƒ¼ã‚¹ã§ã¯ .zip ã‚’ã‚µãƒãƒ¼ãƒˆã—ãªã„
                     await resname.LoadResourceToStreamAsync<TAsset>(toBytesAction, ct),
                 _ when fullpath.IsHttp() =>
                     //await fullpath.LoadFromWebAsync(ct),
-                    await fullpath.GetCachePathAsync(WebLoaderUtility.LoadFromWebAsync, ct).Await(OpenReadStream),
+                    await fullpath.GetCachePathAsync(WebLoaderUtility.LoadFromWebAsync, ct).Await(OpenReadFileStreamEx),
                 _ =>
-                    fullpath.OpenReadStream(),
+                    fullpath.OpenReadFileStreamEx(),
             };
 
 

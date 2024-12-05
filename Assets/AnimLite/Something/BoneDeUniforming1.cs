@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
@@ -190,18 +190,18 @@ namespace AnimLite.experimental.a
 
 
             //anim.re_transform_(dict, HumanBodyBones.LeftShoulder, Vector3.left);
-            anim.re_transform_ident_(dict, HumanBodyBones.LeftShoulder);//Œ¨‚Í³‹K‰»‚Ì‚Ü‚Ü‚Å‚æ‚¢‚Ì‚©‚à
+            anim.re_transform_ident_(dict, HumanBodyBones.LeftShoulder);//è‚©ã¯æ­£è¦åŒ–ã®ã¾ã¾ã§ã‚ˆã„ã®ã‹ã‚‚
             anim.re_transform_(dict, HumanBodyBones.LeftUpperArm, Vector3.left);
             anim.re_transform_(dict, HumanBodyBones.LeftLowerArm, Vector3.left);
             //anim.re_transform_terminal_ident_(dict, HumanBodyBones.LeftHand);
-            anim.re_transform_(dict, HumanBodyBones.LeftHand, Vector3.left);//’†w‚É‚Â‚È‚°‚é
+            anim.re_transform_(dict, HumanBodyBones.LeftHand, Vector3.left);//ä¸­æŒ‡ã«ã¤ãªã’ã‚‹
 
             //anim.re_transform_(dict, HumanBodyBones.RightShoulder, Vector3.right);
-            anim.re_transform_ident_(dict, HumanBodyBones.RightShoulder);//Œ¨‚Í³‹K‰»‚Ì‚Ü‚Ü‚Å‚æ‚¢‚Ì‚©‚à
+            anim.re_transform_ident_(dict, HumanBodyBones.RightShoulder);//è‚©ã¯æ­£è¦åŒ–ã®ã¾ã¾ã§ã‚ˆã„ã®ã‹ã‚‚
             anim.re_transform_(dict, HumanBodyBones.RightUpperArm, Vector3.right);
             anim.re_transform_(dict, HumanBodyBones.RightLowerArm, Vector3.right);
             //anim.re_transform_terminal_ident_(dict, HumanBodyBones.RightHand);
-            anim.re_transform_(dict, HumanBodyBones.RightHand, Vector3.right);//’†w‚É‚Â‚È‚°‚é
+            anim.re_transform_(dict, HumanBodyBones.RightHand, Vector3.right);//ä¸­æŒ‡ã«ã¤ãªã’ã‚‹
 
 
             //anim.re_transform_(dict, HumanBodyBones.LeftThumbProximal, math.normalize(Vector3.left + Vector3.forward));
@@ -369,13 +369,13 @@ namespace AnimLite.experimental.a
             {HumanBodyBones.LeftUpperArm, HumanBodyBones.LeftLowerArm},
             {HumanBodyBones.LeftLowerArm, HumanBodyBones.LeftHand},
             //{HumanBodyBones.LeftHand, HumanBodyBones.LeftHand},//
-            {HumanBodyBones.LeftHand, HumanBodyBones.LeftMiddleProximal},//’†w‚É‚Â‚È‚°‚é
+            {HumanBodyBones.LeftHand, HumanBodyBones.LeftMiddleProximal},//ä¸­æŒ‡ã«ã¤ãªã’ã‚‹
 
             {HumanBodyBones.RightShoulder, HumanBodyBones.RightUpperArm},
             {HumanBodyBones.RightUpperArm, HumanBodyBones.RightLowerArm},
             {HumanBodyBones.RightLowerArm, HumanBodyBones.RightHand},
             //{HumanBodyBones.RightHand, HumanBodyBones.RightHand},//
-            {HumanBodyBones.RightHand, HumanBodyBones.RightMiddleProximal},//’†w‚É‚Â‚È‚°‚é
+            {HumanBodyBones.RightHand, HumanBodyBones.RightMiddleProximal},//ä¸­æŒ‡ã«ã¤ãªã’ã‚‹
             
             {HumanBodyBones.LeftThumbProximal, HumanBodyBones.LeftThumbIntermediate},
             {HumanBodyBones.LeftThumbIntermediate, HumanBodyBones.LeftThumbDistal},
@@ -428,9 +428,9 @@ namespace AnimLite.experimental.a
 
 
         /// <summary>
-        /// ‚u‚l‚c‚©‚çƒ‚ƒfƒ‹‚Æ‚Ì”ä—¦‚ğŠ„‚èo‚¹‚È‚¢‚©‚Æv‚Á‚½‚ªAè‘«‚Ìƒ[ƒJƒ‹ˆÊ’u‚Í‚·‚×‚Ä 0,0,0 ‚Ì‚æ‚¤‚ÅA¸”s
+        /// ï¼¶ï¼­ï¼¤ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã¨ã®æ¯”ç‡ã‚’å‰²ã‚Šå‡ºã›ãªã„ã‹ã¨æ€ã£ãŸãŒã€æ‰‹è¶³ã®ãƒ­ãƒ¼ã‚«ãƒ«ä½ç½®ã¯ã™ã¹ã¦ 0,0,0 ã®ã‚ˆã†ã§ã€å¤±æ•—
         /// 
-        /// ‚±‚ÌŠÖ”‚Í³‚µ‚­‹@”\‚µ‚È‚¢B
+        /// ã“ã®é–¢æ•°ã¯æ­£ã—ãæ©Ÿèƒ½ã—ãªã„ã€‚
         /// </summary>
         public static float CalculateBodyLengthAverage(this Animator anim, Dictionary<VmdBoneName, VmdBodyMotionKey[]> vmddata)
         {
@@ -443,10 +443,10 @@ namespace AnimLite.experimental.a
             };
             var vmd = new[]
             {
-                "¶‚Ğ‚´",
-                "¶‘«ñ",
-                "¶‚Ğ‚¶",
-                "¶èñ",
+                "å·¦ã²ã–",
+                "å·¦è¶³é¦–",
+                "å·¦ã²ã˜",
+                "å·¦æ‰‹é¦–",
             };
 
             //var q =

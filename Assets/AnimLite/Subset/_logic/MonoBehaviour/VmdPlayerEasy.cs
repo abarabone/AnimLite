@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Playables;
 
 namespace AnimLite.Samples
@@ -27,13 +27,13 @@ namespace AnimLite.Samples
 
         async Awaitable Start()
         {
-            // ‚u‚l‚cƒf[ƒ^‚ğƒtƒ@ƒCƒ‹‚©‚çƒp[ƒX‚µAƒXƒgƒŠ[ƒ€ƒf[ƒ^‚ğƒrƒ‹ƒh‚·‚é
+            // ï¼¶ï¼­ï¼¤ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ‘ãƒ¼ã‚¹ã—ã€ã‚¹ãƒˆãƒªãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ“ãƒ«ãƒ‰ã™ã‚‹
             var vmdpath = this.VmdFilePath;
             var facemap = this.FaceMappingFilePath;
             var vmd = await VmdData.LoadVmdStreamDataExAsync(vmdpath, facemap, this.destroyCancellationToken);
             using var vmddata = vmd.vmddata;
 
-            // ‚u‚l‚c‚ğÄ¶‚Ì‚½‚ß‚Ìî•ñ‚ğ\’z‚·‚é
+            // ï¼¶ï¼­ï¼¤ã‚’å†ç”Ÿã®ãŸã‚ã®æƒ…å ±ã‚’æ§‹ç¯‰ã™ã‚‹
             var bone = this.anim.BuildVmdTransformMappings();
             var face = vmd.facemap.BuildStreamingFace();
             //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(vmd.facemap) ?? default;
@@ -42,7 +42,7 @@ namespace AnimLite.Samples
             var faceOperator = this.anim.ToVrmExpressionOperator(face);
 
 
-            // ŠÔ”ÍˆÍ‚È‚Ç‚Ìî•ñ‚ğ‚Á‚½ƒ^ƒCƒ}[‚ğì¬‚·‚é
+            // æ™‚é–“ç¯„å›²ãªã©ã®æƒ…å ±ã‚’æŒã£ãŸã‚¿ã‚¤ãƒãƒ¼ã‚’ä½œæˆã™ã‚‹
             var timer = new StreamingTimer(vmd.vmddata.RotationStreams.Streams.GetLastKeyTime());
 
 
@@ -53,12 +53,12 @@ namespace AnimLite.Samples
                 await Awaitable.NextFrameAsync(this.destroyCancellationToken);
 
 
-                // ƒ^ƒCƒ}[‚ği‚ß‚é
+                // ã‚¿ã‚¤ãƒãƒ¼ã‚’é€²ã‚ã‚‹
                 timer.ProceedTime(Time.deltaTime);
 
 
-                // ƒL[ŒŸõƒIƒuƒWƒFƒNƒg‚ğ\’z‚·‚é
-                // ƒWƒFƒlƒŠƒNƒX‚É‚æ‚èuƒL[•âŠÔ•û®AŠÔ‚ÌƒNƒŠƒbƒv•û–@AŒŸõ•û–@v‚ğw’è‚Å‚«‚é
+                // ã‚­ãƒ¼æ¤œç´¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ§‹ç¯‰ã™ã‚‹
+                // ã‚¸ã‚§ãƒãƒªã‚¯ã‚¹ã«ã‚ˆã‚Šã€Œã‚­ãƒ¼è£œé–“æ–¹å¼ã€æ™‚é–“ã®ã‚¯ãƒªãƒƒãƒ—æ–¹æ³•ã€æ¤œç´¢æ–¹æ³•ã€ã‚’æŒ‡å®šã§ãã‚‹
 
                 var rotKeyFinder = vmd.vmddata.RotationStreams
                     .ToKeyFinderWith<Key4CatmulRot, Clamp, Forward>(timer);
@@ -71,7 +71,7 @@ namespace AnimLite.Samples
                     .ToKeyFinderWith<Key4Catmul, Clamp, Forward>(timer);
 
 
-                // ‚u‚l‚c‚ğÄ¶‚·‚éiƒL[‚ğŒŸõ‚µAŒvZ‚µ‚Ä Transform ‚É‘‚«o‚·j
+                // ï¼¶ï¼­ï¼¤ã‚’å†ç”Ÿã™ã‚‹ï¼ˆã‚­ãƒ¼ã‚’æ¤œç´¢ã—ã€è¨ˆç®—ã—ã¦ Transform ã«æ›¸ãå‡ºã™ï¼‰
                 bodyOperator.SetLocalMotions(posKeyFinder, rotKeyFinder);
                 footOperator.SolveLegPositionIk(posKeyFinder, tfAnim.position, tfAnim.rotation);
                 footOperator.SolveFootRotationIk(rotKeyFinder, tfAnim.position, tfAnim.rotation);

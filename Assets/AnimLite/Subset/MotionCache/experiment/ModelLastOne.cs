@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,21 +22,21 @@ namespace AnimLite.Utility
 {
 
 
-    // ��������Ă��Ȃ�
-    // �� ��ԍŏ��ɍ쐬���ꂽ game object ���j�����ꂽ��A���̔h���̃��b�V���ȂǊe�탊�\�[�X���j������Ă��܂�����
-    // �@��L���삪 prefab �ɑ΂��ĂȂ̂� vrm load �ɑ΂��ĂȂ̂��Y�ꂽ�c
+    // 現状つかっていない
+    // → 一番最初に作成された game object が破棄されたら、その派生のメッシュなど各種リソースが破棄されてしまうため
+    // 　上記動作が prefab に対してなのか vrm load に対してなのか忘れた…
 
 
     /// <summary>
-    /// �擾
-    /// �E�ŏ��ɃC���X�^���X���P���[�h����
-    /// �E�P�����Ȃ��ꍇ�� prototype ��n��
-    /// �E�Q�ڂ���͕�����n��
-    /// �Eprototype �� list �Ƃ��ăC���X�^���X�����ׂĕێ�
-    /// �Eprototype �̔j������Ă��Ȃ��C���X�^���X��n��/��������
-    /// �j��
-    /// �E�C���X�^���X����ɂP�c��悤�ɂ���
-    /// �E�c�肪�P�Ȃ� destroy ���Ȃ�
+    /// 取得
+    /// ・最初にインスタンスを１つロードする
+    /// ・１つしかない場合は prototype を渡す
+    /// ・２つ目からは複製を渡す
+    /// ・prototype は list としてインスタンスをすべて保持
+    /// ・prototype の破棄されていないインスタンスを渡す/複製する
+    /// 破棄
+    /// ・インスタンスが常に１つ残るようにする
+    /// ・残りが１つなら destroy しない
     /// </summary>
     public class ModelLastOne : IPrototype<GameObject>
     {

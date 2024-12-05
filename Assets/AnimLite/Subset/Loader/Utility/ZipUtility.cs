@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 using UnityEngine.Networking;
 using UniVRM10;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Scripting;// [Preserve] ÇÃÇΩÇﬂ
+using UnityEngine.Scripting;// [Preserve] „ÅÆ„Åü„ÇÅ
 using System.Net.Http;
 using System.IO.Compression;
 using AnimLite.Vmd;
@@ -31,7 +31,7 @@ namespace AnimLite.Utility
     public static class ZipUtility
     {
 
-        // Archive ÇÃÇŸÇ§Ç…Ç‡Ç¡ÇƒÇ¢ÇØÇ»Ç¢ÇæÇÎÇ§Ç©
+        // Archive „ÅÆ„Åª„ÅÜ„Å´„ÇÇ„Å£„Å¶„ÅÑ„Åë„Å™„ÅÑ„Å†„Çç„ÅÜ„Åã
 
         /// <summary>
         /// 
@@ -39,7 +39,7 @@ namespace AnimLite.Utility
         public static T Unzip<T>(
             this Stream stream, PathUnit entryPath, Func<Stream, T> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return zip.Unzip(entryPath, createAction);
         }
@@ -51,7 +51,7 @@ namespace AnimLite.Utility
         public static async ValueTask<T> UnzipAsync<T>(
             this Stream stream, PathUnit entryPath, Func<Stream, ValueTask<T>> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return await zip.UnzipAsync(entryPath, createAction);
         }
@@ -62,7 +62,7 @@ namespace AnimLite.Utility
         /// </summary>
         public static T UnzipFirstEntry<T>(this Stream stream, string extension, Func<Stream, string, T> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return zip.UnzipFirstEntry(extension, createAction);
         }
@@ -74,7 +74,7 @@ namespace AnimLite.Utility
         public static async ValueTask<T> UnzipFirstEntryAsync<T>(
             this Stream stream, string extension, Func<Stream, string, ValueTask<T>> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return await zip.UnzipFirstEntryAsync(extension, createAction);
         }
@@ -85,7 +85,7 @@ namespace AnimLite.Utility
         /// </summary>
         public static T UnzipFirstEntry<T>(this Stream stream, string extension, Func<Stream, T> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return zip.UnzipFirstEntry(extension, createAction);
         }
@@ -97,7 +97,7 @@ namespace AnimLite.Utility
         public static async ValueTask<T> UnzipFirstEntryAsync<T>(
             this Stream stream, string extension, Func<Stream, ValueTask<T>> createAction)
         {
-            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, false, LocalEncoding.sjis);
+            using var zip = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true, LocalEncoding.sjis);
 
             return await zip.UnzipFirstEntryAsync(extension, createAction);
         }

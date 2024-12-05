@@ -1,4 +1,4 @@
-using Unity.Mathematics;
+ï»¿using Unity.Mathematics;
 
 namespace AnimLite
 {
@@ -268,7 +268,7 @@ namespace AnimLite
                 TimeNext = keysrc2.time,//c2.AdjustKeyTime(s.Times[i2]),
             };
             var d = cursor.TimeTo - cursor.TimeFrom;
-            cursor.FromToTimeRate = math.select(1.0f / d, 0.0f, d == 0.0f);// Nan o‚é‚Æv‚¤‚ª‚¾‚¢‚¶‚å‚Ô‚¾‚ë
+            cursor.FromToTimeRate = math.select(1.0f / d, 0.0f, d == 0.0f);// Nan å‡ºã‚‹ã¨æ€ã†ãŒã ã„ã˜ã‚‡ã¶ã ã‚
             //cursor.FromToTimeRate = 1.0f / math.select(d, 1.0f, d == 0.0f);
 
             var value = new Key4Value<T>
@@ -311,7 +311,7 @@ namespace AnimLite
                 TimeNext = keysrc.time,
             };
             var d = newCursor.TimeTo - newCursor.TimeFrom;
-            newCursor.FromToTimeRate = math.select(1.0f / d, 0.0f, prevCursor.IndexTo == newCursor.IndexTo);// Nan o‚é‚Æv‚¤‚ª‚¾‚¢‚¶‚å‚Ô‚¾‚ë
+            newCursor.FromToTimeRate = math.select(1.0f / d, 0.0f, prevCursor.IndexTo == newCursor.IndexTo);// Nan å‡ºã‚‹ã¨æ€ã†ãŒã ã„ã˜ã‚‡ã¶ã ã‚
 
             var prevValue = key.value;
             var newValue = new Key4Value<T>

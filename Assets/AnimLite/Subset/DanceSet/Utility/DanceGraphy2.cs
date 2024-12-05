@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace AnimLite.DancePlayable
         Func<ValueTask> DisposeAction = () => new ValueTask();
 
 
-        public float TotalTime;// Žb’èA‚¿‚á‚ñ‚Æ‚µ‚½•û–@‚É‚µ‚½‚¢
+        public float TotalTime;// æš«å®šã€ã¡ã‚ƒã‚“ã¨ã—ãŸæ–¹æ³•ã«ã—ãŸã„
 
 
 
@@ -118,7 +118,7 @@ namespace AnimLite.DancePlayable
                 this.bone.Dispose();
                 this.vmddata?.Dispose();
 
-                await Awaitable.MainThreadAsync();// •s—v‚©‚à
+                await Awaitable.MainThreadAsync();// ä¸è¦ã‹ã‚‚
                 //this.Model.AsUnityNull(o => o?.activeSelf)?.Destroy();
                 await this.Model.DisposeNullableAsync();
             }
@@ -131,7 +131,7 @@ namespace AnimLite.DancePlayable
             public override bool IsMotionBlank => this.AnimationClip is null;
             public override async ValueTask DisposeAsync()
             {
-                await Awaitable.MainThreadAsync();// •s—v‚©‚à
+                await Awaitable.MainThreadAsync();// ä¸è¦ã‹ã‚‚
                 await this.AnimationClip.DisposeNullableAsync();
                 await this.Model.DisposeNullableAsync();
             }
@@ -189,7 +189,7 @@ namespace AnimLite.DancePlayable
             createAudioPlayable_(graph, order.Audio);
 
             if (order.Audio is not null)
-                order.Audio.AudioSource.volume = order.Audio.Volume;// playable ‚Ì weight ‚Å•Ï‚¦‚é‚×‚«‚Æ‚àŽv‚¤‚ªAaudio ‚Ì playable output ‚É‚»‚¤‚¢‚¤‹@”\‚Í‚È‚¢‚æ‚¤‚È‚Ì‚Å‚Æ‚è‚ ‚¦‚¸‚±‚±‚Å
+                order.Audio.AudioSource.volume = order.Audio.Volume;// playable ã® weight ã§å¤‰ãˆã‚‹ã¹ãã¨ã‚‚æ€ã†ãŒã€audio ã® playable output ã«ãã†ã„ã†æ©Ÿèƒ½ã¯ãªã„ã‚ˆã†ãªã®ã§ã¨ã‚Šã‚ãˆãšã“ã“ã§
 
 
             var totalTime = graph.GetRootPlayableCount() > 0

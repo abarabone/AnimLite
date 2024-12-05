@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,13 +17,13 @@ namespace AnimLite.Vmd
     using System.IO.Compression;
 
     /// <summary>
-    /// �u�l�c�f�[�^���L���b�V������B
-    /// �L�[�̓p�X�B�t�F�C�X�}�b�v���قȂ���͈̂قȂ�f�[�^�Ƃ��ĕێ�����B
-    /// �ێ������f�[�^�� �{�f�B��]�A�{�f�B�ʒu�A�t�F�C�X�A�ł���A��������X�g���[���L���b�V�����������A�R�A�f�[�^�Ƃ�����B
-    /// �X�g���[���L���b�V����t������ɂ́A.CloneShallowlyWithCache() �Ńf�[�^�̃N���[�����쐬����B
-    /// VmdStreamDataCache.enabled �� false �ɂȂ����Ƃ��L���b�V���̓N���A�����B
-    /// �������u�l�c�f�[�^�͎Q�ƃJ�E���g�t���ŁA�Q�Ƃ��S�ă[���ɂȂ������ɔj�������B
-    /// �Q�ƃJ�E���g�̓R�A�f�[�^�������A�N���[���쐬���A�ɂP�����Z�����B
+    /// ＶＭＤデータをキャッシュする。
+    /// キーはパス。フェイスマップが異なるものは異なるデータとして保持する。
+    /// 保持されるデータは ボディ回転、ボディ位置、フェイス、であり、いずれもストリームキャッシュを持たず、コアデータといえる。
+    /// ストリームキャッシュを付加するには、.CloneShallowlyWithCache() でデータのクローンを作成する。
+    /// VmdStreamDataCache.enabled が false になったときキャッシュはクリアされる。
+    /// ただしＶＭＤデータは参照カウント付きで、参照が全てゼロになった時に破棄される。
+    /// 参照カウントはコアデータ生成時、クローン作成時、に１ずつ加算される。
     /// </summary>
     public class VmdStreamDataCache : MonoBehaviour
     {
@@ -32,7 +32,7 @@ namespace AnimLite.Vmd
         VmdCacheDictionary Cache = new();
 
         [SerializeField]
-        ModelGameObjectStocker ModelStocker = new();// �Ƃ肠���������ɒu�����A�l�����邱��
+        ModelGameObjectStocker ModelStocker = new();// とりあえずここに置くが、考慮すること
 
 
         public async Awaitable OnDisable()

@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,25 +12,30 @@ namespace AnimLite
 
         public bool IsAccessWithinParentPathOnly = PathUnit.IsAccessWithinParentPathOnly;
 
-        public DanceSceneLoader.ZipMode ZipLoaderMode = DanceSceneLoader.ZipMode.ParallelOpenMultiFiles;
-
         public bool UseAsyncModeForFileStreamApi = DanceSceneLoader.UseAsyncModeForFileStreamApi;
+
+        public bool UseSeaquentialLoading = DanceSceneLoader.UseSeaquentialLoading;
+
+        public DanceSceneLoader.ZipMode ZipLoaderMode = DanceSceneLoader.ZipMode.ParallelOpenMultiFiles;
 
 
         public void Awake()
         {
-            PathUnit.InitPath();// ÉÇÉmÉrÇ…àÀë∂ÇµÇ»Ç¢Ç≈åƒÇ‘ï˚ñ@Ç»Ç¢ÇÃÅHÅH
+            PathUnit.InitPath();// „É¢„Éé„Éì„Å´‰æùÂ≠ò„Åó„Å™„ÅÑ„ÅßÂëº„Å∂ÊñπÊ≥ï„Å™„ÅÑ„ÅÆÔºüÔºü
 
             PathUnit.IsAccessWithinParentPathOnly = this.IsAccessWithinParentPathOnly;
 
-            DanceSceneLoader.ZipLoaderMode = this.ZipLoaderMode;
-
             DanceSceneLoader.UseAsyncModeForFileStreamApi = this.UseAsyncModeForFileStreamApi;
+
+            DanceSceneLoader.UseSeaquentialLoading = this.UseSeaquentialLoading;
+
+            DanceSceneLoader.ZipLoaderMode = this.ZipLoaderMode;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             $"PathUnit.IsAccessWithinParentPathOnly : {PathUnit.IsAccessWithinParentPathOnly}".ShowDebugLog();
-            $"DanceSceneLoader.ZipLoaderMode : {DanceSceneLoader.ZipLoaderMode}".ShowDebugLog();
             $"DanceSceneLoader.UseAsyncModeForFileStreamApi : {DanceSceneLoader.UseAsyncModeForFileStreamApi}".ShowDebugLog();
+            $"DanceSceneLoader.UseSeaquentialLoading : {DanceSceneLoader.UseSeaquentialLoading}".ShowDebugLog();
+            $"DanceSceneLoader.ZipLoaderMode : {DanceSceneLoader.ZipLoaderMode}".ShowDebugLog();
             $"PathUnit.PathUnit.CacheFolderPath : {PathUnit.CacheFolderPath}".ShowDebugLog();
             $"PathUnit.DataFolderPath : {PathUnit.DataFolderPath}".ShowDebugLog();
             $"PathUnit.PersistentFolderPath : {PathUnit.PersistentFolderPath}".ShowDebugLog();

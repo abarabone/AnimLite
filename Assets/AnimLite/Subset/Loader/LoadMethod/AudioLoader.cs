@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +27,9 @@ namespace AnimLite.Utility
     static public class AudioLoader
     {
 
-        // ƒI[ƒfƒBƒI‚ÍƒXƒgƒŠ[ƒ€‚©‚ç‚¾‚Æ audio clip ‚É‚Å‚«‚È‚¢iƒfƒR[ƒhˆ—‚Æ‚©‚©‚©‚È‚¢‚Æ‚¢‚¯‚È‚¢j‚Ì‚ÅA‘¼‚ÌƒƒfƒBƒA‚Æˆá‚¤‚â‚è•û
-        // unity ‚Ì UnityWebRequestMultimedia ‚© addressables ‚©A‚Ì‚Q’Ê‚è
-        // ‚½‚¾‚µ zip ‚Í stream ‚©‚ç‚Ì•û–@‚ğ‚Æ‚Á‚½‚½‚ßA‚¢‚Á‚½‚ñ tmp file ‚É‚µ‚Ä‚©‚ç UnityWebRequestMultimedia ‚Å“Ç‚Ü‚¹‚Ä‚¢‚é
+        // ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã¯ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰ã ã¨ audio clip ã«ã§ããªã„ï¼ˆãƒ‡ã‚³ãƒ¼ãƒ‰å‡¦ç†ã¨ã‹ã‹ã‹ãªã„ã¨ã„ã‘ãªã„ï¼‰ã®ã§ã€ä»–ã®ãƒ¡ãƒ‡ã‚£ã‚¢ã¨é•ã†ã‚„ã‚Šæ–¹
+        // unity ã® UnityWebRequestMultimedia ã‹ addressables ã‹ã€ã®ï¼’é€šã‚Š
+        // ãŸã ã— zip ã¯ stream ã‹ã‚‰ã®æ–¹æ³•ã‚’ã¨ã£ãŸãŸã‚ã€ã„ã£ãŸã‚“ tmp file ã«ã—ã¦ã‹ã‚‰ UnityWebRequestMultimedia ã§èª­ã¾ã›ã¦ã„ã‚‹
 
 
 
@@ -142,12 +142,12 @@ namespace AnimLite.Utility
             {
                 var schemedpath = path.IsHttp()
                     ? path
-                    : $"file://{path.Value}".ToPath();// android ‚¾‚ÆƒXƒL[ƒ€•K—v‚Û‚¢
+                    : $"file://{path.Value}".ToPath();// android ã ã¨ã‚¹ã‚­ãƒ¼ãƒ å¿…è¦ã½ã„
 
                 await Awaitable.MainThreadAsync();
                 using var req = UnityWebRequestMultimedia.GetAudioClip(schemedpath, audioType);
 
-                //((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;// graph.Evalute() ‚Å‚Ì‰¹ƒYƒŒ‚ÌŒ´ˆö‚Å‚ ‚é‰Â”\«‚ ‚è‚È‚Ì‚Å‚â‚ß‚é
+                //((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = true;// graph.Evalute() ã§ã®éŸ³ã‚ºãƒ¬ã®åŸå› ã§ã‚ã‚‹å¯èƒ½æ€§ã‚ã‚Šãªã®ã§ã‚„ã‚ã‚‹
                 ((DownloadHandlerAudioClip)req.downloadHandler).streamAudio = false;
 
                 await req.SendWebRequest();

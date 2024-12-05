@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -233,7 +233,7 @@ namespace AnimLite.Utility.old
                     //UsePositionAndDirection = true,
                     Position = tf.position,
                     EulerAngles = tf.rotation.eulerAngles,
-                    Scale = tf.localScale.y,    // ‚Æ‚è‚ ‚¦‚¸‚‚³‚ªƒXƒP[ƒ‹‚ÌŠî–{‚Æ‚·‚é
+                    Scale = tf.localScale.y,    // ã¨ã‚Šã‚ãˆãšé«˜ã•ãŒã‚¹ã‚±ãƒ¼ãƒ«ã®åŸºæœ¬ã¨ã™ã‚‹
                 },
                 Animation = new AnimationDefineJson
                 {

@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace AnimLite.Utility
 
 
     /// <summary>
-    /// Eprototype ‚ÉƒŠƒ\[ƒX‚ğ•Û
+    /// ãƒ»prototype ã«ãƒªã‚½ãƒ¼ã‚¹ã‚’ä¿æŒ
     /// </summary>
     public class ModelPrefab : IPrototype<GameObject>
     {
@@ -47,7 +47,7 @@ namespace AnimLite.Utility
         int refCount = 0;
 
 
-        // vrm ‚Ì•¡»‚Í”ñ“¯Šú‚Å‚â‚é‚ÆƒXƒvƒŠƒ“ƒOƒ{[ƒ“‚ª“®‚©‚È‚¢‚İ‚½‚¢‚È‚Ì‚ÅAŒ»ó‚Í“¯Šú‚Å‚â‚é
+        // vrm ã®è¤‡è£½ã¯éåŒæœŸã§ã‚„ã‚‹ã¨ã‚¹ãƒ—ãƒªãƒ³ã‚°ãƒœãƒ¼ãƒ³ãŒå‹•ã‹ãªã„ã¿ãŸã„ãªã®ã§ã€ç¾çŠ¶ã¯åŒæœŸã§ã‚„ã‚‹
         //public async ValueTask<Instance<GameObject>> InstantiateAsync()
         //{
         //    await Awaitable.MainThreadAsync();

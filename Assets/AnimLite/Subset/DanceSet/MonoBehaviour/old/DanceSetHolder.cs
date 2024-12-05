@@ -1,4 +1,4 @@
-using System.Linq;
+ï»¿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -153,7 +153,7 @@ namespace AnimLite.DancePlayable
                     let tf = x.transform
                     let pos = tf.position
                     let rot = tf.rotation
-                    select motion_(x.Motion, pos, rot)// with ‚ª‚Â‚©‚ê‚Î‚»‚ê‚Å
+                    select motion_(x.Motion, pos, rot)// with ãŒã¤ã‹ã‚Œã°ãã‚Œã§
                     ;
 
                 this.dance.Motions = this.dance.Motions.Concat(q).ToArray();
@@ -178,7 +178,7 @@ namespace AnimLite.DancePlayable
             this.cts?.Cancel();
 
             "disable start".ShowDebugLog();
-            using (await this.DanceSemapho.WaitAsyncDisposable(default))// ƒQ[ƒ€ƒIƒuƒWƒFƒNƒg‚ª”jŠü‚³‚ê‚Ä‚àA‰ğ•ú‚Í‚â‚èØ‚Á‚Ä‚Ù‚µ‚¢‚Ì‚Å Token ‚Í default
+            using (await this.DanceSemapho.WaitAsyncDisposable(default))// ã‚²ãƒ¼ãƒ ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒç ´æ£„ã•ã‚Œã¦ã‚‚ã€è§£æ”¾ã¯ã‚„ã‚Šåˆ‡ã£ã¦ã»ã—ã„ã®ã§ Token ã¯ default
             {
                 this.Graphy?.Dispose();
                 this.Graphy = null;

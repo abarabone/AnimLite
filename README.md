@@ -9,6 +9,15 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2024.12.1
+- .json に記載した相対パスでは、.json のあるフォルダを起点にするようにした。そのほうが自然かなと…
+  - 今までは一律で PathUnit.ParentPath が起点だった
+  - これに合わせて、zip 管理用の IArchive を拡張してフォルダ関連を管理するクラスにした
+- zip の並列ロード時、１つだけオープンするモードを追加
+  - 今までは並列単位で zip ファイルをオープンしていた（ ZipArchive と Stream クラスの都合上）
+  - ファイルマッピングを使用することでなんとかなりそうだったので組み込んでみた。…が、quest3 で落ちたので調査中…
+- 一部部位で quaternion の回転順序逆になってたかも、しゅうせいした orz　肩とか
+
 2024.11.3
 - .json の BackGrounds と Motions のキー名でワイルドカードを使えるようにした
 
@@ -94,6 +103,7 @@
 - .vmd 変換を高速化したい
 
 # なやみちゅう
+- zip 読み込みの時 android(quest3) で読めなくなったかも…調査中　文字コードかな　相対パス修正したらだめんなった
 - 非同期と並列うまく扱えてない感　特に unity の Awaitable
 - 非同期とバックグラウンドスレッドを分けた関数にしようかな  
   ~~- xxxAsync() と xxxBg() とか？~~  
@@ -196,7 +206,7 @@
 }
 ```
 - パスの形式
-  - 相対パス指定： ds/step1.vmd
+  - 相対パス指定： step1.vmd（ . や .. も使える）
   - 絶対パス指定： c:/xxxx/ds/step1.vmd
   - web から： https://github.com/abarabone/AnimLite/raw/master/Asset/ds/step1.vmd
   - zip を指定： https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip
@@ -209,15 +219,20 @@
   - AnimationFilePath に限り、単体でも配列でも記述できる  
     "AnimationFilePath": "body.vmd"  
     "AnimationFilePath": ["body.vmd", "face.vmd"]
-- 単体 zip に固めたデータは、同じ ZipArchive を使いまわすのでマルチスレッドロードが利かない（非同期ではあるが）
-  - ただし SceneLoadUtilitiy.IsSeaquentialLoadingInZip が false の時には、同じ zip を複数開いて並列にロードする
-  - デフォルトは false
-  - ~~マルチスレッドロードは機能していないことに気づいた。ZipArchive のエントリが相対パスの場合、ローカルを見に行ってしまう…~~ ← 修正対応した（つもり）
+- 単体 zip に固めたデータは、
+  - ３種類のロードモードがあり、DanceSceneLoader.ZipLoaderMode で指定する（全体用の設定なのでロードの度に変えたりはできない）
+    - Sequential              ... １つずつロード
+    - ParallelOpenSingleFile  ... 並列してロードするが、ファイルは１つだけ開く（ファイルマッピングを使用、android だと不安定かも、調査中）
+    - ParallelOpenMultiFiles  ... 並列してロードし、ファイルはそれぞれ開く（そのぶんメモリを消費する）
+  - デフォルトは ParallelOpenMultiFiles
 - いちおう utf8 と sjis の zip に対応しているつもり（ win の送るで作った zip はなんと shift-jis で内部パスが保存される仕様らしい）
 - 相対パスは、下記のように絶対パスに変換してロードする
-  - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
-  - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
-  - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
+  - .json のあるフォルダを起点として検索
+    - .json を上書き読みこみしている場合は、ベースとなった .json のあるフォルダも検索対象となる
+  - 上記でみつからない場合、または .json を使用していない場合
+    - FullPathMode.PersistentDataPath の時は Application.persistentDataPath + /ds/step1.vmd
+    - FullPathMode.DataPath の時は Application.dataPath + /ds/step1.vmd
+    - デフォルトは dataPath（ android の実機の時だけ persistentDataPath ）
 - PathUnit.IsAccessWithinParentPathOnly が true なら、ローカルファイルに関しては PathUnit.ParentPath 以下にあるファイルにしかアクセスできないようにした
   - デフォルトは true
   - アクセスすると IOException をスローする（ null が返されるとかのほうがいいだろうか）
@@ -276,12 +291,6 @@
 - ワイルドカードでの上書き/ベース継承を実装したため、デフォルトアニメーションは廃止とした
 
 # その他
-- ~~vrm 自動インポートを切っていると、サンプルシーンでプレハブがきれてしまうのに気づきました~~
-- ~~![image](https://github.com/user-attachments/assets/6270ef93-c64a-4bdc-8307-ac8bdcb78838)~~
-  - ~~チェックをオンにするか、Resources の中の vrm を reimport すると動くようです~~
-  - ~~vrm 0 は自動でプレハブを新規作成するようで、その時データとなるフォルダ？っぽいのが大量にできてしまう。それが嫌なのでオフにしてます~~
-  - ~~vrm ファイル自体がモデルのプレハブとして機能するようなので、新規作成されたプレハブとデータのフォルダは消してしまっても動きます~~
-  -> vrm 0 パッケージをインポートしないようにしました（ vrm 1.0 だけにした）
 - unity 6 preview から addressables での Resources フォルダが使えなくなったようす…（ひどい）
   -> Resources_moved に移動されてしまう
 

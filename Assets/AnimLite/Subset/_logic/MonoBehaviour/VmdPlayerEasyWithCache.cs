@@ -14,7 +14,7 @@ namespace AnimLite.Samples
 
     public class VmdPlayerEasyWithCache : MonoBehaviour
     {
-        public PrototypeCacheHolder Cache = new PrototypeCacheHolder(useVmdCache: true);
+        public PrototypeCacheManager Cache;
 
         [FilePath]
         public PathUnit VmdFilePath;
@@ -32,8 +32,8 @@ namespace AnimLite.Samples
             // ＶＭＤデータをファイルからパースし、ストリームデータをビルドする
             var vmdpath = this.VmdFilePath;
             var facemappath = this.FaceMappingFilePath;
-            await using var vmddata = await this.Cache.VmdCache.GetOrLoadVmdAsync(vmdpath, facemappath, null, this.destroyCancellationToken);
-            await using var facemap = await this.Cache.VmdCache.facemap.GetOrLoadVmdFaceMappingAsync(facemappath, null, this.destroyCancellationToken);
+            await using var vmddata = await this.Cache.Holder.VmdCache.GetOrLoadVmdAsync(vmdpath, facemappath, null, this.destroyCancellationToken);
+            await using var facemap = await this.Cache.Holder.VmdCache.facemap.GetOrLoadVmdFaceMappingAsync(facemappath, null, this.destroyCancellationToken);
             
             // ＶＭＤを再生のための情報を構築する
             var bone = this.anim.BuildVmdTransformMappings();

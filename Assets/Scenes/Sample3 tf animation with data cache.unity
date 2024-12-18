@@ -1177,7 +1177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1196,7 +1196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1215,7 +1215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1234,7 +1234,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1253,7 +1253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2992d477d1f0d42439a36cdd64ef81a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cache: {fileID: 1532275632}
+  Cache: {fileID: 1532275634}
   VmdFilePath:
     Value: "motions/\u3010\u7530\u4E2D\u30D2\u30E1\u3011\u30ED\u30AD\u3010\u30C0\u30F3\u30B9\u3011.vmd"
   FaceMappingFilePath:
@@ -1303,7 +1303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1532275633}
-  - component: {fileID: 1532275632}
+  - component: {fileID: 1532275634}
   m_Layer: 0
   m_Name: data cache
   m_TagString: Untagged
@@ -1311,20 +1311,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1532275632
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1532275631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c48cc9abe26708e4eb1857de317287d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ModelStocker:
-    MaxStockModelLength: 0
 --- !u!4 &1532275633
 Transform:
   m_ObjectHideFlags: 0
@@ -1340,6 +1326,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1532275634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1532275631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2a241e2810539249bbda0e4ae9e3efa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseVmdCache: 1
+  UseModelCache: 1
 --- !u!1001 &1629253492
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -43,6 +43,11 @@ namespace AnimLite.Utility
                 e.showWarning();
                 return default;
             }
+            catch (System.Net.Http.HttpRequestException e)
+            {
+                e.showWarning();
+                return default;
+            }
             catch (UnityEngine.AddressableAssets.InvalidKeyException e)
             // なぜかこれキャッチできたためしがない、コンソールに常にエラーで表示されてしまう
             // しかもそのまま先に進んでる気がする、ほんとに例外でてんのこれ？
@@ -79,6 +84,11 @@ namespace AnimLite.Utility
                 return default;
             }
             catch (System.IO.DirectoryNotFoundException e)
+            {
+                e.showWarning();
+                return default;
+            }
+            catch (System.Net.Http.HttpRequestException e)
             {
                 e.showWarning();
                 return default;

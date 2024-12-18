@@ -483,8 +483,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsAccessWithinParentPathOnly: 0
-  IsSeaquentialLoadingInZip: 0
   UseAsyncModeForFileStreamApi: 0
+  UseSeaquentialLoading: 1
+  ZipLoaderMode: 2
 --- !u!4 &1347650035
 Transform:
   m_ObjectHideFlags: 0
@@ -509,11 +510,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1347650033}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c48cc9abe26708e4eb1857de317287d4, type: 3}
+  m_Script: {fileID: 11500000, guid: c2a241e2810539249bbda0e4ae9e3efa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelStocker:
-    MaxStockModelLength: 20
+  UseVmdCache: 1
+  UseModelCache: 1
 --- !u!1 &1440763540
 GameObject:
   m_ObjectHideFlags: 0

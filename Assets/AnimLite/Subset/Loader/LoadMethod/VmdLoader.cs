@@ -17,16 +17,10 @@ using UnityEngine.AddressableAssets;
 using System.Net.Http;
 using System.IO.Compression;
 
-namespace AnimLite.Utility
-{
-    using AnimLite.Vmd;
-    using AnimLite.Vrm;
-
-}
-
-namespace AnimLite.Vmd
+namespace AnimLite.Loader
 {
     using AnimLite.Utility;
+    using AnimLite.Vmd;
 
 
     public static partial class VmdLoader
@@ -34,8 +28,7 @@ namespace AnimLite.Vmd
 
 
 
-
-        public static async ValueTask<VmdMotionData> LoadVmdExAsync(
+        public static async ValueTask<VmdMotionData> LoadVmdAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
         {
             if (path.IsBlank()) return default;
@@ -49,16 +42,16 @@ namespace AnimLite.Vmd
                     return data;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadVmdExAsync(path, ct);
+                    return await archive.FallbackArchive.LoadVmdAsync(path, ct);
             }
 
-            return await path.LoadVmdExAsync(ct);
+            return await path.LoadVmdAsync(ct);
         }
 
 
 
 
-        public static ValueTask<VmdMotionData> LoadVmdExAsync(this PathUnit path, CancellationToken ct) =>
+        public static ValueTask<VmdMotionData> LoadVmdAsync(this PathUnit path, CancellationToken ct) =>
             LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>
@@ -81,6 +74,40 @@ namespace AnimLite.Vmd
                     await openAsync_(fullpath + queryString).UsingAwait(VmdParser.ParseVmd),
             };
         });
+
+
+
+
+
+
+        public static ValueTask<VmdMotionData> LoadVmdExAsync(
+            this IArchive archive, PathList pathlist, CancellationToken ct)
+        =>
+
+            // いずれ、並列か直列か選択式にしたい
+            pathlist.Paths
+                .ToAsyncEnumerable()
+                .SelectAwait(x => archive.LoadVmdAsync(x, ct))
+                .Where(x => !x.IsUnload())
+                .DefaultIfEmpty()
+                .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
+
+
+
+        public static ValueTask<VmdMotionData> LoadVmdExAsync(
+            this PathList pathlist, CancellationToken ct)
+        =>
+
+            // いずれ、並列か直列か選択式にしたい
+            pathlist.Paths
+                .ToAsyncEnumerable()
+                .SelectAwait(x => x.LoadVmdAsync(ct))
+                .Where(x => !x.IsUnload())
+                .DefaultIfEmpty()
+                .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
+
+
+
 
 
 

@@ -13,6 +13,22 @@ namespace AnimLite.Utility
     public static class DictionaryExtension
     {
 
+
+
+        public static T AddChain<T, TKey, TValue>(this T dict, TKey key, TValue value)
+            where T : Dictionary<TKey, TValue>
+        {
+            dict.Add(key, value);
+            return dict;
+        }
+
+
+
+
+
+
+
+
         /// <summary>
         /// キーと非同期生成関数を登録する。
         /// キャンセルが発生した場合は、AsyncLazy を辞書から消す。

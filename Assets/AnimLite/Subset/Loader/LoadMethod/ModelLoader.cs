@@ -16,19 +16,13 @@ using UniVRM10;
 using UnityEngine.AddressableAssets;
 using System.Net.Http;
 using System.IO.Compression;
+using UniGLTF;
 
-namespace AnimLite.Utility
+namespace AnimLite.Loader
 {
+    using AnimLite.Utility;
     using AnimLite.Vmd;
     using AnimLite.Vrm;
-
-//}
-
-//namespace AnimLite.Vrm
-//{
-    using AnimLite.Utility;
-    //using AnimLite.Vmd;
-    using UniGLTF;
 
     // todo
     // リソース時、gameobject でロードできなかったら .vrm でロードする
@@ -40,7 +34,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<GameObject> LoadModelExAsync(
+        public static async ValueTask<GameObject> LoadModelAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
         {
             if (path.IsBlank()) return default;
@@ -54,10 +48,10 @@ namespace AnimLite.Utility
                     return model;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadModelExAsync(path, ct);
+                    return await archive.FallbackArchive.LoadModelAsync(path, ct);
             }
 
-            return await path.LoadModelExAsync(ct);
+            return await path.LoadModelAsync(ct);
         }
 
 
@@ -70,7 +64,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<GameObject> LoadModelExAsync(this PathUnit path, CancellationToken ct) =>
+        public static async ValueTask<GameObject> LoadModelAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) => path.OpenStreamFileOrWebAsync(ct);

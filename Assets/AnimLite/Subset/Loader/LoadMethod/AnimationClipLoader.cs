@@ -17,8 +17,9 @@ using UnityEngine.AddressableAssets;
 using System.Net.Http;
 using System.IO.Compression;
 
-namespace AnimLite.Utility
+namespace AnimLite.Loader
 {
+    using AnimLite.Utility;
 
     public static partial class AnimationClipLoader
     {

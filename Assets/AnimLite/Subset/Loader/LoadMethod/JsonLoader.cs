@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace AnimLite.Utility
+namespace AnimLite.Loader
 {
     using AnimLite.Utility;
     using AnimLite.Utility.Linq;
@@ -26,7 +26,7 @@ namespace AnimLite.Utility
     using Newtonsoft.Json.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using static AnimLite.DancePlayable.DanceGraphy2;
+    using static AnimLite.DancePlayable.DanceGraphy;
 
 
     public static class JsonLoader

@@ -24,9 +24,10 @@ namespace AnimLite.Utility
 
 }
 
-namespace AnimLite.Vmd
+namespace AnimLite.Loader
 {
     using AnimLite.Utility;
+    using AnimLite.Vmd;
 
 
     public static partial class VmdLoader
@@ -35,7 +36,7 @@ namespace AnimLite.Vmd
 
 
 
-        public static async ValueTask<VmdCameraData> LoadVmdCameraExAsync(
+        public static async ValueTask<VmdCameraData> LoadVmdCameraAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
         {
             if (path.IsBlank()) return default;
@@ -49,16 +50,16 @@ namespace AnimLite.Vmd
                     return data;
 
                 if (archive.FallbackArchive is not null)
-                    return await archive.FallbackArchive.LoadVmdCameraExAsync(path, ct);
+                    return await archive.FallbackArchive.LoadVmdCameraAsync(path, ct);
             }
 
-            return await path.LoadVmdCameraExAsync(ct);
+            return await path.LoadVmdCameraAsync(ct);
         }
 
 
 
 
-        public static async ValueTask<VmdCameraData> LoadVmdCameraExAsync(this PathUnit path, CancellationToken ct) =>
+        public static async ValueTask<VmdCameraData> LoadVmdCameraAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
             ValueTask<Stream> openAsync_(PathUnit path) =>

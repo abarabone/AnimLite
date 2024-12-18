@@ -17,20 +17,12 @@ using UnityEngine.AddressableAssets;
 using System.Net.Http;
 using System.IO.Compression;
 
-namespace AnimLite.Utility
+namespace AnimLite.Loader
 {
+    using AnimLite.Utility;
+
     using AnimLite.Vmd;
     using AnimLite.Vrm;
-
-//}
-
-//namespace AnimLite.Vrm
-//{
-    //using AnimLite.Utility;
-    //using AnimLite.Vmd;
-
-    // todo
-    // リソース時、gameobject でロードできなかったら .vrm でロードする
 
 
     public static partial class VrmLoader
@@ -61,7 +53,7 @@ namespace AnimLite.Utility
 
 
 
-        public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
+        public static async ValueTask<VmdFaceMapping> LoadFaceMapAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
             {
                 if (!path.IsBlank() && archive is not null && !path.IsFullPath())
@@ -69,14 +61,14 @@ namespace AnimLite.Utility
                     var facemap = await LoadErr.LoggingAsync(() =>
                         archive.GetEntryAsync(path, s => s.ParseFaceMapAsync(ct), ct));
 
-                    if (facemap.VmdToVrmMaps is not null)
+                    if (facemap is not null)
                         return facemap;
 
                     if (archive.FallbackArchive is not null)
-                        return await archive.FallbackArchive.LoadFaceMapExAsync(path, ct);
+                        return await archive.FallbackArchive.LoadFaceMapAsync(path, ct);
                 }
 
-                return await path.LoadFaceMapExAsync(ct);
+                return await path.LoadFaceMapAsync(ct);
             }
 
         //public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(
@@ -93,7 +85,7 @@ namespace AnimLite.Utility
         /// as resourse     … リソース
         /// その他          … ファイル or http
         /// </summary>
-        public static async ValueTask<VmdFaceMapping> LoadFaceMapExAsync(this PathUnit path, CancellationToken ct) =>
+        public static async ValueTask<VmdFaceMapping> LoadFaceMapAsync(this PathUnit path, CancellationToken ct) =>
             await LoadErr.LoggingAsync(async () =>
         {
             //if (path.IsBlank()) path = "face_map_default as resource";

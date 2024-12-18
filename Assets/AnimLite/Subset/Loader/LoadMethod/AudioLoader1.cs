@@ -17,7 +17,7 @@ using UnityEngine.AddressableAssets;
 using System.Net.Http;
 using System.IO.Compression;
 
-namespace AnimLite.Loader
+namespace AnimLite.Loader.old
 {
     using AnimLite.Vmd;
     using AnimLite.Vrm;
@@ -43,7 +43,7 @@ namespace AnimLite.Loader
         //        : await entrypath.LoadAudioClipInArchiveExAsync(archive, ct);
 
 
-        public static async ValueTask<AudioClip> LoadAudioClipAsync(
+        public static async ValueTask<AudioClipAsDisposable> LoadAudioClipAsync(
             this IArchive archive, PathUnit path, CancellationToken ct)
         {
             if (path.IsBlank()) return default;
@@ -53,7 +53,7 @@ namespace AnimLite.Loader
                 var clip = await LoadErr.LoggingAsync(() =>
                     archive.GetEntryAsync(path, s => s.loadAudioClipViaTmpFileAsync(path, ct), ct));
 
-                if (!clip.IsUnityNull()) return clip;
+                if (!clip.clip.IsUnityNull()) return clip;
 
                 if (archive.FallbackArchive is not null)
                     return await archive.FallbackArchive.LoadAudioClipAsync(path, ct);
@@ -62,15 +62,14 @@ namespace AnimLite.Loader
             return await path.LoadAudioClipAsync(ct);
         }
 
-        static async ValueTask<AudioClip> loadAudioClipViaTmpFileAsync(
+        static async ValueTask<AudioClipAsDisposable> loadAudioClipViaTmpFileAsync(
             this Stream stream, PathUnit path, CancellationToken ct)
         {
             var clip = await path.GetCachePathAsync(stream, ct).Await(getAudioClipAsync, ct);
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
             await Awaitable.MainThreadAsync();
-            clip.name = Path.GetFileNameWithoutExtension(path);
-#endif
+            clip.clip.name = Path.GetFileNameWithoutExtension(path);
+
             return clip;
         }
 
@@ -78,7 +77,7 @@ namespace AnimLite.Loader
 
 
 
-        public static ValueTask<AudioClip> LoadAudioClipAsync(this PathUnit path, CancellationToken ct) =>
+        public static ValueTask<AudioClipAsDisposable> LoadAudioClipAsync(this PathUnit path, CancellationToken ct) =>
             LoadErr.LoggingAsync(async () =>
         {
 
@@ -113,7 +112,7 @@ namespace AnimLite.Loader
         //        ? await path.ToResourceName().LoadAudioClipFromResourceAsync(ct)
         //        : await path.LoadAudioClipAsync(ct);
 
-        static async ValueTask<AudioClip> getAudioClipAsync(
+        static async ValueTask<AudioClipAsDisposable> getAudioClipAsync(
             this PathUnit path, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
@@ -136,10 +135,10 @@ namespace AnimLite.Loader
             //if (atype == AudioType.UNKNOWN || !File.Exists(path)) return default;
             if (atype == AudioType.UNKNOWN) return default;
 
-            return await getAudio_(path, atype);
+            return await audio_(path, atype);
 
 
-            async ValueTask<AudioClip> getAudio_(PathUnit path, AudioType audioType)
+            async ValueTask<AudioClipAsDisposable> audio_(PathUnit path, AudioType audioType)
             {
                 var schemedpath = path.IsHttp()
                     ? path
@@ -156,16 +155,16 @@ namespace AnimLite.Loader
                 var _clip = DownloadHandlerAudioClip.GetContent(req);
                 if (_clip == null) return default;
 
-                //var clip = new AudioClipAsDisposable
-                //{
-                //    clip = _clip,
-                //    disposeAction = _clip.DestroyOnMainThreadAsync,
-                //};
+                var clip = new AudioClipAsDisposable
+                {
+                    clip = _clip,
+                    disposeAction = _clip.DestroyOnMainThreadAsync,
+                };
                 _clip.name = Path.GetFileNameWithoutExtension(path);
 
-                await ct.ThrowIfCancellationRequested(_clip.DestroyOnMainThreadAsync);
+                await ct.ThrowIfCancellationRequested(clip.DisposeAsync);
 
-                return _clip;
+                return clip;
             }
         }
 
@@ -174,19 +173,18 @@ namespace AnimLite.Loader
         /// <summary>
         /// 
         /// </summary>
-        public static async Task<AudioClip> LoadAudioClipFromResourceAsync(
+        public static async Task<AudioClipAsDisposable> LoadAudioClipFromResourceAsync(
             this ResourceName name, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
 
             await Awaitable.MainThreadAsync();
-            //var clip = new AudioClipAsDisposable
-            //{
-            //    clip = await name.LoadAssetAsync<AudioClip>(),
-            //};
-            var clip = await name.LoadAssetAsync<AudioClip>();
+            var clip = new AudioClipAsDisposable
+            {
+                clip = await name.LoadAssetAsync<AudioClip>(),
+            };
 
-            await ct.ThrowIfCancellationRequested(clip.ReleaseOnMainThreadAsync);
+            await ct.ThrowIfCancellationRequested(clip.DisposeAsync);
 
             return clip;
         }
@@ -195,24 +193,24 @@ namespace AnimLite.Loader
 
 
 
-//    [Serializable]
-//    public struct AudioClipAsDisposable : IAsyncDisposable
-//    {
-//        public AudioClip clip;// { get; private set; }
-//        public Func<ValueTask> disposeAction { private get; set; }// = () => new ValueTask();
+    [Serializable]
+    public struct AudioClipAsDisposable : IAsyncDisposable
+    {
+        public AudioClip clip;// { get; private set; }
+        public Func<ValueTask> disposeAction { private get; set; }// = () => new ValueTask();
         
-//        //public void Dispose() => this.disposeAction?.Invoke();
-//        public async ValueTask DisposeAsync()
-//        {
+        //public void Dispose() => this.disposeAction?.Invoke();
+        public async ValueTask DisposeAsync()
+        {
 
-//            await this.disposeAction.InvokeNullableAsync();
+            await this.disposeAction.InvokeNullableAsync();
 
-//#if UNITY_EDITOR || DEVELOPMENT_BUILD
-//            $"dispose audio : {this.clip?.name}".ShowDebugLog();
-//#endif
-//        }
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            $"dispose audio : {this.clip?.name}".ShowDebugLog();
+#endif
+        }
 
-//        public static implicit operator AudioClip(AudioClipAsDisposable src) => src.clip;
-//    }
+        public static implicit operator AudioClip(AudioClipAsDisposable src) => src.clip;
+    }
 
 }

@@ -12,16 +12,12 @@ namespace AnimLite.Vrm
     using AnimLite.Vmd;
 
 
-    public struct VmdFaceMapping
+    public class VmdFaceMapping : Dictionary<VmdFaceName, VrmExpressionName>
     {
-        public Dictionary<VmdFaceName, VrmExpressionName> VmdToVrmMaps;
-        public bool IsCreated => this.VmdToVrmMaps != null;
+        public bool IsCreated => this is not null;
 
-        public static implicit operator VmdFaceMapping(Dictionary<VmdFaceName, VrmExpressionName> mapdict) =>
-            new VmdFaceMapping
-            {
-                VmdToVrmMaps = mapdict,
-            };
+        //public static implicit operator VmdFaceMapping(Dictionary<VmdFaceName, VrmExpressionName> mapdict) =>
+        //    (Dictionary<VmdFaceName, VrmExpressionName>)mapdict;
     }
 
 
@@ -68,7 +64,7 @@ namespace AnimLite.Vrm
             var txt = await s.ReadToEndAsync();
             ct.ThrowIfCancellationRequested();
 
-            var result = (VmdFaceMapping)parse_(txt);
+            var result = parse_(txt);
             ct.ThrowIfCancellationRequested();
 
             return result;
@@ -90,7 +86,7 @@ namespace AnimLite.Vrm
 
 
 
-        static Dictionary<VmdFaceName, VrmExpressionName> parse_(string text)
+        static VmdFaceMapping parse_(string text)
         {
             var opt = StringSplitOptions.RemoveEmptyEntries;
 
@@ -106,7 +102,8 @@ namespace AnimLite.Vrm
             string.Join(", ", q.Select((x, i) => $"{i}:{x.vmd.name}:{x.vrm.name}")).ShowDebugLog();
 #endif
 
-            return q.ToDictionary(x => x.vmd, x => x.vrm);
+            //return q.ToDictionary(x => x.vmd, x => x.vrm);
+            return q.Aggregate(new VmdFaceMapping(), (facemap, x) => facemap.AddChain(x.vmd, x.vrm));
         }
     }
 

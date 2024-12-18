@@ -11,7 +11,7 @@ namespace AnimLite.Vmd
 {
     using AnimLite.Vrm;
     using AnimLite.Utility;
-    //using VRM;
+    using AnimLite.Loader;
 
 
     ///// <summary>
@@ -84,7 +84,7 @@ namespace AnimLite.Vmd
         public static async ValueTask<(VmdStreamData vmddata, VmdFaceMapping facemap)> LoadVmdStreamDataExAsync(
             this PathList vmdFilePaths, PathUnit faceMapFilePath, IArchive archive, CancellationToken ct)
         {
-            var facemap = await VrmLoader.LoadFaceMapExAsync(faceMapFilePath, ct);
+            var facemap = await VrmLoader.LoadFaceMapAsync(faceMapFilePath, ct);
             var streamdata = await vmdFilePaths.LoadVmdStreamDataExAsync(facemap, archive, ct);
 
             return (streamdata, facemap);
@@ -104,7 +104,7 @@ namespace AnimLite.Vmd
         {
             var vmddata = await vmdFilePaths.Paths
                 .ToAsyncEnumerable()
-                .SelectAwait(x => archive.LoadVmdExAsync(x, ct))
+                .SelectAwait(x => archive.LoadVmdAsync(x, ct))
                 .Where(x => !x.IsUnload())
                 .DefaultIfEmpty()
                 .AggregateAsync((pre, cur) => pre.AppendOrOverwrite(cur));
@@ -122,7 +122,7 @@ namespace AnimLite.Vmd
         {
             var rot_data = srcvmdData.bodyKeyStreams.CreateRotationData();
             var pos_data = srcvmdData.bodyKeyStreams.CreatePositionData();
-            var face_data = srcvmdData.faceKeyStreams.CreateFaceData(facemap.VmdToVrmMaps);
+            var face_data = srcvmdData.faceKeyStreams.CreateFaceData(facemap);
 
             var rot_index = rot_data.CreateIndex(indexBlockLength: 100);
             var pos_index = pos_data.CreateIndex(indexBlockLength: 100);

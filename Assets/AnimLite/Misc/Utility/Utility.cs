@@ -41,6 +41,9 @@ namespace AnimLite.Utility
         public static ValueTask InvokeNullableAsync(this Func<ValueTask>? f) =>
             f?.Invoke() ?? new ValueTask();
 
+        public static ValueTask<T> InvokeNullableAsync<T>(this Func<T, ValueTask<T>>? f, T param) =>
+            f?.Invoke(param) ?? new ValueTask<T>();
+
 
 
         public static T CloneViaJson<T>(this T src)

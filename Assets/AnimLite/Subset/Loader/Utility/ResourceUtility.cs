@@ -27,17 +27,21 @@ namespace AnimLite.Utility
     static public class ResourceUtility
     {
 
+
         public static Task<T> LoadAssetAsync<T>(this ResourceName name) where T : UnityEngine.Object =>
             Addressables.LoadAssetAsync<T>(name.Value).Task;
 
+
         public static void Release<T>(this T asset) where T : UnityEngine.Object =>
             Addressables.Release(asset);
+
 
         public static async ValueTask ReleaseOnMainThreadAsync<T>(this T asset) where T : UnityEngine.Object
         {
             await Awaitable.MainThreadAsync();
             Addressables.Release(asset);        // もしかしたらメインスレッドじゃなくてもいいのかも
         }
+
 
 
 

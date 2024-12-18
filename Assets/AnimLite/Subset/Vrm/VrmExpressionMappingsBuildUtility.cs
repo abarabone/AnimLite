@@ -17,7 +17,7 @@ namespace AnimLite.Vrm
             if (!facemap.IsCreated) return default;
 
             var qGr =
-                from x in facemap.VmdToVrmMaps.Select((x, istream) => (x, istream))
+                from x in facemap.Select((x, istream) => (x, istream))
                 let id = VrmFace.FaceNameToExpressionId.TryGet(x.x.Value)
                 where id.isExists
                 group x.istream by id.value

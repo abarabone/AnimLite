@@ -489,6 +489,8 @@ namespace AnimLite.Utility
     public struct PathList
     {
 
+        // シリアライズするときに配列である必要がある
+        // 順不同のために HashSet などもよさそうだが…
         //public IEnumerable<PathUnit> Paths;// = new EmptyEnumerableStruct<PathUnit>();
         public PathUnit[] Paths;
 
@@ -508,18 +510,24 @@ namespace AnimLite.Utility
             return obj is PathList unit && Equals(unit);
         }
 
+        // 順不同で比較するために、ソートする
         public bool Equals(PathList other)
         {
-            return this.Paths.SequenceEqual(other.Paths);
+            var a = this.Paths.OrderBy(x => x.Value);
+            var b = other.Paths.OrderBy(x => x.Value);
+            return a.SequenceEqual(b);
+            //return this.Paths.SequenceEqual(other.Paths);
         }
 
+        // 順不同で取得するために、ソートする
         public override int GetHashCode()
         {
             if (this.Paths == null) return 0;
 
             return this.Paths
                 .Select(x => x.GetHashCode())
-                .DefaultIfEmpty()
+                .OrderBy(x => x)// ハッシュがダブっても同じ値なので問題ないと思う
+                //.DefaultIfEmpty()
                 .Aggregate((pre, cur) => HashCode.Combine(pre, cur));
         }
         // dictionary �p boxing ��� ------------------------------------
@@ -539,9 +547,9 @@ namespace AnimLite.Utility
                 .ToArray(),
         };
 
-        public static PathList Merge(this PathUnit path, PathList append) => new PathList
+        public static PathList Append(this PathList paths, PathUnit path) => new PathList
         {
-            Paths = path.WrapEnumerable().Concat(append.Paths).ToArray(),
+            Paths = paths.Paths.Append(path).ToArray(),
         };
     }
 

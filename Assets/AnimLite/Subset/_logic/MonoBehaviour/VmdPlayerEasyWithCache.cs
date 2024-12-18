@@ -8,12 +8,13 @@ namespace AnimLite.Samples
 
     using AnimLite.Vmd;
     using AnimLite.Vrm;
+    using AnimLite.Loader;
     using AnimLite.Utility;
 
 
     public class VmdPlayerEasyWithCache : MonoBehaviour
     {
-        public VmdStreamDataCache Cache;
+        public PrototypeCacheHolder Cache = new PrototypeCacheHolder(useVmdCache: true);
 
         [FilePath]
         public PathUnit VmdFilePath;
@@ -31,19 +32,19 @@ namespace AnimLite.Samples
             // ＶＭＤデータをファイルからパースし、ストリームデータをビルドする
             var vmdpath = this.VmdFilePath;
             var facemappath = this.FaceMappingFilePath;
-            var (vmddata, facemap) = await this.Cache.GetOrLoadVmdStreamDataAsync(vmdpath, facemappath, this.destroyCancellationToken);
-            using var _ = vmddata;
+            await using var vmddata = await this.Cache.VmdCache.GetOrLoadVmdAsync(vmdpath, facemappath, null, this.destroyCancellationToken);
+            await using var facemap = await this.Cache.VmdCache.facemap.GetOrLoadVmdFaceMappingAsync(facemappath, null, this.destroyCancellationToken);
             
             // ＶＭＤを再生のための情報を構築する
             var bone = this.anim.BuildVmdTransformMappings();
-            var face = facemap.BuildStreamingFace();
+            var face = facemap.Value.BuildStreamingFace();
             //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(facemap) ?? default;
             var bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(bone);
             var footOperator = this.anim.ToFootIkTransformOperator(bone);
             var faceOperator = this.anim.ToVrmExpressionOperator(face);
 
             // 時間範囲などの情報を持ったタイマーを作成する
-            var timer = new StreamingTimer(vmddata.RotationStreams.Streams.GetLastKeyTime());
+            var timer = new StreamingTimer(vmddata.Value.RotationStreams.Streams.GetLastKeyTime());
 
 
             var tfAnim = this.anim.transform;
@@ -60,13 +61,13 @@ namespace AnimLite.Samples
                 // キー検索オブジェクトを構築する
                 // ジェネリクスにより「キー補間方式、時間のクリップ方法、検索方法」を指定できる
 
-                var rotKeyFinder = vmddata.RotationStreams
+                var rotKeyFinder = vmddata.Value.RotationStreams
                     .ToKeyFinderWith<Key4CatmulRot, Clamp, Forward>(timer);
 
-                var posKeyFinder = vmddata.PositionStreams
+                var posKeyFinder = vmddata.Value.PositionStreams
                     .ToKeyFinderWith<Key4CatmulPos, Clamp, Forward>(timer);
 
-                var faceKeyFinder = vmddata.FaceStreams
+                var faceKeyFinder = vmddata.Value.FaceStreams
                     //.ToKeyFinderWith<Key2NearestShift, Clamp, Forward>(timer);
                     .ToKeyFinderWith<Key4Catmul, Clamp, Forward>(timer);
 

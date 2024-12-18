@@ -1,6 +1,4 @@
-﻿using AnimLite.DancePlayable;
-using AnimLite.Vmd;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -10,219 +8,32 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using UnityEngine;
 using UnityEngine.Networking;
-using UniVRM10;
+//using UniVRM10;
 using Unity.VisualScripting;
 using Unity.Mathematics;
 
-namespace AnimLite.Utility
-{
-    using AnimLite.Utility;
-    using AnimLite.Utility.Linq;
-
-    using AnimLite.Vrm;
-    using AnimLite.Vmd;
-    using static AnimLite.DancePlayable.DanceGraphy2;
-
-
-    public static class DanceSceneLoader
-    {
-
-        public static bool UseSeaquentialLoading = false;
-
-        public static ZipMode ZipLoaderMode = ZipMode.ParallelOpenMultiFiles; 
-        public enum ZipMode
-        {
-            Sequential,
-            ParallelOpenSingleFile,
-            ParallelOpenMultiFiles,
-        }
-
-
-        /// <summary>
-        /// FileStream で完全な非同期モードを使用する。ただしサイズが 3MB 以上のファイルのみ。
-        /// </summary>
-        public static bool UseAsyncModeForFileStreamApi = false;
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static async ValueTask<IArchive> OpenArchiveAsync(this PathUnit archivepath, IArchive fallback, CancellationToken ct)
-        {
-            if (archivepath.IsBlank()) return fallback;
-
-            var (fullpath, queryString) = archivepath.ToFullPath().DividToPathAndQueryString();
-            fullpath.ThrowIfAccessedOutsideOfParentFolder();
-
-            return fullpath switch
-            {
-                _ when fullpath.IsZipArchive() || fullpath.IsZipEntry() =>
-                    DanceSceneLoader.ZipLoaderMode switch
-                    {
-                        ZipMode.Sequential when DanceSceneLoader.UseSeaquentialLoading =>
-                            await fullpath.OpenZipArchiveSequentialAsync(queryString, fallback, ct),
-                        ZipMode.Sequential =>
-                            await fullpath.OpenZipArchiveSequentialConcurrentAsync(queryString, fallback, ct),
-                        ZipMode.ParallelOpenSingleFile =>
-                            await fullpath.OpenZipArchiveParallelAsync(queryString, fallback, ct),
-                        ZipMode.ParallelOpenMultiFiles =>
-                            await fullpath.OpenDummyArchiveParallelAsync(queryString, fallback, ct),
-                        _ =>
-                            default,
-                    },
-                _ =>
-                    fullpath.OpenFolderArchive(fallback, ct),
-            };
-         }
-
-        public static ValueTask<IArchive> OpenArchiveAsync(this PathUnit path, CancellationToken ct) =>
-            path.OpenArchiveAsync(null, ct);
-
-
-
-
-        public static (PathUnit archivePath, PathUnit entryPath, QueryString queryString) DividPath(
-            this PathUnit fullpath, string extensionList)
-        {
-            if (fullpath.IsResource()) return ("", fullpath, "");
-            // いずれアセットバンドル？的なもののパスをかえせるようになりたい
-
-
-            var (path, queryString) = fullpath.DividToPathAndQueryString();
-
-
-            if (path.IsZipArchive())
-            {
-                return (path, "", queryString);
-            }
-
-
-            var isFile = extensionList.Split(';')
-                .Where(ext => path.Value.EndsWith(ext, StringComparison.InvariantCultureIgnoreCase))
-                .Any();
-
-            // フォルダ
-            if (!isFile)
-            {
-                return (fullpath, "", "");
-            }
-
-            // ファイル
-            {
-                // 下記だと http://.../xx.xxx のときに / が \ に返られてしまうので使えない。しかも // は \ になる
-                //var archivePath = Path.GetDirectoryName(path);
-                //var entryPath = Path.GetFileName(path).ToPath();
-
-                // / と \ が混在しているかも知れないので両方やる
-                var ix = path.Value.LastIndexOf('/');
-                var iy = path.Value.LastIndexOf('\\');
-                var i = math.max(ix, iy);
-                var archivePath = path.Value[..i];
-                var entryPath = path.Value[(i+1)..];
-
-                return (archivePath, entryPath, queryString);
-            }
-        }
-
-
-
-        //public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(
-        //    this PathUnit path, IArchive archive, CancellationToken ct)
-        //{
-
-        //    var json = await archive.LoadJsonAsync<DanceSetJson>(path, ct);
-
-        //    return json.ToData();
-
-        //}
-
-
-        //public static async ValueTask<DanceSetDefineData> LoadDanceSceneAsync(
-        //    this PathUnit path, CancellationToken ct)
-        //{
-
-        //    var json = await path.LoadJsonAsync<DanceSetJson>(ct);
-
-        //    return json.ToData();
-
-        //}
-
-
-
-        //public static async IAsyncEnumerable<(DanceSetJson danceset, IArchive archive)> LoadDaceSceneAsync(
-        //    this IEnumerable<PathUnit> jsonpaths, IArchive fallbackArchive, CancellationToken ct)
-        //{
-        //    IArchive ac = null;
-        //    DanceSetJson ds = null;
-
-        //    foreach (var path in jsonpaths)
-        //    {
-        //        ac = await path.OpenWhenZipAsync(archive, ct);
-
-        //        ds = await ac.LoadJsonAsync<DanceSetJson>(path, ds, ct);
-
-        //        yield return (ds, archive);
-        //    }
-        //}
-
-
-        public struct ArchiveDanceScene : IDisposable
-        {
-            public IArchive archive;
-            public DanceSetJson dancescene;
-
-            public void Dispose() => this.archive?.Dispose();
-
-            public void Deconstruct(out IArchive archive, out DanceSetJson dancescene)
-            {
-                archive = this.archive;
-                dancescene = this.dancescene;
-            }
-        }
-
-        public static ValueTask<ArchiveDanceScene> LoadDanceSceneAsync(
-            this IEnumerable<PathUnit> jsonpaths, CancellationToken ct) =>
-                jsonpaths.LoadDaceSceneAsync(null, null, ct);
-
-        public static async ValueTask<ArchiveDanceScene> LoadDaceSceneAsync(
-            this IEnumerable<PathUnit> jsonpaths, IArchive fallbackArchive, DanceSetJson dancescene, CancellationToken ct)
-        {
-            IArchive ac = fallbackArchive;
-            DanceSetJson ds = dancescene;
-
-            foreach (var path in jsonpaths.Where(x => !x.IsBlank()))
-            {
-                var (archpath, entpath, qstr) = path.DividPath(".json");
-
-                ac = await (archpath + qstr).OpenArchiveAsync(ac, ct);
-
-                ds = await ac.LoadJsonAsync<DanceSetJson>(entpath, ds, ct);
-            }
-
-            return new ArchiveDanceScene
-            {
-                archive = ac,
-                dancescene = ds
-            };
-        }
-
-    }
 
 #nullable enable
 
+namespace AnimLite.Loader
+{
+    using AnimLite.Utility;
+    using AnimLite.Utility.Linq;
+    using AnimLite.DancePlayable;
+
+    using AnimLite.Vrm;
+    using AnimLite.Vmd;
+    using static AnimLite.DancePlayable.DanceGraphy;
+
     public static class SceneLoadUtilitiy
     {
-
-
-
 
 
         /// <summary>
         /// 
         /// </summary>
         public static ValueTask<Order> BuildDanceGraphyOrderAsync(
-            this DanceSetJson ds, VmdStreamDataCache cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         =>
             DanceSceneLoader.UseSeaquentialLoading
                 ? ds.BuildDanceGraphyOrderSequentialAsync(cache, archive, audioSource, ct)
@@ -234,7 +45,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         public static async ValueTask<Order> BuildDanceGraphyOrderParallelAsync(
-            this DanceSetJson ds, VmdStreamDataCache cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         {
             var audioTask =
                 Task.Run(async () => await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct) as object);
@@ -267,7 +78,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         public static async ValueTask<Order> BuildDanceGraphyOrderSequentialAsync(
-            this DanceSetJson ds, VmdStreamDataCache cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         {
 
             var audioOrder = await ds.Audio
@@ -340,7 +151,10 @@ namespace AnimLite.Utility
         {
             var audiopath = define.AudioFilePath;
 
-            var clip = await archive.LoadAudioClipExAsync(audiopath, ct);
+            var prototype = await archive.LoadAudioClipPrototypeAsync(audiopath, ct);
+            var clip = await prototype.NullableAsync(x => x.InstantiateAsync());
+
+            await prototype.DisposeNullableAsync();
 
             return define.toAudioOrder(clip, audioSource);
         }
@@ -352,7 +166,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         static async ValueTask<ModelOrder> buildBackGroundModelOrderAsync(
-            this ModelDefineJson define, VmdStreamDataCache cache, IArchive? archive, CancellationToken ct)
+            this ModelDefineJson define, PrototypeCacheHolder cache, IArchive? archive, CancellationToken ct)
         {
             var bgpath = define.ModelFilePath;
 
@@ -369,7 +183,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         static async ValueTask<MotionOrderBase> buildMotionOrderParallelAsync(
-            this DanceMotionDefineJson define, VmdStreamDataCache cache, IArchive? archive, CancellationToken ct)
+            this DanceMotionDefineJson define, PrototypeCacheHolder cache, IArchive? archive, CancellationToken ct)
         {
 
 
@@ -388,7 +202,7 @@ namespace AnimLite.Utility
 
 
             var model = data[0] as Instance<GameObject>;
-            var (vmddata, facemap) = ((VmdStreamData, VmdFaceMapping))data[1];
+            var (vmddata, facemap) = ((Instance<VmdStreamData>, Instance<VmdFaceMapping>))data[1];
 
             await Awaitable.MainThreadAsync();
             return
@@ -426,7 +240,7 @@ namespace AnimLite.Utility
         /// 
         /// </summary>
         static async ValueTask<MotionOrderBase> buildMotionOrderSequentialAsync(
-            this DanceMotionDefineJson define, VmdStreamDataCache cache, IArchive? archive, CancellationToken ct)
+            this DanceMotionDefineJson define, PrototypeCacheHolder cache, IArchive? archive, CancellationToken ct)
         {
             var modelpath = define.Model.ModelFilePath;
             var vmdpath = define.Animation.AnimationFilePath;
@@ -451,11 +265,11 @@ namespace AnimLite.Utility
         /// とりあえずざんていで stocker あるなしでキャッシュ使うか決める
         /// </summary>
         static async ValueTask<Instance<GameObject>?> loadModelAsync(
-            this VmdStreamDataCache stocker, PathUnit modelpath, IArchive? archive, CancellationToken ct)
+            this PrototypeCacheHolder cache, PathUnit modelpath, IArchive? archive, CancellationToken ct)
         {
-            return stocker != null
-                ? await ModelCacheDictionary.Instance.GetOrLoadAsync(modelpath, archive, ct)
-                : await archive.LoadModelInstanceAsync(modelpath, PrototypeReleaseMode.AutoRelease, ct);
+            return cache is not null
+                ? await cache.ModelCache.GetOrLoadModelAsync(modelpath, archive, ct)
+                : await archive.LoadModelInstanceAsync(modelpath, ct);
         }
         //static ValueTask<GameObject> loadModelAsync(
         //    this VmdStreamDataCache stocker, PathUnit modelpath, IArchive? archive, CancellationToken ct)
@@ -465,19 +279,41 @@ namespace AnimLite.Utility
         //    archive.LoadModelExAsync(modelpath, ct);
 
 
-        static ValueTask<(VmdStreamData, VmdFaceMapping)> loadVmdAsync(
-            this VmdStreamDataCache cache, PathList vmdpaths, PathUnit facepath, IArchive? archive, CancellationToken ct)
-        =>
-            cache?.GetOrLoadVmdStreamDataAsync(vmdpaths, facepath, archive, ct).AsValueTask()
-            ??
-            VmdData.LoadVmdStreamDataExAsync(vmdpaths, facepath, archive, ct);
+
+
+        //static async ValueTask<Instance<VmdFaceMapping>> loadFacemapAsync(
+        //    this PrototypeCacheHolder cache, PathUnit facepath, IArchive? archive, CancellationToken ct)
+        //=>
+        //    cache is not null
+        //        ? await cache.FaceMapCache.GetOrLoadVmdFaceMappingAsync(facepath, archive, ct)
+        //        : await (await archive.LoadFaceMapExAsync(facepath, ct)).ToPrototype().InstantiateAsync();
+
+
+        static ValueTask<(Instance<VmdStreamData>, Instance<VmdFaceMapping>)> loadVmdAsync(
+            this PrototypeCacheHolder cache, PathList vmdpaths, PathUnit facepath, IArchive? archive, CancellationToken ct)
+        {
+            return cache is not null
+                ? loadFromCache_()
+                : loadFromFile_();
+
+            async ValueTask<(Instance<VmdStreamData>, Instance<VmdFaceMapping>)> loadFromCache_() =>
+            (
+                await cache.VmdCache.GetOrLoadVmdAsync(vmdpaths, facepath, archive, ct),
+                await cache.VmdCache.facemap.GetOrLoadVmdFaceMappingAsync(facepath, archive, ct)
+            );
+            async ValueTask<(Instance<VmdStreamData>, Instance<VmdFaceMapping>)> loadFromFile_()
+            {
+                var (vmd, map) = await archive.LoadVmdStreamDataPrototypeAsync(vmdpaths, facepath, ct);
+                return (await vmd.InstantiateAsync(), await map.InstantiateAsync());
+            }
+        }
 
 
 
 
 
         static AudioOrder toAudioOrder(
-            this AudioDefineJson define, AudioClipAsDisposable clip, AudioSource audioSource)
+            this AudioDefineJson define, Instance<AudioClip>? clip, AudioSource audioSource)
         =>
             new()
             {
@@ -500,7 +336,7 @@ namespace AnimLite.Utility
             };
 
         static MotionOrder? toMotionOrder(
-            this DanceMotionDefineJson define, VmdStreamData vmddata, VmdFaceMapping facemap, Instance<GameObject>? model)
+            this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model)
         =>
             // animation clip が face やブレンドを整備するまでの暫定
             vmddata is not null
@@ -510,12 +346,13 @@ namespace AnimLite.Utility
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
 
-                vmddata = vmddata,
+                //vmddata = vmddata,
+                vmd = vmddata,
                 bone = model.AsUnityNull()?.GetComponent<Animator>()
                     .BuildVmdPlayableJobTransformMappings()
                     ??
                     default,
-                face = facemap.BuildStreamingFace(),
+                face = facemap.Value.BuildStreamingFace(),
 
                 DelayTime = define.Animation.DelayTime,
                 BodyScale = define.Options.BodyScaleFromHuman,
@@ -542,8 +379,13 @@ namespace AnimLite.Utility
                         .DefaultIfEmpty("".ToPath())
                         .First()
                         .ToResourceName()
-                        .LoadAnimationClipAsync(PrototypeReleaseMode.AutoRelease, ct))
-                    .NullableAsync(x => x.InstantiateAsync()),
+                        .LoadAnimationClipPrototypeAsync(ct))
+                    .NullableAsync(async x =>
+                    {
+                        var i = await x.InstantiateAsync();
+                        await x.DisposeAsync();
+                        return i;
+                    }),
 
                 DelayTime = define.Animation.DelayTime,
 
@@ -562,7 +404,7 @@ namespace AnimLite.Utility
         static Func<ValueTask> buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrderBase[] motions) order) =>
             async () =>
             {
-                await order.audio.AudioClip.DisposeAsync();
+                await order.audio.AudioClip.DisposeNullableAsync();
 
                 foreach (var bg in order.bgs)
                 {

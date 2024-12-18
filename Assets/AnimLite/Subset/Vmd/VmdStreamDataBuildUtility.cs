@@ -112,7 +112,7 @@ namespace AnimLite.Vmd
         {
 
             var qSrc =
-                from x in facemap.VmdToVrmMaps
+                from x in facemap
                 select nameToStream.TryGetOrBlank(x.Key)
                 ;
             var src = qSrc

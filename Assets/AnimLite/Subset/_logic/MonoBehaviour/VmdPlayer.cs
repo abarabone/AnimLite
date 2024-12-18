@@ -9,6 +9,7 @@ namespace AnimLite.Samples
 {
     using AnimLite;
     using AnimLite.IK;
+    using AnimLite.Loader;
     using AnimLite.Utility;
 
     using AnimLite.Vmd;
@@ -74,8 +75,8 @@ namespace AnimLite.Samples
         async Awaitable OnEnable()
         {
             // ファイルからデータを読み下す
-            var vmdStreamData = await VmdLoader.LoadVmdExAsync(this.VmdFilePath, default);
-            var faceMapping = await VrmLoader.LoadFaceMapExAsync(this.FaceMappingFilePath, default);
+            var vmdStreamData = await VmdLoader.LoadVmdAsync(this.VmdFilePath, default);
+            var faceMapping = await VrmLoader.LoadFaceMapAsync(this.FaceMappingFilePath, default);
 
             // データを利用できる形式に変換する
             this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();

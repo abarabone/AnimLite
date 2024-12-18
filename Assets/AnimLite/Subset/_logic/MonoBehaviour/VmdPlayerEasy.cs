@@ -8,6 +8,7 @@ namespace AnimLite.Samples
 
     using AnimLite.Vmd;
     using AnimLite.Vrm;
+    using AnimLite.Loader;
     using AnimLite.Utility;
 
 

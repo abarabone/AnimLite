@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,87 @@ namespace AnimLite.Utility
 {
 
 
+    public static class JsonSupplemetUtility
+    {
+
+        public static T CloneViaJson<T>(this T value)
+        {
+            if (value is null) return default;
+
+            var json = JsonConvert.SerializeObject(value, setting);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static T PopulateViaJson<T>(this T overridevalue, T basevalue)
+        {
+            if (overridevalue is null) return basevalue;
+
+            var json = JsonConvert.SerializeObject(overridevalue, setting);
+
+            JsonConvert.PopulateObject(json, basevalue);
+
+            return basevalue;
+        }
+
+        public static T PopulateDefaultViaJson<T>(this T overridevalue) where T : new() =>
+            PopulateViaJson(overridevalue, new T { });
+
+
+
+
+
+        public static T CloneViaJson<T>(dynamic value)
+        {
+            if (value is null) return default;
+
+            var json = JsonConvert.SerializeObject(value as object, setting);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static T PopulateViaJson<T>(dynamic overridevalue, T basevalue)
+        {
+            if (overridevalue is null) return basevalue;
+
+            var json = JsonConvert.SerializeObject(overridevalue as object, setting);
+
+            JsonConvert.PopulateObject(json, basevalue);
+
+            return basevalue;
+        }
+
+        public static T PopulateDefaultViaJson<T>(dynamic overridevalue) where T : new() =>
+            PopulateViaJson(overridevalue, new T { });
+
+
+
+
+
+        public static T PopulateTo<T>(this JsonSerializer serializer, JsonReader reader, T value)
+        {
+            serializer.Populate(reader, value);
+
+            return value;
+        }
+
+
+        static JsonSupplemetUtility()
+        {
+            setting = new JsonSerializerSettings
+            {
+                // Vector3 などの normalize など循環を起こして実行時エラーとなるのを防止
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+        }
+        static JsonSerializerSettings setting;
+
+    }
+
+
+
+
+
     // ＜コンバーター覚え＞
     // reader はトークンを読み下すもの
     // オブジェクトは { } にくくられたもの、配列は [ ] にくくられたもの（JsonToken 列挙値を見ればいろいろわかる）
@@ -23,6 +105,105 @@ namespace AnimLite.Utility
     // serializer.Deserialize(reader) は reader でオブジェクトやプリミティブを読み下す処理を自動化するもの（当然カーソルは進む）
     // デシリアライズはカーソルが { の位置にある必要があり、完了時は } の位置になっている
     // 関数に入ってきたときは { の位置になっている
+
+
+
+
+
+
+
+
+    // Options.param ではなくて Options.Value.param になってしまうのでやめる
+
+    //public struct DynamicOption
+    //{
+    //    public dynamic Value;
+
+    //    public T ConvertTo<T>() => DynamicJson.Serialize<T>(this.Value);
+    //    public T OverrideTo<T>(T value) => DynamicJson.Populate<T>(this.Value, value);
+    //    public T OverrideDefault<T>() where T : new() => DynamicJson.PopulateDefault<T>(this.Value);
+
+    //    //public static DynamicOption Default => new DynamicOption { Value = new ExpandoObject { } };
+    //    public static DynamicOption Default => default;
+    //}
+
+    //public class DynamicOptionConverter : JsonConverter<DynamicOption>
+    //{
+    //    public override DynamicOption ReadJson(
+    //        JsonReader reader, Type objectType, DynamicOption existingValue, bool hasExistingValue, JsonSerializer serializer)
+    //    =>
+    //        new DynamicOption
+    //        {
+    //            Value = hasExistingValue && existingValue.Value is not null
+    //                ? serializer.PopulateTo(reader, existingValue.Value as object)
+    //                : serializer.PopulateTo(reader, new ExpandoObject { })
+    //        };
+
+
+    //    public override void WriteJson(
+    //        JsonWriter writer, DynamicOption value, JsonSerializer serializer)
+    //    {
+    //        serializer.Serialize(writer, value);
+    //    }
+
+    //}
+
+    //public class DynamicJsonConverter : JsonConverter
+    //{
+    //    public override bool CanConvert(Type objectType) =>
+    //        objectType == typeof(ExpandoObject) || objectType == typeof(JObject);
+
+
+    //    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) =>
+    //        existingValue is not null
+    //            ? serializer.PopulateTo(reader, existingValue)
+    //            : serializer.PopulateTo(reader, new ExpandoObject { });
+
+    //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) =>
+    //        serializer.Serialize(writer, value);
+    //}
+
+
+
+
+    //// オプションなど、json のまま受け取れるようにしようかと思ったが、間に変換が入る可能性がありそうなので、
+    //// それなら dynamic でいいかと思った
+    //// が、dynamic にしたらデフォルト値の扱いが面倒だったのでやめる
+
+    //public struct JsonString
+    //{
+    //    public string Value;
+
+    //    public T Deserialize<T>() where T : new()
+    //    {
+    //        var obj = new T { };
+    //        JsonConvert.PopulateObject(this.Value ?? "{}", obj);
+    //        return obj;
+    //    }
+
+    //    static public JsonString Default => new JsonString { Value = "{}" };
+    //    static public implicit operator string (JsonString src) => src.Value;
+    //}
+
+    //public class JsonStringConverter : JsonConverter<JsonString>
+    //{
+    //    public override JsonString ReadJson(
+    //        JsonReader reader, Type objectType, JsonString existingValue, bool hasExistingValue, JsonSerializer serializer)
+    //    =>
+    //        new JsonString
+    //        {
+    //            Value = JObject.Load(reader).ToString(),
+    //        };
+
+
+    //    public override void WriteJson(
+    //        JsonWriter writer, JsonString value, JsonSerializer serializer)
+    //    {
+
+    //    }
+
+    //}
+
 
 
 
@@ -55,7 +236,7 @@ namespace AnimLite.Utility
             void deserialize_normal_entries_()
             {
                 var basekeys = new List<string>();
-                // 下記は下地になった dance scene もベースに採用する場合。わかりにくいのでやめる。（同一ファイル内でのみ上書き・ベースを行うとする）
+                // 下記は下地になった dance scene もベースに採用する場合。わかりにくいのでやめる。（→ 同一ファイル内でのみ上書き・ベースを行うこととする）
                 //var basekeys = dictionary.Keys
                 //    .Where(x => is_basekey_(x))
                 //    .Select(x => x)

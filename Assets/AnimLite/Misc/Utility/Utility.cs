@@ -7,9 +7,9 @@ using UnityEngine;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
-using UniJSON;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json;
+//using UniJSON;
+//using Newtonsoft.Json.Converters;
+//using Newtonsoft.Json;
 
 namespace AnimLite.Utility
 {
@@ -46,11 +46,13 @@ namespace AnimLite.Utility
 
 
 
-        public static T CloneViaJson<T>(this T src)
-        {
-            var json = JsonUtility.ToJson(src);
-            return JsonUtility.FromJson<T>(json);
-        }
+        //public static T CloneViaJson<T>(this T src)
+        //{
+        //    //var json = JsonUtility.ToJson(src);
+        //    //return JsonUtility.FromJson<T>(json);
+        //    var json = JsonConvert.SerializeObject(src);
+        //    return 
+        //}
 
     }
 

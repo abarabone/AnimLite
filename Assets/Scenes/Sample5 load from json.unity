@@ -118,17 +118,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &5 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1465291648229673383, guid: 6cdf83e7bb3b8c843978797a95bcb478, type: 3}
-  m_PrefabInstance: {fileID: 214415167}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c941b1898fca53d4c9e0731e3826f5e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &214415167
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -210,6 +199,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6cdf83e7bb3b8c843978797a95bcb478, type: 3}
+--- !u!114 &214415168 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1465291648229673383, guid: 6cdf83e7bb3b8c843978797a95bcb478, type: 3}
+  m_PrefabInstance: {fileID: 214415167}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c941b1898fca53d4c9e0731e3826f5e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &219923941
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,7 +342,7 @@ MonoBehaviour:
   Cache: {fileID: 1347650036}
   JsonFiles:
   - Value: ds/dance_scene.json
-  DanceSceneCaption: {fileID: 5}
+  DanceSceneCaption: {fileID: 214415168}
 --- !u!4 &219923945
 Transform:
   m_ObjectHideFlags: 0
@@ -490,7 +490,7 @@ MonoBehaviour:
   Cache: {fileID: 1347650036}
   JsonFiles:
   - Value: https://github.com/abarabone/AnimLite/raw/master/Assets/ds/dance_scene.json
-  DanceSceneCaption: {fileID: 5}
+  DanceSceneCaption: {fileID: 214415168}
 --- !u!4 &875487698
 Transform:
   m_ObjectHideFlags: 0
@@ -730,7 +730,7 @@ MonoBehaviour:
   Cache: {fileID: 1347650036}
   JsonFiles:
   - Value: https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds
-  DanceSceneCaption: {fileID: 5}
+  DanceSceneCaption: {fileID: 214415168}
 --- !u!4 &1083116351
 Transform:
   m_ObjectHideFlags: 0
@@ -941,7 +941,7 @@ MonoBehaviour:
   Cache: {fileID: 1347650036}
   JsonFiles:
   - Value: ../ds-utf8.zip/ds/dance_scene.json
-  DanceSceneCaption: {fileID: 5}
+  DanceSceneCaption: {fileID: 214415168}
 --- !u!4 &1776308114
 Transform:
   m_ObjectHideFlags: 0

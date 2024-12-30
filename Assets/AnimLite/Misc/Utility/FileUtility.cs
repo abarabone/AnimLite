@@ -411,9 +411,25 @@ namespace AnimLite.Utility
 
 
 
+        //public static PathUnit Normalize(this PathUnit path) =>
+        //    Path.AltDirectorySeparatorChar
+        //    Path.GetFullPath(path).ToPath();
+
+        //public static PathUnit NormalizeWithSlash(this PathUnit path) =>
+        //    path.NormalizeAbsolute().Value.Replace('\\', '/').ToPath();
+
+
+
+        //public static PathUnit NormalizeAbsolute(this PathUnit path) =>
+        //    Path.GetFullPath(path).ToPath();
+
+        //public static PathUnit NormalizeAbsoluteWithSlash(this PathUnit path) =>
+        //    path.NormalizeAbsolute().Value.Replace('\\', '/').ToPath();
+
+
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         public static PathUnit NormalizeRelative(this PathUnit path) =>
-            Path.GetFullPath($"x:/{path.Value}")[3..].ToPath();
+            Path.GetFullPath(@$"x:\{path.Value}")[3..].ToPath();
 
         public static PathUnit NormalizeReativeWithSlash(this PathUnit path) =>
             path.NormalizeRelative().Value.Replace('\\', '/').ToPath();

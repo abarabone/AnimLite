@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO.Compression;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 //using UniVRM10;
@@ -337,9 +338,11 @@ namespace AnimLite.Loader
 
         static MotionOrder? toMotionOrder(
             this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model)
-        =>
+        {
+            var options = define.Animation.OptionsAs<MotionOptionsJson>();
+
             // animation clip が face やブレンドを整備するまでの暫定
-            vmddata is not null
+            return vmddata is not null
             ? new()
             //new()
             {
@@ -355,15 +358,16 @@ namespace AnimLite.Loader
                 face = facemap.Value.BuildStreamingFace(),
 
                 DelayTime = define.Animation.DelayTime,
-                BodyScale = define.Options.BodyScaleFromHuman,
-                FootIkMode = define.Options.FootIkMode,
+                BodyScale = options.BodyScaleFromHuman,
+                FootIkMode = options.FootIkMode,
 
                 Position = define.Model.Position,
                 Rotation = Quaternion.Euler(define.Model.EulerAngles),
                 Scale = define.Model.Scale,
             }
-            : null;
             //;
+            : null;
+        }
             
         // animation clip がキャッシュ、face やブレンドを整備するまでの暫定
         static async ValueTask<MotionOrderWithAnimationClip> toMotionOrderAwait(

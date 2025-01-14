@@ -187,9 +187,9 @@ namespace AnimLite.Loader
             this DanceMotionDefineJson define, PrototypeCacheHolder cache, IArchive? archive, CancellationToken ct)
         {
 
-
             var modelpath = define.Model.ModelFilePath;
             var facepath = define.Animation.FaceMappingFilePath;
+            var adjustpath = define.Animation.BodyAdjustFilePath;
 
             var vmdpath = define.Animation.AnimationFilePath;
 
@@ -197,17 +197,19 @@ namespace AnimLite.Loader
                 Task.Run(async () => await cache.loadModelAsync(modelpath, archive, ct) as object);
             var streamdataTask =
                 Task.Run(async () => await cache.loadVmdAsync(vmdpath, facepath, archive, ct) as object);
+            var adjustTask =
+                Task.Run(async () => await archive.LoadBodyAdjustAsync(adjustpath, ct) as object);
 
-
-            var data = await Task.WhenAll(modelTask, streamdataTask);
+            var data = await Task.WhenAll(modelTask!, streamdataTask, adjustTask);
 
 
             var model = data[0] as Instance<GameObject>;
             var (vmddata, facemap) = ((Instance<VmdStreamData>, Instance<VmdFaceMapping>))data[1];
+            var adjust = (BodyAdjustData)data[2];
 
             await Awaitable.MainThreadAsync();
             return
-                define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
+                define.toMotionOrder(vmddata, facemap, model, adjust) as MotionOrderBase
                 ??
                 // animation clip が face やブレンドを整備するまでの暫定
                 await define.toMotionOrderAwait(model, ct);
@@ -246,13 +248,15 @@ namespace AnimLite.Loader
             var modelpath = define.Model.ModelFilePath;
             var vmdpath = define.Animation.AnimationFilePath;
             var facepath = define.Animation.FaceMappingFilePath;
+            var adjustpath = define.Animation.BodyAdjustFilePath;
 
             var model = await cache.loadModelAsync(modelpath, archive, ct);
             var (vmddata, facemap) = await cache.loadVmdAsync(vmdpath, facepath, archive, ct);
+            var adjust = await archive.LoadBodyAdjustAsync(adjustpath, ct);
 
             await Awaitable.MainThreadAsync();
             return
-                define.toMotionOrder(vmddata, facemap, model) as MotionOrderBase
+                define.toMotionOrder(vmddata, facemap, model, adjust) as MotionOrderBase
                 ??
                 // animation clip が face やブレンドを整備するまでの暫定
                 await define.toMotionOrderAwait(model, ct);
@@ -337,7 +341,7 @@ namespace AnimLite.Loader
             };
 
         static MotionOrder? toMotionOrder(
-            this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model)
+            this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
         {
             var options = define.Animation.OptionsAs<MotionOptionsJson>();
 
@@ -352,7 +356,7 @@ namespace AnimLite.Loader
                 //vmddata = vmddata,
                 vmd = vmddata,
                 bone = model.AsUnityNull()?.GetComponent<Animator>()
-                    .BuildVmdPlayableJobTransformMappings()
+                    .BuildVmdPlayableJobTransformMappings(adjust)
                     ??
                     default,
                 face = facemap.Value.BuildStreamingFace(),

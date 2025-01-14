@@ -15,13 +15,32 @@ namespace AnimLite.Utility
 
 
 
-        public static T AddChain<T, TKey, TValue>(this T dict, TKey key, TValue value)
+        public static T AddInChain<T, TKey, TValue>(this T dict, TKey key, TValue value)
             where T : Dictionary<TKey, TValue>
         {
             dict.Add(key, value);
             return dict;
         }
 
+        public static T AddRangeInChain<T, TKey, TValue>(this T dict, IEnumerable<(TKey key, TValue value)> values)
+            where T : Dictionary<TKey, TValue>
+        {
+            foreach (var e in values)
+            {
+                dict.Add(e.key, e.value);
+            }
+            return dict;
+        }
+
+        public static T AddRangeInChain<T, TKey, TValue>(this T dict, IEnumerable<KeyValuePair<TKey, TValue>> values)
+            where T : Dictionary<TKey, TValue>
+        {
+            foreach (var e in values)
+            {
+                dict.Add(e.Key, e.Value);
+            }
+            return dict;
+        }
 
 
 

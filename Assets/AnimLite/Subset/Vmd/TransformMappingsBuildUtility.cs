@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.VisualScripting;
@@ -9,7 +10,7 @@ namespace AnimLite.Vmd
     using AnimLite;
     using AnimLite.experimental.a;
     using AnimLite.Utility;
-    //using static Unity.VisualScripting.Metadata;
+    using AnimLite.Loader;
 
 
     /// <summary>
@@ -20,11 +21,11 @@ namespace AnimLite.Vmd
     {
 
 
-        public static TransformHandleMappings BuildVmdPlayableJobTransformMappings(this Animator anim)
+        public static TransformHandleMappings BuildVmdPlayableJobTransformMappings(this Animator anim, BodyAdjustData adjust = null)
         {
             if (anim.IsUnityNull()) return default;
 
-            var x = anim.buildVmdTfMappings<TfHandle>();
+            var x = anim.buildVmdTfMappings<TfHandle>(adjust);
 
             return new TransformHandleMappings
             {
@@ -34,11 +35,11 @@ namespace AnimLite.Vmd
             };
         }
 
-        public static TransformMappings BuildVmdTransformMappings(this Animator anim)
+        public static TransformMappings BuildVmdTransformMappings(this Animator anim, BodyAdjustData adjust = null)
         {
             if (anim.IsUnityNull()) return default;
 
-            var x = anim.buildVmdTfMappings<Tf>();
+            var x = anim.buildVmdTfMappings<Tf>(adjust);
 
             return new TransformMappings
             {
@@ -50,14 +51,14 @@ namespace AnimLite.Vmd
 
 
 
-
         /// <summary>
         /// 
         /// </summary>
         static (HumanBoneReference<TTf>[] a, BoneRotationInitialPose[] b, OptionalBoneChecker c)
-            buildVmdTfMappings<TTf>(this Animator anim)
+            buildVmdTfMappings<TTf>(this Animator anim, BodyAdjustData adjust)
                 where TTf : ITransformProxy, new()
         {
+
             var refs = buildRefereces_();
             var rots = buildInitialPoses_(refs);
 
@@ -86,8 +87,9 @@ namespace AnimLite.Vmd
                 //    ;
 
                 var q =
-                    from i in Enumerable.Range(0, (int)HumanBodyBones.LastBone)
-                    let humanId = (HumanBodyBones)i
+                    //from i in Enumerable.Range(0, (int)HumanBodyBones.LastBone)
+                    //let humanId = (HumanBodyBones)i
+                    from humanId in VmdBone.HumanBoneToParentDict.Keys//.Do(x => Debug.Log(x))
                     let tf = anim.GetBoneTransform(humanId)
                     where tf != null
                     let vmdId = htomdict.TryGet(humanId)
@@ -114,50 +116,102 @@ namespace AnimLite.Vmd
                     .ToArray();
             }
 
+
             BoneRotationInitialPose[] buildInitialPoses_(IEnumerable<HumanBoneReference<TTf>> refs)
             {
-                var default_rotation = (world: quaternion.identity, local: quaternion.identity);
-                //var default_boneid = (primary: HumanBodyBones.LastBone, secondary: HumanBodyBones.LastBone, forward: Vector3.zero);
+                var adjustDefault = new BodyAdjust
+                {
+                    rotation = quaternion.identity,
+                };
+
+                var boneExists = Enumerable.ToHashSet(refs.Select(x => x.HumanBoneId));
+
+                var tfnameToSkeltonDict = anim.avatar.humanDescription.skeleton
+                    //.Do(x => Debug.Log($"{x.name} {x.rotation}"))
+                    .ToDictionary(x => x.name, x => x);
+
+                var adjustDict = adjust is not null
+                    ? adjust
+                    : new();
+
+
+                var rotLocalAppliedDict = new Dictionary<HumanBodyBones, quaternion>()
+                {
+                    {HumanBodyBones.LastBone, quaternion.identity}
+                };
 
                 var q =
-                    from x in refs
+                    from x in refs.Skip(1)//.Do(x => Debug.Log(x.HumanBoneId))
 
-                        //let tf = x.HumanBoneId == HumanBodyBones.LastBone
-                        //    ? anim.GetBoneTransform(HumanBodyBones.Hips).parent
-                        //    //? anim.avatarRoot
-                        //    : anim.GetBoneTransform(x.HumanBoneId)
-                    //let nextid = VmdBone.ParentToChildDictionary.TryGetOrDefault(x.HumanBoneId, default_boneid)
-                    //let tfThis = getbone_(x.HumanBoneId)
-                    //let tfNext = getbone_(nextid.primary) ?? getbone_(nextid.secondary)
+                    let this_boneid = x.HumanBoneId
+                    let parent_bone_id = boneExists.GetParentBone(this_boneid)
 
-                    //let arot = tfThis == null || tfNext == null
-                    //    ? Quaternion.identity
-                    //    : Quaternion.Euler(0, 180, 0)
-                    //    //: Quaternion.FromToRotation((tfNext.position - tfThis.position).normalized, nextid.forward)
-                    //let arot = x.HumanBoneId == HumanBodyBones.LeftShoulder  ? Quaternion.Euler(0, -30, 0) : Quaternion.identity
-                    //let brot = x.HumanBoneId == HumanBodyBones.RightShoulder ? Quaternion.Euler(0, +30, 0) : Quaternion.identity
+                    let tf = anim.GetBoneTransform(this_boneid)
+                    let rot_rest = tfnameToSkeltonDict[tf.name].rotation.As_quaternion()
 
-                    let rot = VmdBone.HumanBodyToAdjustRotation.TryGetOrDefault(x.HumanBoneId, default_rotation)
+                    let rot_adjust = adjustDict.TryGetOrDefault(this_boneid, adjustDefault).rotation
 
+                    let rot_parent = rotLocalAppliedDict[parent_bone_id]
+                    //let rot_this = rotLocalAppliedDict[this_boneid] = mul(rot_parent, rot_adjust)
+                    let rot_this = rotLocalAppliedDict[this_boneid] = mul(rot_parent, rot_adjust, rot_rest)
+                    let rot_inv_parent = math.inverse(rot_parent)
+
+                    // inv(apose) * anim * apose * rest
                     select new BoneRotationInitialPose
                     {
-                        RotLocalize = rot.local * Quaternion.Inverse(rot.world),    // 左からかける
-                        //RotGlobalize = arot*brot * rot.world,                                   // 右からかける
-                        RotGlobalize = rot.world,                                   // 右からかける
+                        RotGlobalize = rot_inv_parent,          // 左からかける
+                        //RotLocalize = mul(rot_this, rot_rest),  // 右からかける
+                        RotLocalize = rot_this,                 // 右からかける
                     };
 
                 return q
-                    //.Do(x => Debug.Log($"{x.RotGlobalize}"))
+                    .Prepend(new BoneRotationInitialPose
+                    {
+                        RotGlobalize = quaternion.identity,
+                        RotLocalize = quaternion.identity,
+                    })
                     .ToArray();
-
-
-                Transform getbone_(HumanBodyBones boneid)
-                {
-                    if (boneid == HumanBodyBones.LastBone) return null;
-
-                    return anim.GetBoneTransform(boneid);
-                }
             }
+        }
+        static int i;
+
+        static quaternion mul(quaternion r1, quaternion r2) => math.mul(r1, r2);
+        static quaternion mul(quaternion r1, quaternion r2, quaternion r3) => math.mul(math.mul(r1, r2), r3);
+
+        static quaternion rotx_(float deg) => quaternion.RotateX(math.radians(deg));
+        static quaternion roty_(float deg) => quaternion.RotateY(math.radians(deg));
+        static quaternion rotz_(float deg) => quaternion.RotateZ(math.radians(deg));
+
+
+        // rot_anim     ... アニメーションのローカル回転
+        // rot_apose    ... Ａポーズ修正のローカル回転
+
+        // ・式は inv(rot_apose_parent) * rot_anim * rot_apose
+
+        // ・rot_anim はＡポーズを想定して格納されている
+        // ・上腕の rot_pose は親子関係により、前腕にも伝わる
+        // ・rot_apose -> rot_anim の順で適用する必要あり
+
+        // ・各ボーンで rot_anim の前に rot_apose を適用する必要がある
+        // ・各ボーンで rot_apose を適用すると、子の rot_apose と重複してしまう
+        // ・親ボーンの rot_apose を打ち消す必要がある（ inv(rot_apose) ）
+
+
+
+        public static HumanBodyBones GetParentBone(this HashSet<HumanBodyBones> boneExists, HumanBodyBones thisbone)
+        {
+            var parentbone = VmdBone.HumanBoneToParentDict[thisbone];
+            if (parentbone == HumanBodyBones.LastBone)
+            {
+                return parentbone;
+            }
+
+            if (boneExists.Contains(parentbone))
+            {
+                return parentbone;
+            }
+
+            return boneExists.GetParentBone(parentbone);
         }
 
 

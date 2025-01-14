@@ -34,6 +34,7 @@ namespace AnimLite.Samples
             var facemap = this.FaceMappingFilePath;
             var vmdStreamData = await VmdLoader.LoadVmdAsync(vmdpath, this.destroyCancellationToken);
             var faceMapping = await VrmLoader.LoadFaceMapAsync(facemap, this.destroyCancellationToken);
+            var bodyAdjust = await BodyAdjustLoader.DefaultBodyAdjustAsync;
 
             // データを利用できる形式に変換する
             using var rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -55,7 +56,7 @@ namespace AnimLite.Samples
 
 
             // ヒューマノイドモデルの情報を構築する
-            using var bone = this.anim.BuildVmdPlayableJobTransformMappings();
+            using var bone = this.anim.BuildVmdPlayableJobTransformMappings(bodyAdjust);
             var face = faceMapping.BuildStreamingFace();
             //var face = this.faceRenderer.sharedMesh.BuildStreamingFace(faceMapping);
 

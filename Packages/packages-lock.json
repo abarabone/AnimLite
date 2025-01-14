@@ -197,6 +197,15 @@
       },
       "hash": "d320f73eecc5a434a2afbdaf5a27f6c98d5c82a9"
     },
+    "org.nuget.fastenum": {
+      "version": "1.8.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "org.nuget.system.runtime.compilerservices.unsafe": "4.5.0"
+      },
+      "url": "https://unitynuget-registry.azurewebsites.net"
+    },
     "org.nuget.microsoft.bcl.asyncinterfaces": {
       "version": "6.0.0",
       "depth": 2,

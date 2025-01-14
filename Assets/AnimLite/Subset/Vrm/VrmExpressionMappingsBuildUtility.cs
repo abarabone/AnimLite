@@ -14,7 +14,7 @@ namespace AnimLite.Vrm
         //public static VrmExpressionMappings BuildStreamingFace(this Mesh mesh, VmdFaceMapping facemap)
         public static VrmExpressionMappings BuildStreamingFace(this VmdFaceMapping facemap)
         {
-            if (!facemap.IsCreated) return default;
+            if (!facemap.IsCreated()) return default;
 
             var qGr =
                 from x in facemap.Select((x, istream) => (x, istream))

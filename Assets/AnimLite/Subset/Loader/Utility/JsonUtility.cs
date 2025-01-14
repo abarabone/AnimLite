@@ -16,7 +16,6 @@ namespace AnimLite.Utility
 
     public static class JsonSupplemetUtility
     {
-
         public static T CloneViaJson<T>(this T value)
         {
             if (value is null) return default;
@@ -43,7 +42,32 @@ namespace AnimLite.Utility
 
 
 
+#if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
 
+        public static T CloneViaJson<T>(object value)
+        {
+            if (value is null) return default;
+
+            var json = JsonConvert.SerializeObject(value as object, setting);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static T PopulateViaJson<T>(object overridevalue, T basevalue)
+        {
+            if (overridevalue is null) return basevalue;
+
+            var json = JsonConvert.SerializeObject(overridevalue as object, setting);
+
+            JsonConvert.PopulateObject(json, basevalue);
+
+            return basevalue;
+        }
+
+        public static T PopulateDefaultViaJson<T>(object overridevalue) where T : new() =>
+            PopulateViaJson(overridevalue, new T { });
+
+#else
         public static T CloneViaJson<T>(dynamic value)
         {
             if (value is null) return default;
@@ -67,7 +91,7 @@ namespace AnimLite.Utility
         public static T PopulateDefaultViaJson<T>(dynamic overridevalue) where T : new() =>
             PopulateViaJson(overridevalue, new T { });
 
-
+#endif
 
 
 

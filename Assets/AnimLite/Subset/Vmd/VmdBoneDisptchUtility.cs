@@ -151,11 +151,14 @@ namespace AnimLite.Vmd
         static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6) => accumulate(accumulate(r1, r2, r3, r4, r5), r6);
         static quaternion accumulate(quaternion r1, quaternion r2, quaternion r3, quaternion r4, quaternion r5, quaternion r6, quaternion r7) => accumulate(accumulate(r1, r2, r3, r4, r5, r6), r7);
 
+        // quaternion の回転適用は、右側がローカル側
+        // 先に回転を計算すると、後に続く計算はその回転が適用された上で適用されることになり、
+        // それはつまり後に計算される回転がよりローカルとして適用される＝先に適用されるということになる。
 
-        static quaternion downArmL() => quaternion.RotateZ(math.radians(+30));
-        static quaternion downArmR() => quaternion.RotateZ(math.radians(-30));
-        //static quaternion downArmL() => quaternion.RotateZ(math.radians(+45));
-        //static quaternion downArmR() => quaternion.RotateZ(math.radians(-45));
+        //static quaternion downArmL() => quaternion.RotateZ(math.radians(+30));
+        //static quaternion downArmR() => quaternion.RotateZ(math.radians(-30));
+        ////static quaternion downArmL() => quaternion.RotateZ(math.radians(+45));
+        ////static quaternion downArmR() => quaternion.RotateZ(math.radians(-45));
 
         static quaternion reverse(quaternion r) => new quaternion(r.value.x, -r.value.y, r.value.z, -r.value.w);
 

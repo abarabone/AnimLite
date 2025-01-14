@@ -33,9 +33,10 @@ namespace AnimLite.Samples
             var facemap = this.FaceMappingFilePath;
             var vmd = await VmdData.LoadVmdStreamDataExAsync(vmdpath, facemap, this.destroyCancellationToken);
             using var vmddata = vmd.vmddata;
+            var bodyAdjust = await BodyAdjustLoader.DefaultBodyAdjustAsync;
 
             // ＶＭＤを再生のための情報を構築する
-            var bone = this.anim.BuildVmdTransformMappings();
+            var bone = this.anim.BuildVmdTransformMappings(bodyAdjust);
             var face = vmd.facemap.BuildStreamingFace();
             //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(vmd.facemap) ?? default;
             var bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(bone);

@@ -112,8 +112,8 @@ namespace AnimLite
 
                     select new BoneRotationInitialPose
                     {
-                        RotLocalize = quaternion.identity,
                         RotGlobalize = quaternion.identity,
+                        RotLocalize = quaternion.identity,
                     };
 
                 return q

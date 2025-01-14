@@ -56,6 +56,7 @@ namespace AnimLite.Utility
         //public PathUnit AnimationFilePath = "";
         public PathList AnimationFilePath = new () { Paths = new PathUnit [] { } };
         public PathUnit FaceMappingFilePath = "";
+        public PathUnit BodyAdjustFilePath = "";
 
         public float DelayTime = 0.0f;
     }
@@ -100,10 +101,14 @@ namespace AnimLite.Utility
     {
         ExpandoObject? _options;
 
+    #if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
+        public object Options
+    #else
         public dynamic Options
+    #endif
         {
             get => this._options ?? new ExpandoObject { };
-            set => this._options = value;
+            set => this._options = value as ExpandoObject;
         }
 
         public T OptionsAs<T>() where T : new() =>

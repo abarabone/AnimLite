@@ -77,6 +77,7 @@ namespace AnimLite.Samples
             // ファイルからデータを読み下す
             var vmdStreamData = await VmdLoader.LoadVmdAsync(this.VmdFilePath, default);
             var faceMapping = await VrmLoader.LoadFaceMapAsync(this.FaceMappingFilePath, default);
+            var bodyAdjust = await BodyAdjustLoader.DefaultBodyAdjustAsync;
 
             // データを利用できる形式に変換する
             this.rot_data = vmdStreamData.bodyKeyStreams.CreateRotationData();
@@ -105,7 +106,7 @@ namespace AnimLite.Samples
             this.timer = new StreamingTimer(rot_data.GetLastKeyTime());
             
             // ヒューマノイドモデルの情報を構築する
-            this.bone = this.anim.BuildVmdTransformMappings();
+            this.bone = this.anim.BuildVmdTransformMappings(bodyAdjust);
             this.face = faceMapping.BuildStreamingFace();
             //this.face = this.anim.FindFaceRendererIfNothing(this.FaceMeshRenderer)?.sharedMesh?.BuildStreamingFace(faceMapping) ?? default;
 

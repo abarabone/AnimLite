@@ -11,6 +11,7 @@
     "com.unity.visualscripting": "1.9.5",
     "com.vrmc.gltf": "https://github.com/vrm-c/UniVRM.git?path=/Assets/UniGLTF#v0.127.0",
     "com.vrmc.vrm": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRM10#v0.127.0",
+    "org.nuget.fastenum": "1.8.0",
     "org.nuget.system.interactive.async": "6.0.1",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",

@@ -230,7 +230,7 @@ namespace AnimLite.Bvh
                     from sign in Parse.Char('+').Or(Parse.Char('-')).OneOrEmpty().Text()
                     from digit in Parse.Number.GetOrBlank()
                     from piriod in Parse.Char('.').OneOrEmpty().Text()
-                    from frac in Parse.Number
+                    from frac in Parse.Number.GetOrBlank()
                     select float.Parse($"{sign}{digit}{piriod}{frac}")
                     ;
                 var qVector3 =

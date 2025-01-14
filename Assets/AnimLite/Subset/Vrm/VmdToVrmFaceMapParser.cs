@@ -14,10 +14,13 @@ namespace AnimLite.Vrm
 
     public class VmdFaceMapping : Dictionary<VmdFaceName, VrmExpressionName>
     {
-        public bool IsCreated => this is not null;
-
         //public static implicit operator VmdFaceMapping(Dictionary<VmdFaceName, VrmExpressionName> mapdict) =>
         //    (Dictionary<VmdFaceName, VrmExpressionName>)mapdict;
+    }
+
+    public static class VmdFaceMappingExtension
+    {
+        public static bool IsCreated(this VmdFaceMapping facemap) => facemap is not null;
     }
 
 
@@ -38,7 +41,7 @@ namespace AnimLite.Vrm
             var txt = await s.ReadToEndAsync();
             ct.ThrowIfCancellationRequested();
 
-            var result = (VmdFaceMapping)parse_(txt);
+            var result = parse_(txt);
             ct.ThrowIfCancellationRequested();
 
             return result;
@@ -103,7 +106,7 @@ namespace AnimLite.Vrm
 #endif
 
             //return q.ToDictionary(x => x.vmd, x => x.vrm);
-            return q.Aggregate(new VmdFaceMapping(), (facemap, x) => facemap.AddChain(x.vmd, x.vrm));
+            return q.Aggregate(new VmdFaceMapping(), (facemap, x) => facemap.AddInChain(x.vmd, x.vrm));
         }
     }
 

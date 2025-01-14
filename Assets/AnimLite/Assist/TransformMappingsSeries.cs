@@ -107,8 +107,8 @@ namespace AnimLite
     /// </summary>
     public struct BoneRotationInitialPose
     {
-        public quaternion RotLocalize;  // 左からかける
-        public quaternion RotGlobalize; // 右からかける
+        public quaternion RotGlobalize;  // 左からかける
+        public quaternion RotLocalize; // 右からかける
     }
 
 
@@ -123,7 +123,8 @@ namespace AnimLite
             //return quaternion.identity;
             //return streamLocalRotation;
             //return initpose.RotGlobalize;
-            return mul(initpose.RotLocalize, streamLocalRotation, initpose.RotGlobalize);
+            return mul(initpose.RotGlobalize, streamLocalRotation, initpose.RotLocalize);
+            //return mul(initpose.RotLocalize, initpose.RotGlobalize);
         }
 
         static quaternion mul(quaternion r1, quaternion r2) => math.mul(r1, r2);

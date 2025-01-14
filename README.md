@@ -9,6 +9,13 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2025.1.14
+- 今までT→Aポーズ固定だった、ポーズ補正を一般化した
+  - .txt ファイルに humanoid 部位とローカル回転補正値を記述できる
+  - .json に BodyAdjustFilePath として .txt ファイルのパスを指定する
+- .json の Options を il2cpp, android, ios 向けの時だけ dynamic 型ではなく object 型になるようにプラグマを入れた
+  - ていうかそもそも .net standard 2.1 向けだと dynamic 使えないっぽいので、USE_DYNAMIC が true じゃないと object になるようにしたけど悩み中
+
 2024.12.31
 - .json の 各パートに Options として任意の設定をかけるようにした
 - それに伴い、Motions にある Options を廃止
@@ -188,6 +195,7 @@
             "Animation": {                        // キャラクターのアニメーション
                 "AnimationFilePath": "",          // ["", ..., ""], とすれば複数 .vmd のマージ読込となる
                 "FaceMappingFilePath": "",        // .vrm と .vmd の表情名対応表へのパス。"" ならデフォルトの対応表が使用される
+                "BodyAdjustFilePath": "",         // アニメーションのポーズ補正表へのパス。"" ならデフォルトの補正表（T -> A ポーズ変換用）が使用される
                 "DelayTime": 0.0,
                 "Options": {                      // Vmd では下記を記載可能だが、任意のデータを記述できる
                     "BodyScaleFromHuman": 0.0,    // unity humanoid の標準からのスケール。0.0 なら自動的に計算される
@@ -314,6 +322,37 @@
   - .json に書いてあるプロパティのみ取得される
   - .Options は dynamic アクセスが可能。内部には ExpandoObject が格納されている（初期値は null だがアクセスした時点で生成される）
   - .OptionsAs<デシリアライズ先クラス>() でデフォルト値を考慮した型変換ができ、ちゃんとした型で受け取れる（動作としては populate のような感じ）
+
+# ポーズ補正ファイルについて
+- テキストファイルで、HumanoidBodyBones Enum 値に対応した部位ごとに、ローカル回転を記述する
+  - .json の BodyAdjustFilePath を "" にするとデフォルトの補正ファイルが使用されるが、下記のような T -> A ポーズ補正となっている。
+```
+LeftUpperArm
+  lrot z+30
+RightUpperArm
+  lrot z-30
+```
+- 現状はローカル回転しか記述できない
+  - ローカル回転は、lrot | local rotation | LocalRotation の後に、x|y|z{実数} という形式で記述する
+- 回転は x|y|z 軸を {実数} 度という意味合いを持ち、* でクォータニオンの掛け算のように記載できる
+- ところで https://www.nicovideo.jp/watch/sm42270202 からＤＬさせてもらえる「ドクヘビ」という .vmd データは、どうも肩が 30 度くらい前に傾いている
+  - これを補正するには、下記のような補正ファイルを用意すればよい
+``` 
+LeftShoulder
+  lrot y-30
+RightShoulder
+  lrot y+30
+LeftUpperArm
+  lrot y+30 * z+30 
+RightUpperArm
+  lrot y-30 * z-30
+```
+- ちなみに下記のように処理している。あんまり自信はない…
+```
+ボーン回転補正 = 親ボーンの回転補正 * 補正ファイルから得た回転 * アバターから得た初期姿勢回転
+localRotation = inv(親のボーン回転補正) * .vmd から得た回転 * ボーン回転補正
+```
+- ワールド回転でやったほうが無駄ないかもねぇ
 
 # その他
 - unity 6 preview から addressables での Resources フォルダが使えなくなったようす…（ひどい）

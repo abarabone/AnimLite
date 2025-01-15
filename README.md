@@ -15,6 +15,7 @@
   - .json に BodyAdjustFilePath として .txt ファイルのパスを指定する
 - .json の Options を il2cpp, android, ios 向けの時だけ dynamic 型ではなく object 型になるようにプラグマを入れた
   - ていうかそもそも .net standard 2.1 向けだと dynamic 使えないっぽいので、USE_DYNAMIC が true じゃないと object になるようにしたけど悩み中
+  - ExpandoObject だと quest3 でエラーでたので、Json.Net の JObject に変更したら動いた
 
 2024.12.31
 - .json の 各パートに Options として任意の設定をかけるようにした

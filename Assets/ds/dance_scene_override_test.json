@@ -1,0 +1,14 @@
+{
+    "Motions": {
+        "azusa": {
+            "Model": {
+                "ModelFilePath": "riku as resource"
+            }
+        },
+        "mika": {
+            "Model": {
+                "ModelFilePath": "ぶいけっとにゃん.vrm"
+            }
+        }
+    }
+}

@@ -13,6 +13,7 @@ using Unity.VisualScripting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
 
 namespace AnimLite.Utility
 {
@@ -99,7 +100,7 @@ namespace AnimLite.Utility
 
     public class OpttionBase
     {
-        ExpandoObject? _options;
+        JObject? _options;
 
     #if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
         public object Options
@@ -107,8 +108,9 @@ namespace AnimLite.Utility
         public dynamic Options
     #endif
         {
-            get => this._options ?? new ExpandoObject { };
-            set => this._options = value as ExpandoObject;
+            //get => this._options ?? = new ExpandoObject { };
+            get => this._options ??= new JObject { };
+            set => this._options = value as JObject;
         }
 
         public T OptionsAs<T>() where T : new() =>

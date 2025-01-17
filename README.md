@@ -10,9 +10,9 @@
 
 # 新機能・修正
 2025.1.17
-- DanceSetPlayerFromJson のロード開始/完了を、待機可能な簡易公共イベントで流すようにした（AsyncMessaging<T>.Post()）
-  - caption などはそれを await で待てる（await AsyncMessaging<T>.ReciveAsync()）
-  - static 関数なので、参照をセットしたりなどはしないで、疎結合的にやり取りできるしくみ
+- DanceSetPlayerFromJson のロード開始/完了を、待機可能な簡易公共イベントで流すようにした（AsyncMessaging\<T\>.Post()）
+  - caption などはそれを await で待てる（await AsyncMessaging\<T\>.ReciveAsync()）
+  - static 関数なので、参照をセットしたりなどはしないで、疎結合的にやり取りできるしくみ。T の型が同じ相手同士でやり取りされる
 
 2025.1.14
 - 今までT→Aポーズ固定だった、ポーズ補正を一般化した

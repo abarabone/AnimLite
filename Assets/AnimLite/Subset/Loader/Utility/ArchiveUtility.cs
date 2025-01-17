@@ -168,11 +168,11 @@ namespace AnimLite.Utility
         public struct ArchiveDanceScene : IDisposable
         {
             public IArchive archive;
-            public DanceSetJson dancescene;
+            public DanceSceneJson dancescene;
 
             public void Dispose() => this.archive?.Dispose();
 
-            public void Deconstruct(out IArchive archive, out DanceSetJson dancescene)
+            public void Deconstruct(out IArchive archive, out DanceSceneJson dancescene)
             {
                 archive = this.archive;
                 dancescene = this.dancescene;
@@ -184,10 +184,10 @@ namespace AnimLite.Utility
                 jsonpaths.LoadDaceSceneAsync(null, null, ct);
 
         public static async ValueTask<ArchiveDanceScene> LoadDaceSceneAsync(
-            this IEnumerable<PathUnit> jsonpaths, IArchive fallbackArchive, DanceSetJson dancescene, CancellationToken ct)
+            this IEnumerable<PathUnit> jsonpaths, IArchive fallbackArchive, DanceSceneJson dancescene, CancellationToken ct)
         {
             IArchive ac = fallbackArchive;
-            DanceSetJson ds = dancescene;
+            DanceSceneJson ds = dancescene;
 
             foreach (var path in jsonpaths.Where(x => !x.IsBlank()))
             {
@@ -195,7 +195,7 @@ namespace AnimLite.Utility
 
                 ac = await (archpath + qstr).OpenArchiveAsync(ac, ct);
 
-                ds = await ac.LoadJsonAsync<DanceSetJson>(entpath, ds, ct);
+                ds = await ac.LoadJsonAsync<DanceSceneJson>(entpath, ds, ct);
             }
 
             return new ArchiveDanceScene

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
@@ -13,7 +14,7 @@ namespace AnimLite.DancePlayable
     //using AnimLite.Vrm;
     //using AnimLite.Vmd;
 
-    public class DanceSetSimpleCaption : DanceSceneCaptionBase
+    public class DanceSetSimpleCaption : MonoBehaviour
     {
 
 
@@ -29,60 +30,61 @@ namespace AnimLite.DancePlayable
 
 
 
-        public override void NortifyPlaying(DanceSetJson ds) =>
-            this.waitForPlaying.TrySetResult(ds)
-                .NotThen(this.waitForPlaying.SetCanceled);
-
-        AwaitableCompletionSource<DanceSetJson> waitForPlaying = new();
-
-
-
-
-        private void Awake()
+        private void OnDisable()
         {
-            this.Canvas.gameObject.SetActive(false);
+            this.cts?.Cancel();
         }
 
         private async Awaitable OnEnable()
         {
-            this.Canvas.gameObject.SetActive(true);
-            this.waitForPlaying.Reset();
-
-            try
+            for (; ; )
             {
-                this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
-                var ct = this.cts.Token;
-
-                showInfomatonCaption_(false);
-
-                var ds = await this.waitForPlaying.Awaitable;
-                ct.ThrowIfCancellationRequested();
-
-                showInfomatonCaption_(true);
-
-                setAudioCaption_(ds);
-                setModelCaptions_(ds);
-                adjustModelCaptionPosition_(ds);
-
-                await Awaitable.WaitForSecondsAsync(this.DisplayedTimeSec, ct);
-            }
-            catch (OperationCanceledException e)
-            {
-                Debug.LogWarning(e.ToString());
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
-            finally
-            {
-                this.cts.Dispose();
-                this.cts = null;
+                await showTelop_();
             }
 
-            this.Canvas.gameObject.SetActive(false);
-            return;
 
+            async ValueTask showTelop_()
+            {
+                try
+                {
+                    this.Canvas.gameObject.SetActive(false);
+
+                    this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
+                    var ct = this.cts.Token;
+
+
+                    await AsyncMessaging<DanceSetPlayerFromJson.OnLoadStart>.ReciveAsync();
+
+                    this.Canvas.gameObject.SetActive(true);
+
+
+                    showInfomatonCaption_(false);
+
+                    var loaded = await AsyncMessaging<DanceSetPlayerFromJson.OnLoaded>.ReciveAsync();
+                    ct.ThrowIfCancellationRequested();
+
+                    showInfomatonCaption_(true);
+
+                    setAudioCaption_(loaded.ds);
+                    setModelCaptions_(loaded.ds);
+                    adjustModelCaptionPosition_(loaded.ds);
+
+                    await Awaitable.WaitForSecondsAsync(this.DisplayedTimeSec, ct);
+                }
+                catch (OperationCanceledException e)
+                {
+                    Debug.LogWarning(e.ToString());
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+                finally
+                {
+                    this.cts.Dispose();
+                    this.cts = null;
+                }
+            }
 
             void showInfomatonCaption_(bool isVisible)
             {
@@ -90,7 +92,7 @@ namespace AnimLite.DancePlayable
                 this.InfoGroup.gameObject.SetActive(isVisible);
             }
 
-            void setAudioCaption_(DanceSetJson ds)
+            void setAudioCaption_(DanceSceneJson ds)
             {
                 var title = ds.AudioInformation.Caption;
                 var author = ds.AudioInformation.Author != ""
@@ -100,7 +102,7 @@ namespace AnimLite.DancePlayable
                 this.AudioInfo.text = $"{title}\r\n<indent=1em><size=10%>\r\n<size=50%>{author}";
             }
 
-            void setModelCaptions_(DanceSetJson ds)
+            void setModelCaptions_(DanceSceneJson ds)
             {
                 this.ModelInfo.text = string.Join("\r\n<size=30%>\r\n",
                     ds.Motions.Values
@@ -129,7 +131,7 @@ namespace AnimLite.DancePlayable
                 );
             }
 
-            void adjustModelCaptionPosition_(DanceSetJson ds)
+            void adjustModelCaptionPosition_(DanceSceneJson ds)
             {
                 var rtf = this.ModelInfo.rectTransform;
                 var pw = this.ModelInfo.preferredWidth;
@@ -143,10 +145,6 @@ namespace AnimLite.DancePlayable
             }
         }
 
-        private void OnDisable()
-        {
-            this.cts?.Cancel();
-        }
     }
 
 }

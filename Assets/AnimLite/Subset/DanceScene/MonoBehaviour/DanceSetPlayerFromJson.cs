@@ -18,6 +18,7 @@ namespace AnimLite.DancePlayable
     using static AnimLite.DancePlayable.DanceGraphy;
     using System.IO.Compression;
     using System.Security.Cryptography;
+    using UnityEditor.VersionControl;
 
     public class DanceSetPlayerFromJson : MonoBehaviour
     {
@@ -25,7 +26,6 @@ namespace AnimLite.DancePlayable
         public AudioSource AudioSource;
 
         public PrototypeCacheManager Cache;
-
 
 
         [FilePath]
@@ -38,29 +38,28 @@ namespace AnimLite.DancePlayable
         public float? TotalTime => this.graphy?.TotalTime;// 暫定
 
 
-        [SerializeField]
-        public DanceSceneCaptionBase DanceSceneCaption;
 
-
-
-        public SemaphoreSlim DanceSemapho { get; } = new (1);
+        public SemaphoreSlim DanceSemapho { get; } = new(1);
 
         CancellationTokenSource cts;
 
 
-
+        public struct OnLoadStart {}
+        public struct OnLoaded { public DanceSceneJson ds; }
+        //public struct OnPlayEnd { }
 
         private async Awaitable OnEnable()
         {
-            this.DanceSceneCaption?.SetEnable(true);
-            this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
-            var ct = this.cts.Token;
-
             try
             {
                 "load start".ShowDebugLog();
                 using (await this.DanceSemapho.WaitAsyncDisposable(default))
                 {
+                    AsyncMessaging<OnLoadStart>.Post();
+                    this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
+                    var ct = this.cts.Token;
+                    
+
                     using var x = await this.JsonFiles.LoadDanceSceneAsync(ct);
                     var order = await x.dancescene.BuildDanceGraphyOrderAsync(this.Cache?.Holder, x.archive, this.AudioSource, ct);
 
@@ -71,7 +70,9 @@ namespace AnimLite.DancePlayable
                     changeVisibility_(order, true);
 
                     this.graphy.graph.Play();
-                    this.DanceSceneCaption?.NortifyPlaying(x.dancescene);
+
+
+                    AsyncMessaging<OnLoaded>.Post(new OnLoaded { ds = x.dancescene });
                 }
                 "load end".ShowDebugLog();
             }
@@ -80,12 +81,18 @@ namespace AnimLite.DancePlayable
                 e.Message.ShowDebugLog();
                 await this.graphy.DisposeNullableAsync();
                 this.graphy = null;
+
+                AsyncMessaging<OnLoadStart>.Throw(e);
+                AsyncMessaging<OnLoaded>.Throw(e);
             }
             catch (Exception e)
             {
                 e.ShowDebugError();
                 await this.graphy.DisposeNullableAsync();
                 this.graphy = null;
+
+                AsyncMessaging<OnLoadStart>.Throw(e);
+                AsyncMessaging<OnLoaded>.Throw(e);
             }
             finally
             {
@@ -133,7 +140,8 @@ namespace AnimLite.DancePlayable
                 }
                 "disable end".ShowDebugLog();
 
-                this.DanceSceneCaption.AsUnityNull()?.SetEnable(false);
+                AsyncMessaging<OnLoadStart>.Cancel();
+                AsyncMessaging<OnLoaded>.Cancel();
             });
         }
     }

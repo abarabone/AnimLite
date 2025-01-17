@@ -34,7 +34,7 @@ namespace AnimLite.Loader
         /// 
         /// </summary>
         public static ValueTask<Order> BuildDanceGraphyOrderAsync(
-            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSceneJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         =>
             DanceSceneLoader.UseSeaquentialLoading
                 ? ds.BuildDanceGraphyOrderSequentialAsync(cache, archive, audioSource, ct)
@@ -46,7 +46,7 @@ namespace AnimLite.Loader
         /// 
         /// </summary>
         public static async ValueTask<Order> BuildDanceGraphyOrderParallelAsync(
-            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSceneJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         {
             var audioTask =
                 Task.Run(async () => await ds.Audio.buildAudioOrderAsync(archive, audioSource, ct) as object);
@@ -79,7 +79,7 @@ namespace AnimLite.Loader
         /// 
         /// </summary>
         public static async ValueTask<Order> BuildDanceGraphyOrderSequentialAsync(
-            this DanceSetJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
+            this DanceSceneJson ds, PrototypeCacheHolder cache, IArchive? archive, AudioSource audioSource, CancellationToken ct)
         {
 
             var audioOrder = await ds.Audio

@@ -27,7 +27,7 @@ namespace AnimLite.Utility
 
 
     [System.Serializable]
-    public class DanceSetJson : OpttionBase
+    public class DanceSceneJson : OpttionBase
     {
         public AudioDefineJson Audio = new();
         public AnimationDefineJson DefaultAnimation = new();

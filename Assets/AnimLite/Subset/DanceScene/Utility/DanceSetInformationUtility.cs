@@ -26,7 +26,7 @@ namespace AnimLite.DancePlayable
 
 
         public static async ValueTask OrverrideInformationIfBlankAsync(
-            this DanceSetJson ds, DanceGraphy.Order order)
+            this DanceSceneJson ds, DanceGraphy.Order order)
         {
             await Awaitable.MainThreadAsync();
 

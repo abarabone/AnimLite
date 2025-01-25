@@ -54,7 +54,7 @@ namespace AnimLite.Samples
 
 
         VmdBodyMotionOperator<TransformMappings, Tf> bodyOperator;
-        FootIkOperator<Tf> footOperator;
+        VmdFootIkOperator<Tf> footOperator;
         VrmExpressionOperator faceOperator;
 
 
@@ -112,7 +112,7 @@ namespace AnimLite.Samples
 
             // ＶＭＤを再生のための情報を構築する
             this.bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(this.bone);
-            this.footOperator = this.anim.ToFootIkTransformOperator(this.bone);
+            this.footOperator = this.anim.ToVmdFootIkTransformOperator(this.bone);
             this.faceOperator = this.anim.ToVrmExpressionOperator(this.face);
 
             if (!this.enabled) this.OnDisable();
@@ -145,10 +145,9 @@ namespace AnimLite.Samples
 
 
             // ＶＭＤを再生する（キーを検索し、計算して Transform に書き出す）
-            var tfAnim = this.anim.transform;
             this.bodyOperator.SetLocalMotions(posKeyFinder, rotKeyFinder);
-            this.footOperator.SolveLegPositionIk(posKeyFinder, tfAnim.position, tfAnim.rotation);
-            this.footOperator.SolveFootRotationIk(rotKeyFinder, tfAnim.position, tfAnim.rotation);
+            this.footOperator.SolveLegPositionIk(posKeyFinder);
+            this.footOperator.SolveFootRotationIk(rotKeyFinder);
             this.faceOperator.SetFaceExpressions(faceKeyFinder);
         }
 

@@ -121,6 +121,8 @@ namespace AnimLite.Utility
     public class MotionOptionsJson
     {
         public float BodyScaleFromHuman = 0.0f;
+        public float FootScaleFromHuman = 0.0f;
+        public float MoveScaleFromHuman = 0.0f;
         public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
     }
 

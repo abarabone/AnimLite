@@ -363,6 +363,8 @@ namespace AnimLite.Loader
 
                 DelayTime = define.Animation.DelayTime,
                 BodyScale = options.BodyScaleFromHuman,
+                FootScale = options.FootScaleFromHuman,
+                MoveScale = options.MoveScaleFromHuman,
                 FootIkMode = options.FootIkMode,
 
                 Position = define.Model.Position,

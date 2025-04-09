@@ -76,26 +76,26 @@ namespace AnimLite.Vmd
             where TPFinder : IKeyFinder<float4>
             where TRFinder : IKeyFinder<quaternion>
         {
+            (quaternion, float4) get_(MmdBodyBones ibone) => (rkf.getrot(ibone), pkf.getpos(ibone));
 
             return humanbone switch
             {
 
                 HumanBodyBones.LastBone =>
-                    //kf.p.get((int)MmdBodyBones.センター).As3() * 0.1f,
-
-                    //math.rotate(math.inverse(math.mul(rkf.get((int)MmdBodyBones.グルーブ), rkf.get((int)MmdBodyBones.センター))), pkf.get((int)MmdBodyBones.全ての親).To3()) *0.1f +
-                    //math.rotate(math.inverse(rkf.get((int)MmdBodyBones.グルーブ)), pkf.get((int)MmdBodyBones.センター).To3()) * 0.1f +
-                    //pkf.get((int)MmdBodyBones.グルーブ).To3() * 0.1f,
-
-                    //kf.p.get((int)MmdBodyBones.全ての親).As3() * 0.1f +
-                    //math.rotate(kf.r.get((int)MmdBodyBones.センター), kf.p.get((int)MmdBodyBones.センター).As3()) * 0.1f +
-                    //math.rotate(mul(kf.r.get((int)MmdBodyBones.グルーブ), kf.r.get((int)MmdBodyBones.センター)), kf.p.get((int)MmdBodyBones.グルーブ).As3()) * 0.1f,
-
-                    //pkf.getpos(MmdBodyBones.全ての親).As3() * 0.1f +
-                    a() * 0.1f,
+                    //transform(
+                    //    get_(MmdBodyBones.全ての親),
+                    //    get_(MmdBodyBones.センター),
+                    //    get_(MmdBodyBones.グルーブ)) * 0.1f,
+                    //pkf.getpos(MmdBodyBones.全ての親).As3() * 0.1f,
+                    get_root_pos_() * 0.1f,
 
                 HumanBodyBones.Hips =>
-                    pkf.getpos(MmdBodyBones.下半身).As3() * 0.1f,
+                    //pkf.getpos(MmdBodyBones.下半身).As3() * 0.1f,
+                    //transform(
+                    //    get_(MmdBodyBones.センター),
+                    //    get_(MmdBodyBones.グルーブ),
+                    //    get_(MmdBodyBones.下半身)) * 0.1f,
+                    get_hip_pos_() * 0.1f,
 
                 HumanBodyBones.Spine =>
                     pkf.getpos(MmdBodyBones.上半身).As3() * 0.1f,
@@ -103,29 +103,56 @@ namespace AnimLite.Vmd
                 _ => default,
             };
 
-            float3 a()
+            float3 get_root_pos_()
             {
-                var arr = new NativeArray<MmdBodyBones>(3, Allocator.Temp);
-                arr[0] = MmdBodyBones.全ての親;
-                arr[1] = MmdBodyBones.センター;
-                arr[2] = MmdBodyBones.グルーブ;
-                var pos = (pkf, rkf).transform<TPFinder, TRFinder>(arr);
-                arr.Dispose();
-                return pos;
+                var pos = transform(
+                    get_(MmdBodyBones.全ての親),
+                    get_(MmdBodyBones.センター),
+                    get_(MmdBodyBones.グルーブ));
+
+                return new float3(pos.x, 0.0f, pos.z);
+            }
+
+            float3 get_hip_pos_()
+            {
+                var rootpos = transform(
+                    get_(MmdBodyBones.全ての親),
+                    get_(MmdBodyBones.センター),
+                    get_(MmdBodyBones.グルーブ));
+                
+                var hippos = pkf.getpos(MmdBodyBones.下半身).As3();
+
+                return hippos + new float3(0.0f, rootpos.y, 0.0f);
             }
         }
 
-        static float3 transform<TPFinder, TRFinder>(
-            this (TPFinder p, TRFinder r) kf, NativeSlice<MmdBodyBones> istreams)
-                where TPFinder : IKeyFinder<float4>
-                where TRFinder : IKeyFinder<quaternion>
+        static float3 transform((quaternion, float4) bone0, (quaternion, float4) bone1)
         {
-            var pos = kf.p.getpos(istreams[0]).As3();
+            var arr = new NativeArray<(quaternion, float4)>(2, Allocator.Temp);
+            arr[0] = bone0;
+            arr[1] = bone1;
+            var pos = transform(arr);
+            arr.Dispose();
+            return pos;
+        }
+        static float3 transform((quaternion, float4) bone0, (quaternion, float4) bone1, (quaternion, float4) bone2)
+        {
+            var arr = new NativeArray<(quaternion, float4)>(3, Allocator.Temp);
+            arr[0] = bone0;
+            arr[1] = bone1;
+            arr[2] = bone2;
+            var pos = transform(arr);
+            arr.Dispose();
+            return pos;
+        }
+        static float3 transform(NativeSlice<(quaternion rot, float4 pos)> streams)
+        {
+            var pos = streams[0].pos.As3();
 
-            for (var i = 1; i < istreams.Length; i++)
+            for (var i = 1; i < streams.Length; i++)
             {
-                var lrot = kf.r.getrot(istreams[i - 1]);
-                var lpos = kf.p.getpos(istreams[i - 0]).As3();
+                var lrot = streams[i - 1].rot;
+                var lpos = streams[i - 0].pos.As3();
 
                 pos += math.rotate(lrot, lpos);
             }

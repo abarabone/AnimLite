@@ -1,9 +1,10 @@
-﻿using AnimLite.Utility;
+﻿using AnimLite.IK;
+using AnimLite.Utility;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace AnimLite.Vmd
 {
-
 
     static public class BodyMotionExtension
     {
@@ -25,7 +26,7 @@ namespace AnimLite.Vmd
                 where TStream : ITransformStreamSource<TTf>
         {
             op.bone.SetLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
-                0, pkf, rkf, stream, op.bodyScale);
+                0, pkf, rkf, stream, op.moveScale);
 
             op.bone.SetHipLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
                 1, pkf, rkf, stream, op.bodyScale, op.rootToHipLocal, op.spineToHipLocal);
@@ -57,7 +58,7 @@ namespace AnimLite.Vmd
         }
 
         public static void SetLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
-            this TBone bone, int i, TPFinder pkf, TRFinder rkf, TStream stream, float bodyScale)
+            this TBone bone, int i, TPFinder pkf, TRFinder rkf, TStream stream, float scale)
                 where TPFinder : IKeyFinder<float4>
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>
@@ -71,7 +72,7 @@ namespace AnimLite.Vmd
             var _lpos = pkf.AccumulateStreamPosition(rkf, map.HumanBoneId);
 
             var lrot = unit.initpose.RotateBone(_lrot);
-            var lpos = _lpos * bodyScale;
+            var lpos = _lpos * scale;
             stream.SetLocalRotation(map.TransformHandle, lrot);
             stream.SetLocalPosition(map.TransformHandle, lpos);
         }

@@ -33,7 +33,7 @@ namespace AnimLite.Vmd
 
 
         public VmdBodyMotionOperator<TransformHandleMappings, TfHandle> body;
-        public FootIkOperator<TfHandle> foot;
+        public VmdFootIkOperator<TfHandle> foot;
 
         [ReadOnly]
         public bool useLegPositionIk;
@@ -136,10 +136,10 @@ namespace AnimLite.Vmd
             this.body.SetLocalMotions(pkf_, rkf_, stream);
 
             if (!this.useLegPositionIk) return;
-            this.foot.SolveLegPositionIk(stream, pkf_, rawstream.rootMotionPosition, rawstream.rootMotionRotation);
+            this.foot.SolveLegPositionIk(stream, pkf_);
 
             if (!this.useFootRotationIk) return;
-            this.foot.SolveFootRotationIk(stream, rkf_, rawstream.rootMotionPosition, rawstream.rootMotionRotation);
+            this.foot.SolveFootRotationIk(stream, rkf_);
         }
     }
 
@@ -158,7 +158,8 @@ namespace AnimLite.Vmd
 
 
         public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
-            this Animator anim, TransformHandleMappings bone, TPFinder pkf, TRFinder rkf, StreamingTimer timer, VmdFootIkMode footIkMode = VmdFootIkMode.auto, float bodyScale = 0)
+            this Animator anim, TransformHandleMappings bone, TPFinder pkf, TRFinder rkf, StreamingTimer timer,
+            VmdFootIkMode footIkMode = VmdFootIkMode.auto, float moveScale = 0, float bodyScale = 0, float footScale = 0)
                 where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
                 where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
         {
@@ -172,7 +173,7 @@ namespace AnimLite.Vmd
                 _ => getUseIk_(),
             };
 
-            anim.BindStreamTransform(anim.transform);// バインドしないと rootMotionPosition が取得できない様子
+            //anim.BindStreamTransform(anim.transform);// バインドしないと rootMotionPosition が取得できない様子
 
             return new VmdAnimationJob<TPFinder, TRFinder>
             {
@@ -185,9 +186,9 @@ namespace AnimLite.Vmd
                 useLegPositionIk = useIk.pos,
                 useFootRotationIk = useIk.rot,
 
-                body = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bone, bodyScale),
+                body = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bone, moveScale, bodyScale),
 
-                foot = anim.ToFootIkOperator<TransformHandleMappings, TfHandle>(bone, bodyScale),
+                foot = anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(bone, moveScale, footScale),
             };
 
 

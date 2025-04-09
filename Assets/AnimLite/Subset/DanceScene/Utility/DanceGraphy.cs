@@ -119,6 +119,8 @@ namespace AnimLite.DancePlayable
 
             public VmdFootIkMode FootIkMode;
             public float BodyScale;
+            public float FootScale;
+            public float MoveScale;
 
             public override bool IsMotionBlank => this.vmd is null;
             public override async ValueTask DisposeAsync()
@@ -295,7 +297,7 @@ namespace AnimLite.DancePlayable
                         .ToKeyFinderWith<Key4CatmulRot, Clamp>();
 
                     var anim = order.Model.Value.GetComponent<Animator>();
-                    var job = anim.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.BodyScale);
+                    var job = anim.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.MoveScale, order.BodyScale, order.FootScale);
                     graph.CreateVmdAnimationJobWithSyncScript(anim, job, timer, order.DelayTime);
                 }
 

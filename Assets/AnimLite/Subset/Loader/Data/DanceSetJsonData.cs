@@ -27,7 +27,7 @@ namespace AnimLite.Utility
 
 
     [System.Serializable]
-    public class DanceSetJson : OpttionBase
+    public class DanceSceneJson : OpttionBase
     {
         public AudioDefineJson Audio = new();
         public AnimationDefineJson DefaultAnimation = new();
@@ -121,6 +121,8 @@ namespace AnimLite.Utility
     public class MotionOptionsJson
     {
         public float BodyScaleFromHuman = 0.0f;
+        public float FootScaleFromHuman = 0.0f;
+        public float MoveScaleFromHuman = 0.0f;
         public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
     }
 

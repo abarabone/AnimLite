@@ -40,15 +40,12 @@ namespace AnimLite.Samples
             var face = vmd.facemap.BuildStreamingFace();
             //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(vmd.facemap) ?? default;
             var bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(bone);
-            var footOperator = this.anim.ToFootIkTransformOperator(bone);
+            var footOperator = this.anim.ToVmdFootIkTransformOperator(bone);
             var faceOperator = this.anim.ToVrmExpressionOperator(face);
 
 
             // 時間範囲などの情報を持ったタイマーを作成する
             var timer = new StreamingTimer(vmd.vmddata.RotationStreams.Streams.GetLastKeyTime());
-
-
-            var tfAnim = this.anim.transform;
 
             for (; ; )
             {
@@ -75,8 +72,8 @@ namespace AnimLite.Samples
 
                 // ＶＭＤを再生する（キーを検索し、計算して Transform に書き出す）
                 bodyOperator.SetLocalMotions(posKeyFinder, rotKeyFinder);
-                footOperator.SolveLegPositionIk(posKeyFinder, tfAnim.position, tfAnim.rotation);
-                footOperator.SolveFootRotationIk(rotKeyFinder, tfAnim.position, tfAnim.rotation);
+                footOperator.SolveLegPositionIk(posKeyFinder);
+                footOperator.SolveFootRotationIk(rotKeyFinder);
                 faceOperator.SetFaceExpressions(faceKeyFinder);
             }
         }

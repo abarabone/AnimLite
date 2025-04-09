@@ -9,6 +9,15 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2025.1.26
+- Motions.Animation.Options の BodyScaleFromHuman を、Body/Foot/Move に分けた
+  - これにより、腰の位置をモデルの大きさに合わせたまま、移動量や歩幅だけ調節したりできるようになった
+
+2025.1.17
+- DanceSetPlayerFromJson のロード開始/完了を、待機可能な簡易公共イベントで流すようにした（AsyncMessaging\<T\>.Post()）
+  - caption などはそれを await で待てる（await AsyncMessaging\<T\>.ReciveAsync()）
+  - static 関数なので、参照をセットしたりなどはしないで、疎結合的にやり取りできるしくみ。T の型が同じ相手同士でやり取りされる
+
 2025.1.14
 - 今までT→Aポーズ固定だった、ポーズ補正を一般化した
   - .txt ファイルに humanoid 部位とローカル回転補正値を記述できる
@@ -199,7 +208,9 @@
                 "BodyAdjustFilePath": "",         // アニメーションのポーズ補正表へのパス。"" ならデフォルトの補正表（T -> A ポーズ変換用）が使用される
                 "DelayTime": 0.0,
                 "Options": {                      // Vmd では下記を記載可能だが、任意のデータを記述できる
-                    "BodyScaleFromHuman": 0.0,    // unity humanoid の標準からのスケール。0.0 なら自動的に計算される
+                    "BodyScaleFromHuman": 0.0,    // 身体サイズの補正比率。0.0 なら自動的に計算される
+                    "FootScaleFromHuman": 0.0,    // 足ＩＫ位置の補正比率。0.0 なら自動的に計算される
+                    "MoveScaleFromHuman": 0.0,    // キャラクター移動の補正比率。0.0 なら自動的に計算される
                     "FootIkMode": "auto"          // .vmd のフットＩＫをどうするか。auto|on|off|leg_only|foot_only から選ぶ。auto は .vmd の足ＩＫにキーがあるかないかで自動判別する
                 },
             },
@@ -323,6 +334,19 @@
   - .json に書いてあるプロパティのみ取得される
   - .Options は dynamic アクセスが可能。内部には ExpandoObject が格納されている（初期値は null だがアクセスした時点で生成される）
   - .OptionsAs<デシリアライズ先クラス>() でデフォルト値を考慮した型変換ができ、ちゃんとした型で受け取れる（動作としては populate のような感じ）
+- Motion.Animation.Options の BodyScaleFromHuman について
+  - BodyScaleFromHuman
+    - アニメーションにおける身体サイズの補正値。値 * 0.8 * 0.1 がアニメーションの移動ベクトルに乗算される。
+      - 値が 0.0 なら自動計算され、Animator.humanScale * 0.8 * 0.1 となる（humanScale は標準股下 1m からの比率）
+      - \* 0.8 は、unity humanoid の股下標準(1m)と mmd 標準ミクとの股下の比率
+      - \* 0.1 は、mmd の位置単位から unity(1m) への補正値。経験的に割り出したので、根拠のある値ではない
+      - 値を 1.0 にすると、vmd 本来のモデルと近い値となる（ように試行錯誤で調節したつもり）
+  - FootScaleFromHuman は足ＩＫの補正値。Body と同様の計算で、歩幅が調節される
+  - MoveScaleFromHuman はキャラクター移動量の補正値。計算は Body と同様
+  - Body を 0.0 にして Move を 1.0 にすれば、体の上下移動をキャラクターの身体サイズに合わせつつ、移動量を元のモデルと同じにできる
+    - Foot を Move と異なる値にすると滑ってみえる
+    - 小さいキャラで 1.0 にすると大股になって頑張ってる感じがしてかわいい
+  - 今考えると FromHuman って意味わかんないな、FromVmd とかのがいいのでは？ FromHumanoid ならまだしも…
 
 # ポーズ補正ファイルについて
 - テキストファイルで、HumanoidBodyBones Enum 値に対応した部位ごとに、ローカル回転を記述する

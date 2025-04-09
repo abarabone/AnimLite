@@ -9,6 +9,19 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2025.4.10
+- 足ＩＫを接地に対応させた
+  - animation job だと job 中で raycast が使えないので、job system で raycast command を使うモードを experimental として実装した
+  - sample7 で animation job と job system での実行比較、sample8 で接地を実行
+  - sample8 では .json に Mosions.Animation.Options.UseStreamHandleAnimationJob : false を記述すると使えることを示した（デフォルトでは true ）
+  - 現状、従来のアニメーションモード（ transform, animation job playable ）では、接地は使えない
+  - job system は ecs みたいに job を小さい単位で組んだんだけど、複雑になってしまった
+    - animation job のようにモデル１体ごとに単一の job のほうがパフォーマンスでてるか？
+      - モデル１体の時でも並列度は高くなってるが、トータル負荷は増えてる気がする（モデル増えたら逆転するか？）
+      - 一連の job は、.json 単位で作ってる
+- DanceSetPlayerFromJson でアニメーション終了を通知するようにした
+  - OnPlayEnd を await すれば待機できる（ DanceSetSimpleCaption で使ってる） 
+  
 2025.1.26
 - Motions.Animation.Options の BodyScaleFromHuman を、Body/Foot/Move に分けた
   - これにより、腰の位置をモデルの大きさに合わせたまま、移動量や歩幅だけ調節したりできるようになった
@@ -106,10 +119,12 @@
   - 任意のタイミングでクリアできるが、必ずプログラム開始時にクリアされる
 
 # やりたい・検討中
+- 現状、.vmd のキャッシュはオンメモリだけど、一時ファイルにした方がよくない？メモリ占有し続けるのってどうなの
+- move/body/ik の補正スケールは水平と垂直で別にしたほうがいいかも？（ベクトルで指定するなど）
 - 各種動作フラグとかは static からオプションインスタンスを引数で渡す方式にしたほうがいいかな…
 - IStreamProcedure が Absolute のときカクつく気がするので調査する
 - そういえばカメラがないとふつうのビューワーだとダメか。ＶＲしか考えてなかったが…
-- キャラごとにボーンのオフセット値を設定できるようにしたいかも（Ｔポーズ→Ａポーズもこれでやってもいい）
+- ~~キャラごとにボーンのオフセット値を設定できるようにしたいかも（Ｔポーズ→Ａポーズもこれでやってもいい）~~
   - 回転制限か比率をつけるのもいいかなぁ、特に肩がモデルによって違うからな…
 - ~~足ＩＫとつま先ＩＫ（向き）のオンオフを分けて .json に記載できるといいかも~~ <- 対応した
 - ~~http 時の .zip で クエリストリングの ? 以降と ZipArchive エントリの指定に対応させたい（が、http での .zip はあまり実用性ない気もする…）~~
@@ -136,6 +151,7 @@
 - body motion が burst job なのに、face の playable script がメインスレッドなうえに遅い、なんとかならないか…
   - 表情は univrm ではない再生方法もあるといいかも
 - .vmd 変換を高速化したい
+- そこそこ使えるようになってきた気がするので、そろそろ外面的な関数だけでも整理しようか…
 
 # なやみちゅう
 - zip paralell open single file 読み込みの時 android(quest3) で落ちるようになった、file mapping のとこで落ちてる様子
@@ -211,7 +227,9 @@
                     "BodyScaleFromHuman": 0.0,    // 身体サイズの補正比率。0.0 なら自動的に計算される
                     "FootScaleFromHuman": 0.0,    // 足ＩＫ位置の補正比率。0.0 なら自動的に計算される
                     "MoveScaleFromHuman": 0.0,    // キャラクター移動の補正比率。0.0 なら自動的に計算される
-                    "FootIkMode": "auto"          // .vmd のフットＩＫをどうするか。auto|on|off|leg_only|foot_only から選ぶ。auto は .vmd の足ＩＫにキーがあるかないかで自動判別する
+                    "FootIkMode": "auto",         // .vmd のフットＩＫをどうするか。auto|on|off|leg_only|foot_only から選ぶ。auto は .vmd の足ＩＫにキーがあるかないかで自動判別する
+                                                  // _with_ground をつけると接地ＩＫを使う（ auto_with_ground とか leg_only_with_ground とか書く）
+                    "UseStreamHandleAnimationJob": true  // 従来の animation job モードを使用する（接地を試すには false ）
                 },
             },
             "ModelInformation": {                 // キャラクターモデルの情報

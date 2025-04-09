@@ -37,6 +37,8 @@ namespace AnimLite.DancePlayable
 
         private async Awaitable OnEnable()
         {
+            this.Canvas.gameObject.SetActive(false);
+
             for (; ; )
             {
                 await showTelop_();
@@ -47,29 +49,39 @@ namespace AnimLite.DancePlayable
             {
                 try
                 {
-                    this.Canvas.gameObject.SetActive(false);
-
                     this.cts = CancellationTokenSource.CreateLinkedTokenSource(this.destroyCancellationToken);
                     var ct = this.cts.Token;
 
+                    // wait load start
+                    {
+                        await AsyncMessaging<DanceSetPlayerFromJson.OnLoadStart>.ReciveAsync();
 
-                    await AsyncMessaging<DanceSetPlayerFromJson.OnLoadStart>.ReciveAsync();
-
-                    this.Canvas.gameObject.SetActive(true);
+                        this.Canvas.gameObject.SetActive(true);
 
 
-                    showInfomatonCaption_(false);
+                        showInfomatonCaption_(false);
+                    }
 
-                    var loaded = await AsyncMessaging<DanceSetPlayerFromJson.OnLoaded>.ReciveAsync();
-                    ct.ThrowIfCancellationRequested();
+                    // wait load end
+                    {
+                        var loaded = await AsyncMessaging<DanceSetPlayerFromJson.OnLoaded>.ReciveAsync();
+                        ct.ThrowIfCancellationRequested();
 
-                    showInfomatonCaption_(true);
+                        showInfomatonCaption_(true);
 
-                    setAudioCaption_(loaded.ds);
-                    setModelCaptions_(loaded.ds);
-                    adjustModelCaptionPosition_(loaded.ds);
+                        setAudioCaption_(loaded.ds);
+                        setModelCaptions_(loaded.ds);
+                        adjustModelCaptionPosition_(loaded.ds);
+                    }
 
-                    await Awaitable.WaitForSecondsAsync(this.DisplayedTimeSec, ct);
+                    // wait telop off
+                    {
+                        var waittask = Task.Delay((int)(this.DisplayedTimeSec * 1000), ct);
+                        var endtask = AsyncMessaging<DanceSetPlayerFromJson.OnPlayEnd>.ReciveAsync();
+                        await Task.WhenAny(waittask, endtask);
+
+                        this.Canvas.gameObject.SetActive(false);
+                    }
                 }
                 catch (OperationCanceledException e)
                 {

@@ -27,7 +27,7 @@ namespace AnimLite.Utility
 
 
     [System.Serializable]
-    public class DanceSceneJson : OpttionBase
+    public class DanceSceneJson : OptionBase
     {
         public AudioDefineJson Audio = new();
         public AnimationDefineJson DefaultAnimation = new();
@@ -41,7 +41,7 @@ namespace AnimLite.Utility
         public InformationDefine AnimationInformation = new ();
     }
     [System.Serializable]
-    public class DanceMotionDefineJson : OpttionBase
+    public class DanceMotionDefineJson : OptionBase
     {
         public ModelDefineJson Model = new();
         public AnimationDefineJson Animation = new();
@@ -52,7 +52,7 @@ namespace AnimLite.Utility
     }
 
     [System.Serializable]
-    public class AnimationDefineJson : OpttionBase
+    public class AnimationDefineJson : OptionBase
     {
         //public PathUnit AnimationFilePath = "";
         public PathList AnimationFilePath = new () { Paths = new PathUnit [] { } };
@@ -62,7 +62,7 @@ namespace AnimLite.Utility
         public float DelayTime = 0.0f;
     }
     [System.Serializable]
-    public class AudioDefineJson : OpttionBase
+    public class AudioDefineJson : OptionBase
     {
         public PathUnit AudioFilePath = "";
 
@@ -70,7 +70,7 @@ namespace AnimLite.Utility
         public float Volume = 1.0f;
     }
     [System.Serializable]
-    public class ModelDefineJson : OpttionBase
+    public class ModelDefineJson : OptionBase
     {
         public PathUnit ModelFilePath = "";
 
@@ -80,7 +80,7 @@ namespace AnimLite.Utility
         public float Scale = 1.0f;
     }
     [System.Serializable]
-    public class CameraDefineJson : OpttionBase
+    public class CameraDefineJson : OptionBase
     {
         public PathUnit AnimationFilePath = "";
 
@@ -98,7 +98,7 @@ namespace AnimLite.Utility
     }
 
 
-    public class OpttionBase
+    public class OptionBase
     {
         JObject? _options;
 
@@ -123,7 +123,13 @@ namespace AnimLite.Utility
         public float BodyScaleFromHuman = 0.0f;
         public float FootScaleFromHuman = 0.0f;
         public float MoveScaleFromHuman = 0.0f;
+
         public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
+
+        public float GroundHitDistance = 2.0f;
+        public float GroundHitOriginOffset = 2.0f;
+
+        public bool UseStreamHandleAnimationJob = true;
     }
 
 }

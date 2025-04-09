@@ -112,7 +112,7 @@ namespace AnimLite.Samples
 
             // ＶＭＤを再生のための情報を構築する
             this.bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(this.bone);
-            this.footOperator = this.anim.ToVmdFootIkTransformOperator(this.bone);
+            this.footOperator = this.anim.ToVmdFootIkTransformOperator(this.bone).WithFootIkUsage(useLegIk:true, useFootIk:true);
             this.faceOperator = this.anim.ToVrmExpressionOperator(this.face);
 
             if (!this.enabled) this.OnDisable();

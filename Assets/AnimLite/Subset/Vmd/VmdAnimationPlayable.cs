@@ -35,10 +35,6 @@ namespace AnimLite.Vmd
         public VmdBodyMotionOperator<TransformHandleMappings, TfHandle> body;
         public VmdFootIkOperator<TfHandle> foot;
 
-        [ReadOnly]
-        public bool useLegPositionIk;
-        [ReadOnly]
-        public bool useFootRotationIk;
 
 
 
@@ -133,12 +129,10 @@ namespace AnimLite.Vmd
         {
             var stream = new TfHandle.StreamSource { stream = rawstream };
 
-            this.body.SetLocalMotions(pkf_, rkf_, stream);
+            this.body.SetLocalMotions(stream, pkf_, rkf_);
 
-            if (!this.useLegPositionIk) return;
             this.foot.SolveLegPositionIk(stream, pkf_);
 
-            if (!this.useFootRotationIk) return;
             this.foot.SolveFootRotationIk(stream, rkf_);
         }
     }
@@ -146,11 +140,16 @@ namespace AnimLite.Vmd
 
     public enum VmdFootIkMode
     {
-        auto        = -1,
-        off         = 0,
-        leg_only    = 1,
-        foot_only   = 2,
-        on          = 3,
+        off                     = 0b_0000,
+        leg_only                = 0b_0001,
+        foot_only               = 0b_0010,
+        on                      = 0b_0011,
+        off_with_ground         = 0b_0100,
+        leg_only_with_ground    = 0b_0101,
+        foot_only_with_ground   = 0b_0110,
+        on_with_ground          = 0b_0111,
+        auto                    = 0b_1000,
+        auto_with_ground        = 0b_1100,
     }
 
     public static class VmdJobExtension
@@ -158,24 +157,13 @@ namespace AnimLite.Vmd
 
 
         public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
-            this Animator anim, TransformHandleMappings bone, TPFinder pkf, TRFinder rkf, StreamingTimer timer,
-            VmdFootIkMode footIkMode = VmdFootIkMode.auto, float moveScale = 0, float bodyScale = 0, float footScale = 0)
+            this Animator anim, TransformHandleMappings bones, TPFinder pkf, TRFinder rkf, StreamingTimer timer,
+            VmdBodyMotionOperator<TransformHandleMappings, TfHandle> bodyop,
+            VmdFootIkOperator<TfHandle> footop)
                 where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
                 where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
-        {
-
-            var useIk = footIkMode switch
-            {
-                VmdFootIkMode.off => (pos: false, rot: false),
-                VmdFootIkMode.leg_only => (pos: true, rot: false),
-                VmdFootIkMode.foot_only => (pos: false, rot: true),
-                VmdFootIkMode.on => (pos: true, rot: true),
-                _ => getUseIk_(),
-            };
-
-            //anim.BindStreamTransform(anim.transform);// バインドしないと rootMotionPosition が取得できない様子
-
-            return new VmdAnimationJob<TPFinder, TRFinder>
+        =>
+            new VmdAnimationJob<TPFinder, TRFinder>
             {
                 pkf = pkf,
                 rkf = rkf,
@@ -183,43 +171,38 @@ namespace AnimLite.Vmd
                 timer = timer,
                 indexBlockTime = rkf.IndexBlockTimeRange,
                 
-                useLegPositionIk = useIk.pos,
-                useFootRotationIk = useIk.rot,
-
-                body = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bone, moveScale, bodyScale),
-
-                foot = anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(bone, moveScale, footScale),
+                body = bodyop,
+                foot = footop,
             };
 
+        public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
+            this Animator anim, TransformHandleMappings bones, TPFinder pkf, TRFinder rkf, StreamingTimer timer)
+                where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
+                where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
+        =>
+            anim.create(bones, pkf, rkf, timer,
+                anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bones),
+                anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(bones).WithIkUsage(pkf, rkf, VmdFootIkMode.auto));
 
-            (bool pos, bool rot) getUseIk_()
-            {
-                var kneeRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.左ひざ].length;
-                var ankleRotLengthL = rkf.Streams.Sections[(int)MmdBodyBones.左足首].length;
-                var footIkLengthL = pkf.Streams.Sections[(int)MmdBodyBones.左足ＩＫ].length;
+        public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
+            this Animator anim, TransformHandleMappings bones, TPFinder pkf, TRFinder rkf, StreamingTimer timer,
+            VmdBodyMotionOperator<TransformHandleMappings, TfHandle> bodyop)
+                where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
+                where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
+        =>
+            anim.create(bones, pkf, rkf, timer,
+                bodyop,
+                anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(bones).WithIkUsage(pkf, rkf, VmdFootIkMode.auto));
 
-                var kneeRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.右ひざ].length;
-                var ankleRotLengthR = rkf.Streams.Sections[(int)MmdBodyBones.右足首].length;
-                var footIkLengthR = pkf.Streams.Sections[(int)MmdBodyBones.右足ＩＫ].length;
-
-                var usePosIk1 =
-                    kneeRotLengthL < 3 & footIkLengthL > 2
-                    &
-                    kneeRotLengthR < 3 & footIkLengthR > 2;
-
-                var useRotIk1 =
-                    ankleRotLengthL < 3 & footIkLengthL > 2
-                    &
-                    ankleRotLengthR < 3 & footIkLengthR > 2;
-
-                var useIk2 =
-                    ankleRotLengthL < footIkLengthL
-                    &
-                    ankleRotLengthR < footIkLengthR;
-
-                return (usePosIk1 | useIk2, useRotIk1 | useIk2);
-            }
-        }
+        public static VmdAnimationJob<TPFinder, TRFinder> create<TPFinder, TRFinder>(
+            this Animator anim, TransformHandleMappings bones, TPFinder pkf, TRFinder rkf, StreamingTimer timer,
+            VmdFootIkOperator<TfHandle> footop)
+                where TPFinder : struct, IKeyFinderWithoutProcedure<float4>
+                where TRFinder : struct, IKeyFinderWithoutProcedure<quaternion>
+        =>
+            anim.create(bones, pkf, rkf, timer,
+                anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(bones),
+                footop);
     }
 
 }

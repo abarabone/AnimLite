@@ -208,11 +208,7 @@ namespace AnimLite.Loader
             var adjust = (BodyAdjustData)data[2];
 
             await Awaitable.MainThreadAsync();
-            return
-                define.toMotionOrder(vmddata, facemap, model, adjust) as MotionOrderBase
-                ??
-                // animation clip が face やブレンドを整備するまでの暫定
-                await define.toMotionOrderAwait(model, ct);
+            return await define.toMotionOrderAwait(vmddata, facemap, model, adjust, ct);
         }
         //static async ValueTask<MotionOrder> buildMotionOrderParallelAsync(
         //    this DanceMotionDefineJson define, VmdStreamDataCache cache, IArchive archive, CancellationToken ct)
@@ -255,11 +251,7 @@ namespace AnimLite.Loader
             var adjust = await archive.LoadBodyAdjustAsync(adjustpath, ct);
 
             await Awaitable.MainThreadAsync();
-            return
-                define.toMotionOrder(vmddata, facemap, model, adjust) as MotionOrderBase
-                ??
-                // animation clip が face やブレンドを整備するまでの暫定
-                await define.toMotionOrderAwait(model, ct);
+            return await define.toMotionOrderAwait(vmddata, facemap, model, adjust, ct);
         }
 
 
@@ -340,15 +332,57 @@ namespace AnimLite.Loader
                 Scale = define.Scale,
             };
 
-        static MotionOrder? toMotionOrder(
-            this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
+        static async ValueTask<MotionOrderBase> toMotionOrderAwait(
+            this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust, CancellationToken ct)
         {
             var options = define.Animation.OptionsAs<MotionOptionsJson>();
 
-            // animation clip が face やブレンドを整備するまでの暫定
-            return vmddata is not null
-            ? new()
-            //new()
+            return (vmddata.Value is not null) switch
+            {
+                true when options.UseStreamHandleAnimationJob =>
+                    define.toMotionOrderOld(options, vmddata, facemap, model, adjust),
+                true =>
+                    define.toMotionOrder(options, vmddata, facemap, model, adjust),
+                false =>
+                    await define.toMotionOrderAwait(options, model, ct),
+            };
+        }
+
+
+        static MotionOrder toMotionOrder(
+            this DanceMotionDefineJson define, MotionOptionsJson options,
+            Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
+        {
+            return new()
+            {
+                Model = model,
+                FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
+
+                //vmddata = vmddata,
+                vmd = vmddata,
+                bone = model.AsUnityNull()?.GetComponent<Animator>()
+                    .BuildVmdTransformMappings(adjust)
+                    ??
+                    default,
+                face = facemap.Value.BuildStreamingFace(),
+
+                DelayTime = define.Animation.DelayTime,
+                //BodyScale = options.BodyScaleFromHuman,
+                //FootScale = options.FootScaleFromHuman,
+                //MoveScale = options.MoveScaleFromHuman,
+                //FootIkMode = options.FootIkMode,
+                Options = options,
+
+                Position = define.Model.Position,
+                Rotation = Quaternion.Euler(define.Model.EulerAngles),
+                Scale = define.Model.Scale,
+            };
+        }
+        static MotionOrderOld toMotionOrderOld(
+            this DanceMotionDefineJson define, MotionOptionsJson options,
+            Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
+        {
+            return new()
             {
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
@@ -362,22 +396,21 @@ namespace AnimLite.Loader
                 face = facemap.Value.BuildStreamingFace(),
 
                 DelayTime = define.Animation.DelayTime,
-                BodyScale = options.BodyScaleFromHuman,
-                FootScale = options.FootScaleFromHuman,
-                MoveScale = options.MoveScaleFromHuman,
-                FootIkMode = options.FootIkMode,
+                //BodyScale = options.BodyScaleFromHuman,
+                //FootScale = options.FootScaleFromHuman,
+                //MoveScale = options.MoveScaleFromHuman,
+                //FootIkMode = options.FootIkMode,
+                Options = options,
 
                 Position = define.Model.Position,
                 Rotation = Quaternion.Euler(define.Model.EulerAngles),
                 Scale = define.Model.Scale,
-            }
-            //;
-            : null;
+            };
         }
-            
         // animation clip がキャッシュ、face やブレンドを整備するまでの暫定
         static async ValueTask<MotionOrderWithAnimationClip> toMotionOrderAwait(
-            this DanceMotionDefineJson define, Instance<GameObject>? model, CancellationToken ct)
+            this DanceMotionDefineJson define, MotionOptionsJson options,
+            Instance<GameObject>? model, CancellationToken ct)
         =>
             new()
             {
@@ -385,7 +418,7 @@ namespace AnimLite.Loader
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
 
                 // vmd ロード失敗してたら、animation clip をリソースロードする
-                AnimationClip = await(await define.Animation.AnimationFilePath.Paths
+                AnimationClip = await (await define.Animation.AnimationFilePath.Paths
                         .DefaultIfEmpty("".ToPath())
                         .First()
                         .ToResourceName()

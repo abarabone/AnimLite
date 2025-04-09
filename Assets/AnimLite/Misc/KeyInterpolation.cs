@@ -133,7 +133,7 @@ namespace AnimLite
         public static quaternion adjust_quaterion(quaternion q0, quaternion q1)
         {
             return math.select(-q1.value, q1.value, math.dot(q0, q1) >= 0);
-            //return math.select(math.inverse(q1).value, q1v.value, math.dot(q0, q1) > 0);
+            //return math.select(math.inverse(q1).value, q1.value, math.dot(q0, q1) > 0);
 
             //quaternion reverse_(quaternion q) => new quaternion(q.value.x, q.value.y, q.value.z, q.value.w);
         }

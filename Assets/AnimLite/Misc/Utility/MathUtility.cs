@@ -42,14 +42,16 @@ namespace AnimLite.Utility
 
         //public static float3 As3(this float4 v) => (float3)v;
         public static float3 As3(this float4 v) => new float3(v.x, v.y, v.z);
+        public static float4 As4(this float3 v, float w = 0.0f) => new float4(v, w);
 
         public static float3 AsXZ(this float3 v) => new float3(v.x, 0, v.z);
 
-        public static float3 As_float3(this float4 v) => new float3(v.x, v.y, v.z);
+        //public static float3 As_float3(this float4 v) => new float3(v.x, v.y, v.z);
 
         public static quaternion As_quaternion(this float4 v) => v;
 
         public static float3 As_float3(this Vector3 v) => (float3)v;
+        public static float4 As_float4(this Vector3 v, float w = 0.0f) => new float4(v, w);
         public static Vector3 AsVector3(this float3 v) => (Vector3)v;
         public static quaternion As_quaternion(this Quaternion q) => (quaternion)q;
         public static Quaternion AsQuaternion(this quaternion q) => (Quaternion)q;

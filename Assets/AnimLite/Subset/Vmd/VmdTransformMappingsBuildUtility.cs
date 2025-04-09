@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.VisualScripting;
+using UnityEngine.Jobs;
 
 namespace AnimLite.Vmd
 {
@@ -48,6 +49,21 @@ namespace AnimLite.Vmd
                 OptionalBones = x.c,
             };
         }
+
+        //public static TransformAccessMappings BuildVmdTransformArrayMappings(this Animator anim, BodyAdjustData adjust = null)
+        //{
+        //    if (anim.IsUnityNull()) return default;
+
+        //    var x = anim.buildVmdTfMappings<Tf>(adjust);
+
+        //    return new TransformAccessMappings
+        //    {
+        //        transformAccessArray = new TransformAccessArray(x.a.Select(x => x.TransformHandle.tf).ToArray()),
+        //        BoneToStreamIndexMappings = x.a.Select(x => x.ToTfAccess()).ToNativeArray(),
+        //        InitialPoseRotations = x.b.ToNativeArray(),
+        //        OptionalBones = x.c,
+        //    };
+        //}
 
 
 

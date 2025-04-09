@@ -3,6 +3,7 @@
     "com.unity.addressables": "2.2.2",
     "com.unity.burst": "1.8.18",
     "com.unity.collab-proxy": "2.6.0",
+    "com.unity.collections": "2.5.3",
     "com.unity.feature.development": "1.0.2",
     "com.unity.multiplayer.center": "1.0.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1",

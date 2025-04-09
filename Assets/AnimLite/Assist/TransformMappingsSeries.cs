@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Jobs;
@@ -19,7 +20,7 @@ namespace AnimLite
         public OptionalBoneChecker OptionalBones;
 
 
-        public (HumanBoneReference<TfHandle>, BoneRotationInitialPose, OptionalBoneChecker) this[int i]
+        public (HumanBoneReference<TfHandle> human, BoneRotationInitialPose initpose, OptionalBoneChecker option) this[int i]
         {
             get => (this.BoneToStreamIndexMappings[i], this.InitialPoseRotations[i], this.OptionalBones);
         }
@@ -45,31 +46,60 @@ namespace AnimLite
         public OptionalBoneChecker OptionalBones;
 
 
-        public (HumanBoneReference<Tf>, BoneRotationInitialPose, OptionalBoneChecker) this[int i]
+        public (HumanBoneReference<Tf> human, BoneRotationInitialPose initpose, OptionalBoneChecker option) this[int i]
         {
             get => (this.BoneToStreamIndexMappings[i], this.InitialPoseRotations[i], this.OptionalBones);
         }
         public int BoneLength => this.BoneToStreamIndexMappings.Length;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct TransformAccessMappings
-    {
-        public TransformAccessArray transforms;
-        public NativeArray<HumanBoneReference> BoneToStreamIndexMappings;
-        public NativeArray<BoneRotationInitialPose> InitialPoseRotations;
+    ///// <summary>
+    ///// TransformAccessArray に対応させるものだが、まだ作ってない
+    ///// </summary>
+    //public struct TransformAccessMappings : ITransformMappings<TfAccess>, IDisposable
+    //{
+    //    public TransformAccessArray transformAccessArray;
+    //    public NativeArray<HumanBoneReference<TfAccess>> BoneToStreamIndexMappings;
+    //    public NativeArray<BoneRotationInitialPose> InitialPoseRotations;
 
-        public OptionalBoneChecker OptionalBones;
+    //    public OptionalBoneChecker OptionalBones;
 
-        public void Dispose()
-        {
-            this.transforms.Dispose();
-            this.BoneToStreamIndexMappings.Dispose();
-            this.InitialPoseRotations.Dispose();
-        }
-    }
+    //    public (HumanBoneReference<TfAccess> human, BoneRotationInitialPose initpose, OptionalBoneChecker option) this[int i]
+    //    {
+    //        get => (this.BoneToStreamIndexMappings[i], this.InitialPoseRotations[i], this.OptionalBones);
+    //    }
+    //    public int BoneLength => this.BoneToStreamIndexMappings.Length;
+
+    //    public void Dispose()
+    //    {
+    //        this.transformAccessArray.Dispose();
+    //        this.BoneToStreamIndexMappings.Dispose();
+    //        this.InitialPoseRotations.Dispose();
+    //    }
+    //}
+    //public static class tfaextesion
+    //{
+    //    public static TfAccess.TfAccessProxy ToTfAccessProxy(this Tf tfproxy, TransformAccess tf) =>
+    //        new TfAccess.TfAccessProxy
+    //        {
+    //            tf = tf,
+    //        };
+
+    //    public static HumanBoneReference<TfAccess> ToTfAccess(this HumanBoneReference<Tf> src) =>
+    //        new HumanBoneReference<TfAccess>
+    //        {
+    //            HumanBoneId = src.HumanBoneId,
+    //            StreamId = src.StreamId,
+    //        };
+
+    //    //public static HumanBoneReference ToHumanBoneReference(this HumanBoneReference<TfAccess> src) =>
+    //    //    new HumanBoneReference
+    //    //    {
+    //    //        HumanBoneId = src.HumanBoneId,
+    //    //        StreamId = src.StreamId,
+    //    //    };
+
+    //}
 
 
 
@@ -96,11 +126,11 @@ namespace AnimLite
         public HumanBodyBones HumanBoneId;
         public int StreamId;
     }
-    public struct HumanBoneReference
-    {
-        public HumanBodyBones HumanBoneId;
-        public int StreamId;
-    }
+    //public struct HumanBoneReference
+    //{
+    //    public HumanBodyBones HumanBoneId;
+    //    public int StreamId;
+    //}
 
     /// <summary>
     /// 

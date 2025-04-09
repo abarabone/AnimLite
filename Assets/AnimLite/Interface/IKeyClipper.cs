@@ -17,37 +17,6 @@
         =>
             currentTime >= cursor.TimeTo;
     }
-    //public interface IKeyClipper
-    //{
-    //    int ClipIndex(int ikey, int length);
 
-    //    float ClipCurrentTime(float currentTime, float totalTime);
-
-
-    //    bool isOver<TProcedure>(TProcedure cursor, StreamingTimer timer) where TProcedure : IKeyCursor;
-    //}
-
-    //public interface ILoopKeyClipper : IKeyClipper
-    //{
-    //    bool IKeyClipper.isOver<TProcedure>(TProcedure cursor, StreamingTimer timer)
-    //    {
-    //        var limittime = cursor.TimeTo + math.select(0.0f, timer.TotalTime, cursor.TimeTo < cursor.TimeFrom);
-
-    //        return timer.CurrentTime >= limittime;
-    //    }
-    //}
-
-    public static class clipExtension
-    {
-        //public static float AdjustKeyTime<TClip>(this TClip c, float time)
-        //    where TClip : IKeyClipper
-        //=>
-        //    c.AdjustKeyTime(time);
-
-        //public static float ClipCurrentTime<TClip>(this TClip c, float time, StreamingTimer timer)
-        //    where TClip : IKeyClipper
-        //=>
-        //    c.ClipCurrentTime(time, timer.TotalTime, timer.TotalTimeR);
-    }
 
 }

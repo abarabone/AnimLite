@@ -1,0 +1,65 @@
+{
+  "BackGrounds": {
+    "main": {
+      "ModelFilePath": "神社橋配布用test as resource",
+      "Position": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -1.5
+      },
+      "EulerAngles": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 30.0
+      }
+    }
+  },
+  "Motions": {
+    "right-back": {
+      "Model": {
+        "ModelFilePath": "5239679709811772970 as resource",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -0.5
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "Animation": {
+        "AnimationFilePath": "【田中ヒメ】ロキ【ダンス】 as resource",
+        "DelayTime": 0.4,
+        "Options": {
+          "FootIkMode": "on_with_ground",
+          "UseStreamHandleAnimationJob": false
+        }
+      }
+    },
+    "left-back": {
+      "Model": {
+        "ModelFilePath": "5239679709811772970 as resource",
+        "Position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -0.5
+        },
+        "EulerAngles": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "Animation": {
+        "AnimationFilePath": "【鈴木ヒナ】ロキ【ダンス】 as resource",
+        "DelayTime": 0.4,
+        "Options": {
+          "FootIkMode": "on_with_ground",
+          "UseStreamHandleAnimationJob": false
+        }
+      }
+    }
+  }
+}

@@ -119,17 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &5 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1465291648229673383, guid: 6cdf83e7bb3b8c843978797a95bcb478, type: 3}
-  m_PrefabInstance: {fileID: 214415167}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c941b1898fca53d4c9e0731e3826f5e2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &214415167
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -345,7 +334,6 @@ MonoBehaviour:
   - Value: ds/dance_scene.json
   - Value: 
   - Value: 
-  DanceSceneCaption: {fileID: 5}
 --- !u!4 &219923945
 Transform:
   m_ObjectHideFlags: 0
@@ -587,7 +575,7 @@ MonoBehaviour:
   index: 0
   ChangeToPrevKey: 276
   ChangeToNextKey: 275
-  KeepTimeOnChane: 1
+  KeepTimeOnChange: 1
 --- !u!114 &1440763545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -608,7 +596,7 @@ MonoBehaviour:
   index: 0
   ChangeToPrevKey: 273
   ChangeToNextKey: 274
-  KeepTimeOnChane: 1
+  KeepTimeOnChange: 0
 --- !u!1 &1816883843
 GameObject:
   m_ObjectHideFlags: 0

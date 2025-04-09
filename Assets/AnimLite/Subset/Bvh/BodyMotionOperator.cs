@@ -33,9 +33,10 @@ namespace AnimLite
 
 
 
-        public static BodyMotionOperator<TBone, TTf> ToBodyMotionOperator<TBone, TTf>(this Animator anim, TBone bone, float bodyScale = 0)
-            where TBone : ITransformMappings<TTf>
-            where TTf : ITransformProxy
+        public static BodyMotionOperator<TBone, TTf> ToBodyMotionOperator<TBone, TTf>(
+            this Animator anim, TBone bone, float bodyScale = 0)
+                where TBone : ITransformMappings<TTf>
+                where TTf : ITransformProxy
         {
             var bodyScale_ = bodyScale == 0
                 ? anim.humanScale

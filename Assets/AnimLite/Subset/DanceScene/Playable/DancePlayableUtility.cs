@@ -7,20 +7,53 @@ using Unity.VisualScripting;
 //using SimpleDance;
 using System.Collections.Generic;
 using System.Linq;
-
+using Unity.Mathematics;
 
 namespace AnimLite.DancePlayable
 {
     using AnimLite.Vrm;
     using AnimLite.Vmd;
-
+    using AnimLite.Vmd.experimental;
+    using AnimLite.Utility;
 
     public static class DancePlayableUtility
     {
 
         /// <summary>
-        /// 単一のＶＭＤボディアニメーションを再生する playable グラフを作成する。
-        /// 再生は Job を使用する。Job は playable から時刻などの情報を直接的に取得できないので、
+        /// 複数のＶＭＤアニメーションを再生する単一の playable グラフを作成する。
+        /// 再生には c# job system を使用し、複数ステップの job を連携させて複数のモデルをアニメーションさせる。
+        /// 時刻は起点となる script playable から job に流し込む。
+        /// </summary>
+        public static void CreateVmdMotionJobWithSyncScript<TPFinder, TRFinder>(
+            this PlayableGraph graph, IEnumerable<Animator> anims, JobBuffers<TPFinder, TRFinder> buf, float totalTime)
+                where TPFinder : unmanaged, IKeyFinderWithoutProcedure<float4>
+                where TRFinder : unmanaged, IKeyFinderWithoutProcedure<quaternion>
+        {
+            var name = "vmd motion job";
+
+            var output = ScriptPlayableOutput.Create(graph, name);
+            var playable_sync = SyncJobTimerPlayable.Create(graph, (currentTime, prevdep) =>
+            {
+                var dep = buf.BuildMotionJobsAndSchedule(Time.deltaTime, prevdep);
+
+                foreach (var anim in anims)
+                {
+                    anim.AddJobDependency(dep);
+                }
+
+                return dep;
+            });
+            //playable_sync.SetInputCount(1);
+            playable_sync.SetOutputCount(1);
+            //playable_sync.SetInputWeight(0, 1);
+
+            playable_sync.SetDuration(totalTime);
+
+            output.SetSourcePlayable(playable_sync);
+        }
+        /// <summary>
+        /// 単一のＶＭＤアニメーションを再生する playable グラフを作成する。
+        /// 再生には IAnimationJob を使用する。Job は playable から時刻などの情報を直接的に取得できないので、
         /// 補助として時間を更新する playable も作成する。
         /// </summary>
         public static void CreateVmdAnimationJobWithSyncScript<TJob>(
@@ -42,10 +75,11 @@ namespace AnimLite.DancePlayable
             playable_job.SetOutputCount(1);
             //playable_job.SetInputWeight(0, 1);
 
-            var playable_sync = SyncJobTimerPlayable.Create(graph, currentTime =>
+            var playable_sync = SyncJobTimerPlayable.Create(graph, (currentTime, _) =>
             {
                 job.UpdateTimer(currentTime);
                 playable_job.SetJobData(job);
+                return default;
             });
             playable_sync.SetInputCount(1);
             playable_sync.SetOutputCount(1);

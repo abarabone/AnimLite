@@ -1,11 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Animations;
 using Unity.VisualScripting;
 using UnityEngine.Playables;
-using System;
-using System.Threading.Tasks;
 
 namespace AnimLite.DancePlayable
 {
@@ -13,12 +14,11 @@ namespace AnimLite.DancePlayable
     using AnimLite.Loader;
     using AnimLite.Vrm;
     using AnimLite.Vmd;
-    //using static UnityEditor.Progress;
-    using System.Collections.Generic;
     using static AnimLite.DancePlayable.DanceGraphy;
-    using System.IO.Compression;
-    using System.Security.Cryptography;
-    using UnityEditor.VersionControl;
+    //using static UnityEditor.Progress;
+    //using System.IO.Compression;
+    //using System.Security.Cryptography;
+    //using UnityEditor.VersionControl;
 
     public class DanceSetPlayerFromJson : MonoBehaviour
     {
@@ -35,7 +35,7 @@ namespace AnimLite.DancePlayable
         DanceGraphy graphy;
 
         public PlayableGraph? Graph => this.graphy?.graph;
-        public float? TotalTime => this.graphy?.TotalTime;// 暫定
+        public float TotalTime => this.graphy?.timekeeper.TotalTime ?? 0.0f;// 暫定
 
 
 
@@ -44,9 +44,9 @@ namespace AnimLite.DancePlayable
         CancellationTokenSource cts;
 
 
-        public struct OnLoadStart {}
+        public struct OnLoadStart { }
         public struct OnLoaded { public DanceSceneJson ds; }
-        //public struct OnPlayEnd { }
+        public struct OnPlayEnd { }
 
         private async Awaitable OnEnable()
         {
@@ -75,6 +75,11 @@ namespace AnimLite.DancePlayable
                     AsyncMessaging<OnLoaded>.Post(new OnLoaded { ds = x.dancescene });
                 }
                 "load end".ShowDebugLog();
+
+
+                await this.graphy.timekeeper.WaitForEndAsync(this.destroyCancellationToken);
+                AsyncMessaging<OnPlayEnd>.Post();
+
             }
             catch (OperationCanceledException e)
             {
@@ -84,6 +89,7 @@ namespace AnimLite.DancePlayable
 
                 AsyncMessaging<OnLoadStart>.Throw(e);
                 AsyncMessaging<OnLoaded>.Throw(e);
+                AsyncMessaging<OnPlayEnd>.Throw(e);
             }
             catch (Exception e)
             {
@@ -93,6 +99,7 @@ namespace AnimLite.DancePlayable
 
                 AsyncMessaging<OnLoadStart>.Throw(e);
                 AsyncMessaging<OnLoaded>.Throw(e);
+                AsyncMessaging<OnPlayEnd>.Throw(e);
             }
             finally
             {
@@ -123,6 +130,7 @@ namespace AnimLite.DancePlayable
             }
         }
 
+
         private async Awaitable OnDisable()
         {
             await Err.LoggingAsync(async () =>
@@ -142,6 +150,7 @@ namespace AnimLite.DancePlayable
 
                 AsyncMessaging<OnLoadStart>.Cancel();
                 AsyncMessaging<OnLoaded>.Cancel();
+                AsyncMessaging<OnPlayEnd>.Cancel();
             });
         }
     }

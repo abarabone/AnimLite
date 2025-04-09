@@ -22,8 +22,8 @@ namespace AnimLite
                 where TPFinder : IKeyFinder<float4>
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>
-                where TTf : ITransformProxy
-                where TStream : ITransformStreamSource<TTf>
+                where TTf : ITransformProxy<TStream>
+                where TStream : ITransformStreamSource
         {
             op.bone.SetLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
                 0, pkf, rkf, stream, op.bodyScale);
@@ -42,8 +42,8 @@ namespace AnimLite
             this TBone bone, int i, TRFinder rkf, TStream stream)
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>
-                where TTf : ITransformProxy
-                where TStream : ITransformStreamSource<TTf>
+                where TTf : ITransformeLocalRotationProxy<TStream>
+                where TStream : ITransformStreamSource
         {
             var unit = bone[i];
             var map = unit.human;
@@ -51,7 +51,7 @@ namespace AnimLite
             var _lrot = rkf.AccumulateStreamRotation(unit.option, map.HumanBoneId);//, map.StreamId);
             var lrot = unit.initpose.RotateBone(_lrot);
 
-            stream.SetLocalRotation(map.TransformHandle, lrot);
+            map.TransformHandle.SetLocalRotation(stream, lrot);
         }
 
         public static void SetLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
@@ -59,8 +59,8 @@ namespace AnimLite
                 where TPFinder : IKeyFinder<float4>
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>
-                where TTf : ITransformProxy
-                where TStream : ITransformStreamSource<TTf>
+                where TTf : ITransformeLocalRotationProxy<TStream>, ITransformLocalPositionProxy<TStream>
+                where TStream : ITransformStreamSource
         {
             var unit = bone[i];
             var map = unit.human;
@@ -70,8 +70,8 @@ namespace AnimLite
 
             var lrot = unit.initpose.RotateBone(_lrot);
             var lpos = _lpos * bodyScale;
-            stream.SetLocalRotation(map.TransformHandle, lrot);
-            stream.SetLocalPosition(map.TransformHandle, lpos);
+            map.TransformHandle.SetLocalRotation(stream, lrot);
+            map.TransformHandle.SetLocalPosition(stream, lpos);
         }
 
 

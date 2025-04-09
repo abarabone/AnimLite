@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
+using Unity.Mathematics;
 
 namespace AnimLite.DancePlayable
 {
@@ -17,11 +18,15 @@ namespace AnimLite.DancePlayable
     using AnimLite.Loader;
     using AnimLite.Vmd;
     using AnimLite.Vrm;
+    using AnimLite.Vmd.experimental;
+    using AnimLite.Vmd.experimental.Job;
+
     //using static AnimLite.DancePlayable.DanceGraphy;
     //using static AnimLite.Loader.AudioLoader;
 
     //using static UnityEditor.Progress;
-
+    using VmdPosFinder = KeyFinderWithoutProcedure<float4, Key4CatmulPos, Clamp, Key4StreamCache<float4>, StreamIndex>;
+    using VmdRotFinder = KeyFinderWithoutProcedure<quaternion, Key4CatmulRot, Clamp, Key4StreamCache<quaternion>, StreamIndex>;
 
     public class DanceGraphy : IAsyncDisposable
     {
@@ -31,39 +36,15 @@ namespace AnimLite.DancePlayable
         Func<ValueTask> DisposeAction = () => new ValueTask();
 
 
-        public float TotalTime;// 暫定、ちゃんとした方法にしたい
+        //public float TotalTime;// 暫定、ちゃんとした方法にしたい
+        public DanceTimeKeeper timekeeper { get; private set; }
 
 
 
-        //public Awaitable WaitForPlayingAsync() => this._waitForPlaying.Awaitable;
-
-        //AwaitableCompletionSource _waitForPlaying = new();
+        public JobBuffers<VmdPosFinder, VmdRotFinder> jobbuf;
 
 
-        //public void Play()
-        //{
-        //    this.graph.Play();
-        //    this._waitForPlaying.SetResult();
-        //}
-
-        //public void Stop()
-        //{
-        //    if (this.graph.IsPlaying())
-        //    {
-        //        this.graph.Stop();
-
-        //        if (!this.graph.IsDone())
-        //            this._waitForPlaying.SetCanceled();
-        //    }
-
-        //    this._waitForPlaying.Reset();
-        //}
-
-        //public void Evaluate(float deltaTime)
-        //{
-        //    this.graph.Evaluate(deltaTime);
-        //}
-
+        
 
         public struct Order
         {
@@ -72,6 +53,12 @@ namespace AnimLite.DancePlayable
             public MotionOrderBase[] Motions;
 
             public Func<ValueTask> DisposeAction;
+        }
+
+
+        interface IOrderUnit
+        {
+            float TotalTime { get; }
         }
 
         public class ModelOrder : IAsyncDisposable
@@ -88,7 +75,7 @@ namespace AnimLite.DancePlayable
             }
         }
 
-        public class AudioOrder : IAsyncDisposable
+        public class AudioOrder : IAsyncDisposable, IOrderUnit
         {
             public AudioSource AudioSource;
             public Instance<AudioClip> AudioClip;
@@ -100,6 +87,9 @@ namespace AnimLite.DancePlayable
             {
                 return this.AudioClip.DisposeNullableAsync();
             }
+            public float TotalTime => this.AudioClip.Value is not null
+                ? this.AudioClip.Value.length - this.DelayTime
+                : 0.0f;
         }
 
         public abstract class MotionOrderBase : ModelOrder
@@ -108,19 +98,20 @@ namespace AnimLite.DancePlayable
 
             public virtual bool IsMotionBlank => true;
         }
-        public class MotionOrder : MotionOrderBase
+        public class MotionOrder : MotionOrderBase, IOrderUnit
         {
             public Instance<VmdStreamData> vmd;
 
-            public TransformHandleMappings bone;
+            public TransformMappings bone;
             public VrmExpressionMappings face;
 
             public float DelayTime;
 
-            public VmdFootIkMode FootIkMode;
-            public float BodyScale;
-            public float FootScale;
-            public float MoveScale;
+            //public VmdFootIkMode FootIkMode;
+            //public float BodyScale;
+            //public float FootScale;
+            //public float MoveScale;
+            public MotionOptionsJson Options;
 
             public override bool IsMotionBlank => this.vmd is null;
             public override async ValueTask DisposeAsync()
@@ -128,14 +119,25 @@ namespace AnimLite.DancePlayable
                 await base.DisposeAsync();
 
                 //this.face.Dispose();
-                this.bone.Dispose();
+                //this.bone.Dispose();
                 await this.vmd.DisposeNullableAsync();
 
                 await Awaitable.MainThreadAsync();// 不要かも
                 await this.Model.DisposeNullableAsync();
             }
+            public float TotalTime => this.vmd.Value.RotationStreams.Streams.GetLastKeyTime() - this.DelayTime;
         }
-        public class MotionOrderWithAnimationClip : MotionOrderBase
+        public class MotionOrderOld : MotionOrder
+        {
+            public TransformHandleMappings bone;
+
+            public override async ValueTask DisposeAsync()
+            {
+                await base.DisposeAsync();
+                this.bone.Dispose();
+            }
+        }
+        public class MotionOrderWithAnimationClip : MotionOrderBase, IOrderUnit
         {
             public Instance<AnimationClip> AnimationClip;
             public float DelayTime;
@@ -146,30 +148,13 @@ namespace AnimLite.DancePlayable
                 await base.DisposeAsync();
 
                 await Awaitable.MainThreadAsync();// 不要かも
-                await this.AnimationClip.DisposeNullableAsync();
+                await this.AnimationClip.DisposeAsync();
                 await this.Model.DisposeNullableAsync();
             }
+            public float TotalTime => this.AnimationClip is not null
+                ? this.AnimationClip.Value.length - this.DelayTime
+                : 0.0f;
         }
-        //public class MotionOrder
-        //{
-        //    public GameObject Model;
-        //    public SkinnedMeshRenderer FaceRenderer;
-
-        //    public VmdStreamData vmddata;
-
-        //    public TransformHandleMappings bone;
-        //    public VrmExpressionMappings face;
-
-        //    public float DelayTime;
-
-        //    public VmdFootIkMode FootIkMode;
-        //    public float BodyScale;
-
-        //    //public bool OverWritePositionAndRotation;
-        //    public Vector3 Position;
-        //    public Quaternion Rotation;
-        //    public float Scale;
-        //}
 
 
         public async ValueTask DisposeAsync()
@@ -196,20 +181,17 @@ namespace AnimLite.DancePlayable
             var graph = PlayableGraph.Create();
 
 
+            createBackGroundCollider_(order.BackGrouds, order.Motions);
             showBackGround_(order.BackGrouds);
 
-            createMotionPlayables_(graph, order.Motions);
+            var jobbuf = createMotionPlayables_(graph, order.Motions);
 
             createAudioPlayable_(graph, order.Audio);
 
-            if (order.Audio is not null)
+            if (order.Audio?.AudioSource.AsUnityNull() is not null)
                 order.Audio.AudioSource.volume = order.Audio.Volume;// playable の weight で変えるべきとも思うが、audio の playable output にそういう機能はないようなのでとりあえずここで
 
-
-            var totalTime = graph.GetRootPlayableCount() > 0
-                ? (float)graph.GetRootPlayable(0).GetDuration()
-                : 0.0f;
-
+            var timeKeeper = new DanceTimeKeeper(graph);
             graph.AdjustPlayableLength();
 
             return new DanceGraphy
@@ -218,8 +200,13 @@ namespace AnimLite.DancePlayable
 
                 DisposeAction = () => new ValueTask(),
 
-                TotalTime = totalTime,//
+                //TotalTime = totalTime,//
+                //timekeeper = new DanceTimeKeeper(graph),
+                timekeeper = timeKeeper,
+
+                jobbuf = jobbuf,
             };
+
 
 
             static void showBackGround_(ModelOrder[] orders)
@@ -231,6 +218,34 @@ namespace AnimLite.DancePlayable
                     overwritePosition_(order);
                     overwriteScale_(order);
                 }
+            }
+            static void createBackGroundCollider_(ModelOrder[] orders, MotionOrderBase[] motions)
+            {
+                var useCollider = motions
+                    .OfType<MotionOrder>()
+                    .Any(x => (x.Options.FootIkMode & VmdFootIkMode.off_with_ground) != 0);
+
+                if (!useCollider) return;
+
+
+                var qmf = orders
+                    .Where(order => order.Model is not null)
+                    .SelectMany(order => order.Model.Value.GetComponentsInChildren<MeshFilter>())
+                    .Where(m => !m.IsUnityNull())
+                    .Select(x => (go:x.gameObject, mesh:x.sharedMesh));
+                var qsm = orders
+                    .Where(order => order.Model is not null)
+                    .SelectMany(order => order.Model.Value.GetComponentsInChildren<SkinnedMeshRenderer>())
+                    .Where(m => !m.IsUnityNull())
+                    .Select(x => (go: x.gameObject, mesh: x.sharedMesh));
+
+                Enumerable.Concat(qmf, qsm)
+                    .ForEach(x =>
+                    {
+                        var mc = x.go.gameObject.AddComponent<MeshCollider>();
+                        mc.sharedMesh = x.mesh;
+                        mc.gameObject.layer = LayerMask.NameToLayer(FootIkOperator.defaultHitLayer);
+                    });
             }
 
 
@@ -244,30 +259,38 @@ namespace AnimLite.DancePlayable
             }
 
 
-            static void createMotionPlayables_(PlayableGraph graph, IEnumerable<MotionOrderBase> orders)
+            static JobBuffers<VmdPosFinder, VmdRotFinder> createMotionPlayables_(PlayableGraph graph, IEnumerable<MotionOrderBase> orders)
             {
                 //if (orders == null) return;
 
+                var modelParams = new List<ModelParams<VmdPosFinder, VmdRotFinder>>();
+
                 foreach (var order in orders)
                 {
-                    if (order is MotionOrder mo)
+                    if (order is MotionOrderOld mo_old)
                     {
-                        createFaceMotion_(mo);
-                        createBodyMotion_(mo);
+                        createFaceMotionPlayable_(mo_old);
+                        createBodyMotionPlayable_AnimationJob_(mo_old);
+                    }
+                    else if (order is MotionOrder mo)
+                    {
+                        createFaceMotionPlayable_(mo);
+                        buildModelParameters_(mo).AddTo(modelParams);
                     }
                     else if (order is MotionOrderWithAnimationClip moac)
                     {
-                        createBodyMotion_withAnimationClip_(moac);
+                        createBodyMotionPlayable_AnimationClip_(moac);
                     }
 
                     overwritePosition_(order);
                     overwriteScale_(order);
                 }
 
-                return;
+                return createBodyMotionPlayable_(modelParams);
 
 
-                void createFaceMotion_(MotionOrder order)
+
+                void createFaceMotionPlayable_(MotionOrder order)
                 {
                     if (!order.face.IsCreated) return;
                     if (order.FaceRenderer.IsUnityNull()) return;
@@ -282,7 +305,49 @@ namespace AnimLite.DancePlayable
                     graph.CreateVmdFaceAnimation(order.Model, fkf, order.face, timer, order.DelayTime);
                 }
 
-                void createBodyMotion_(MotionOrder order)
+                JobBuffers<VmdPosFinder, VmdRotFinder> createBodyMotionPlayable_(
+                    IEnumerable<ModelParams<VmdPosFinder, VmdRotFinder>> modelparams)
+                {
+                    if (modelparams.IsEmpty()) return default;
+
+                    var countlist = modelparams.CountParams();
+                    var buf = modelparams.BuildJobBuffers(countlist);
+
+                    var qTotalTime =
+                        from p in modelparams
+                        from t in p.model_timeOptions
+                        select t.timer.TotalTime + t.previousTime
+                        ;
+
+                    var objs = modelparams.Select(x => x.model_data.anim);
+                    graph.CreateVmdMotionJobWithSyncScript(objs, buf, qTotalTime.Max());
+
+                    return buf;
+                }
+                ModelParams<VmdPosFinder, VmdRotFinder> buildModelParameters_(MotionOrder order)
+                {
+                    //if (order is null) return;
+                    if (order.vmd is null) return null;
+                    if (order.Model.IsUnityNull()) return null;
+
+                    //var timer = new StreamingTimer(order?.vmd?.Value?.RotationStreams.Streams.GetLastKeyTime() ?? default);
+
+                    var pkf = order.vmd.Value.PositionStreams
+                        .ToKeyFinderWith<Key4CatmulPos, Clamp>();
+
+                    var rkf = order.vmd.Value.RotationStreams
+                        .ToKeyFinderWith<Key4CatmulRot, Clamp>();
+
+                    var anim = order.Model.Value.GetComponent<Animator>();
+                    var bodyop = anim.ToVmdBodyTransformMotionOperator(order.bone)
+                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                    var footop = anim.ToVmdFootIkTransformOperator(order.bone)
+                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
+                        .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
+                    var param = anim.BuildJobParams(order.bone, pkf, rkf, bodyop, footop, order.DelayTime);
+                    return param;
+                }
+                void createBodyMotionPlayable_AnimationJob_(MotionOrderOld order)
                 {
                     //if (order is null) return;
                     if (order.vmd is null) return;
@@ -297,11 +362,16 @@ namespace AnimLite.DancePlayable
                         .ToKeyFinderWith<Key4CatmulRot, Clamp>();
 
                     var anim = order.Model.Value.GetComponent<Animator>();
-                    var job = anim.create(order.bone, pkf, rkf, timer, order.FootIkMode, order.MoveScale, order.BodyScale, order.FootScale);
+                    var bodyop = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(order.bone)
+                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                    var footop = anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(order.bone)
+                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
+                        .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
+                    var job = anim.create(order.bone, pkf, rkf, timer, bodyop, footop);
                     graph.CreateVmdAnimationJobWithSyncScript(anim, job, timer, order.DelayTime);
                 }
 
-                void createBodyMotion_withAnimationClip_(MotionOrderWithAnimationClip order)
+                void createBodyMotionPlayable_AnimationClip_(MotionOrderWithAnimationClip order)
                 {
                     //if (order is null) return;
                     if (order.AnimationClip is null) return;
@@ -332,5 +402,44 @@ namespace AnimLite.DancePlayable
 
         }
 
+
+        public class DanceTimeKeeper
+        {
+            public float CurrentTime => (float)this.timerPlayable.GetTime() - this.offset;
+            public float TotalTime => (float)this.timerPlayable.GetDuration() - this.offset;
+
+            Playable timerPlayable;
+            float offset;
+
+            public DanceTimeKeeper(PlayableGraph graph)
+            {
+                this.timerPlayable = Enumerable.Range(0, graph.GetOutputCount())
+                    //.Select(i => graph.GetRootPlayable(i))
+                    .Select(i => graph.GetOutput(i).GetSourcePlayable())
+                    .Select(p =>
+                    {
+                        for (; p.GetInputCount() > 0; p = p.GetInput(0)) ;
+                        return p;
+                    })
+                    .Where(p => !double.IsInfinity(p.GetDuration()))
+                    //.Do(x => Debug.Log($"playable {x.GetTime()} {x.GetDuration()} {x.GetPlayableType()}"))
+                    .MaxBy(x => x.GetDuration() - x.GetTime())
+                    .First()
+                    ;
+                this.offset = (float)this.timerPlayable.GetTime();
+            }
+
+            public async Awaitable WaitForEndAsync(CancellationToken ct)
+            {
+                for (; ; )
+                {
+                    if (!this.timerPlayable.IsValid()) return;
+                    if (this.timerPlayable.GetTime() >= this.timerPlayable.GetDuration()) break;
+                    
+                    await Awaitable.NextFrameAsync(ct);
+                }
+            }
+        }
     }
+
 }

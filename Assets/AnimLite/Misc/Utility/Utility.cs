@@ -46,6 +46,14 @@ namespace AnimLite.Utility
 
 
 
+        public static T AddTo<T>(this T obj, List<T> list)
+        {
+            list.Add(obj);
+            return obj;
+        }
+
+
+
         //public static T CloneViaJson<T>(this T src)
         //{
         //    //var json = JsonUtility.ToJson(src);

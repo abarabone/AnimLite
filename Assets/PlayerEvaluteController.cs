@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerEvaluteController : MonoBehaviour
 {
@@ -9,6 +9,8 @@ public class PlayerEvaluteController : MonoBehaviour
 
     void Update()
     {
+        if (this.player is null) return;
+
         if (Input.GetKey("."))
         {
             this.player.Graph.Value.Evaluate(Time.deltaTime * this.timeRate);
@@ -17,6 +19,18 @@ public class PlayerEvaluteController : MonoBehaviour
         if (Input.GetKey(","))
         {
             this.player.Graph.Value.Evaluate(Time.deltaTime * -this.timeRate);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(this.player.Graph.Value.IsPlaying())
+            {
+                this.player.Graph.Value.Stop();
+            }
+            else
+            {
+                this.player.Graph.Value.Play();
+            }
         }
     }
 }

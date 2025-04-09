@@ -30,14 +30,58 @@ namespace AnimLite.Utility
         public IDisposable this[int i] =>
             this.disposables[i];
 
-        public void Add(IDisposable item) =>
+        public DisposableBag Add(IDisposable item)
+        {
             this.disposables.Add(item);
+            return this;
+        }
+        public DisposableBag AddRange(IEnumerable<IDisposable> items)
+        {
+            this.disposables.AddRange(items);
+            return this;
+        }
+
 
         public void Dispose() =>
             this.disposables.ForEach(x => x.Dispose());
 
+        //public ValueTask DisposeAsync() =>
+        //    this.disposables.ForEach(async x => await x.DisposeAsync());
+
 
         public IEnumerator<IDisposable> GetEnumerator() =>
+            this.disposables.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => this.disposables.GetEnumerator();
+    }
+
+    public class AsyncDisposableBag : IAsyncDisposable, IEnumerable<IAsyncDisposable>
+    {
+
+        List<IAsyncDisposable> disposables = new List<IAsyncDisposable>();
+
+
+        public IAsyncDisposable this[int i] =>
+            this.disposables[i];
+
+        public AsyncDisposableBag Add(IAsyncDisposable item)
+        {
+            this.disposables.Add(item);
+            return this;
+        }
+        public AsyncDisposableBag AddRange(IEnumerable<IAsyncDisposable> items)
+        {
+            this.disposables.AddRange(items);
+            return this;
+        }
+
+
+        public async ValueTask DisposeAsync()
+        {
+            foreach (var d in this.disposables) await d.DisposeAsync();
+        }
+
+        public IEnumerator<IAsyncDisposable> GetEnumerator() =>
             this.disposables.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.disposables.GetEnumerator();

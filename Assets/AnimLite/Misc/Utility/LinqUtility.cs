@@ -35,6 +35,11 @@ namespace AnimLite.Utility.Linq
     {
         public static EmptyEnumerableStruct<T> EmptyEnumerable<T>(this IEnumerable<T> src) => new EmptyEnumerableStruct<T>();
         public static IEnumerable<T> Box<T>(this EmptyEnumerableStruct<T> src) => src;
+
+        //public static IEnumerable<T> SetEmptyEnumerable<T>(ref this IEnumerable<T> prop)
+        //{
+        //    return prop = prop.EmptyEnumerable();
+        //}
     }
 
 

@@ -41,7 +41,7 @@ namespace AnimLite.Samples
             var face = facemap.Value.BuildStreamingFace();
             //var face = this.anim.FindFaceRendererIfNothing(this.faceRenderer)?.sharedMesh?.BuildStreamingFace(facemap) ?? default;
             var bodyOperator = this.anim.ToVmdBodyTransformMotionOperator(bone);
-            var footOperator = this.anim.ToVmdFootIkTransformOperator(bone);
+            var footOperator = this.anim.ToVmdFootIkTransformOperator(bone).WithIkUsage(vmddata, VmdFootIkMode.auto);
             var faceOperator = this.anim.ToVrmExpressionOperator(face);
 
             // 時間範囲などの情報を持ったタイマーを作成する

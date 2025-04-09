@@ -30,11 +30,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 724284d6bf8b45f44a43dd56b836285b
-    m_Address: default_facemap
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 757d1c40a0fc60041975ba14eb4a915c
     m_Address: step2
     m_ReadOnly: 0
@@ -42,11 +37,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 877fbe30b9471334b909f070d1ca22b1
     m_Address: "\u795E\u793E\u6A4B\u914D\u5E03\u7528test"
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a902dfa9c7fb4ae4a8b473010b48a8c5
-    m_Address: default_body_adjust
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

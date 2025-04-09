@@ -794,7 +794,7 @@ MonoBehaviour:
     - line: '|     tvOS: 1'
     - line: '|   incrementalIl2cppBuild: {}'
     - line: '|   suppressCommonWarnings: 1'
-    - line: '|   allowUnsafeCode: 0'
+    - line: '|   allowUnsafeCode: 1'
     - line: '|   useDeterministicCompilation: 1'
     - line: '|   additionalIl2CppArgs: '
     - line: '|   scriptingRuntimeVersion: 1'

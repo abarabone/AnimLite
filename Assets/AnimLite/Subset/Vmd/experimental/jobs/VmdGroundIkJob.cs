@@ -36,14 +36,15 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<LegIkAnchorIndex> noikleg_anchorIndices;
 
         [WriteOnly]
-        public NativeArray<LegIkAnchor> legalwaysLR_ikAnchors;
+        [NativeDisableParallelForRestriction]
+        public NativeArray<LegIkAnchor> legalways_ikAnchors;
 
 
         public void Execute(int index_noikleg, TransformAccess tf)
         {
             var i = this.noikleg_anchorIndices[index_noikleg];
 
-            this.legalwaysLR_ikAnchors[i.legalways_ikAnchorIndex] = new LegIkAnchor
+            this.legalways_ikAnchors[i.legalways_ikAnchorIndex] = new LegIkAnchor
             {
                 legWorldPosition = tf.position.As_float4(1.0f)
             };
@@ -57,14 +58,15 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<FootIkAnchorIndex> noikfoot_anchorIndices;
 
         [WriteOnly]
-        public NativeArray<FootIkAnchor> footalwaysLR_ikAnchors;
+        [NativeDisableParallelForRestriction]
+        public NativeArray<FootIkAnchor> footalways_ikAnchors;
 
 
         public void Execute(int index_noikfoot, TransformAccess tf)
         {
             var i = this.noikfoot_anchorIndices[index_noikfoot];
 
-            this.footalwaysLR_ikAnchors[i.footalways_ikAnchorIndex] = new FootIkAnchor
+            this.footalways_ikAnchors[i.footalways_ikAnchorIndex] = new FootIkAnchor
             {
                 footWorldRotation = tf.rotation
             };
@@ -219,8 +221,8 @@ namespace AnimLite.Vmd.experimental.Job
             };
 
 
-            var ikfoot = this.footalways_ikAnchors[data.legalways_index];
-            this.footalways_ikAnchors[data.legalways_index] = new FootIkAnchorLR
+            var ikfoot = this.footalways_ikAnchors[data.footalways_index];
+            this.footalways_ikAnchors[data.footalways_index] = new FootIkAnchorLR
             {
                 footWorldRotationL = math.select(
                     falseValue: ikfoot.footWorldRotationL.value,

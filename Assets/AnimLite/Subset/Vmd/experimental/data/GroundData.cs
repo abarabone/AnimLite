@@ -37,8 +37,9 @@ namespace AnimLite.Vmd.experimental.Data
     public struct LegHitData
     {
         public int model_index;
-        public int legalways_index;
         public int ikalways_index;
+        public int legalways_index;
+        public int footalways_index;
 
         public LayerMask hitMask;
         public float ankleHightL;

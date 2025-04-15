@@ -66,6 +66,10 @@ namespace AnimLite.Vmd.experimental.Job
                     legvalue.ULegPosR, legvalue.LLegPosR, legvalue.FootPosR,
                     ikleg.legWorldPositionR.As3());
             }
+            else
+            {
+                legvalue = legvalue.SetNanToLeg();
+            }
 
             if (Hint.Likely(i.footalways_ikAnchorIndex != -1))
             {
@@ -73,6 +77,10 @@ namespace AnimLite.Vmd.experimental.Job
 
                 legvalue.FootRotL.rot = ikfoot.footWorldRotationL;
                 legvalue.FootRotR.rot = ikfoot.footWorldRotationR;
+            }
+            else
+            {
+                legvalue = legvalue.SetNanToFoot();
             }
 
 
@@ -113,11 +121,10 @@ namespace AnimLite.Vmd.experimental.Job
 
         public void Execute(int index, TransformAccess tf)
         {
-            //if (index > 3) return;
             var value = this.ikalways_legTransformValues[index];
+            if (Hint.Unlikely(float.IsNaN(value.rot.value.x))) return;
 
             tf.rotation = value.rot;
-            //tf.SetPositionAndRotation(value.pos.As3(), value.rot);
         }
     }
 

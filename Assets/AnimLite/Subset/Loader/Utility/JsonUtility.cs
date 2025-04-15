@@ -303,7 +303,7 @@ namespace AnimLite.Utility
                 bool is_basekey_(string keyname) =>
                     keyname[0] == '_';
 
-                TValue? find_base_(string keyname)
+                TValue find_base_(string keyname)
                 {
                     var targetkey = is_basekey_(keyname)
                         ? keyname

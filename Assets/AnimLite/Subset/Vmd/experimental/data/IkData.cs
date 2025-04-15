@@ -122,6 +122,30 @@ namespace AnimLite.Vmd.experimental.Data
         public TfRotation FootRotR;
     }
 
+    public static class SolveIkTransformValueSetExtension
+    {
+        public static SolveIkTransformValueSet SetNanToLeg(this SolveIkTransformValueSet value)
+        {
+            var s = new ValueStreamSource { };
+            value.ULegRotL.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            value.ULegRotR.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            value.LLegRotL.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            value.LLegRotR.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            return value;
+        }
+        public static SolveIkTransformValueSet SetNanToFoot(this SolveIkTransformValueSet value)
+        {
+            var s = new ValueStreamSource { };
+            value.FootRotL.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            value.FootRotR.SetRotation(s, new float4(float.NaN, float.NaN, float.NaN, float.NaN));
+            return value;
+        }
+    }
+
+
+
+
+
     [StructLayout(LayoutKind.Sequential)]
     public struct SolveIkAppliedTransformValue
     {

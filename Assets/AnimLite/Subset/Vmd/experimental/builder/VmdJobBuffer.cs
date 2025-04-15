@@ -80,9 +80,9 @@ namespace AnimLite.Vmd.experimental
 
         public void Dispose()
         {
+            this.model_finders.Dispose();
             this.model_finders_origin.Dispose();
 
-            this.model_finders.Dispose();
             this.model_boneOptions.Dispose();
             this.model_timer.Dispose();
             this.model_hipAdjusts.Dispose();
@@ -143,17 +143,6 @@ namespace AnimLite.Vmd.experimental
     public static class JobNativeBufferExtension
     {
 
-        public static IEnumerable<U> ConvertParam<T, U>(this IEnumerable<T> src, Func<T, IEnumerable<U>> f) =>
-            from x in src
-            from y in f(x)
-            select y;
-
-        public static IEnumerable<V> ConvertParam<T, U, V>(this (IEnumerable<T> param, IEnumerable<U> opt) src, Func<T, U, IEnumerable<V>> f) =>
-            from x in src.param.Zip(src.opt, (src, opt) => (src, opt))
-            from y in f(x.src, x.opt)
-            select y;
-
-
 
         public unsafe static JobBuffers<TPFinder, TRFinder> BuildJobBuffers<TPFinder, TRFinder>(
             this IEnumerable<ModelParams<TPFinder, TRFinder>> paramlist, IEnumerable<ParamCount> countlist)
@@ -178,7 +167,7 @@ namespace AnimLite.Vmd.experimental
                 })
                 .ToNativeArray(alloc);
             buffers.model_boneOptions = to_(p => p.model_boneOptions);
-            buffers.model_hipAdjusts = count_to_((p, c) => p.model_hipAdjusts.invoke(c));
+            buffers.model_hipAdjusts = count_to_(p => p.model_hipAdjusts);
             buffers.model_timer = to_(p => p.model_timeOptions);
             buffers.model_procedureSelectors = create_<ModelProcedureSelector>(buffers.model_finders.Length);
 
@@ -187,18 +176,18 @@ namespace AnimLite.Vmd.experimental
             {
                 buffers.ikalways_baseTransforms = tf_to_(p => p.ikalways_baseTransforms);
                 buffers.ikalways_baseTransformValues = create_<IkBaseTransformValue>(buffers.ikalways_baseTransforms.length);
-                buffers.ikalways_ikAnchorIndices = count_to_((p, c) => p.ikalways_ikAnchorIndices.invoke(c));
+                buffers.ikalways_ikAnchorIndices = count_to_(p => p.ikalways_ikAnchorIndices);
                 buffers.ikalways_legTransformValueSets = create_<SolveIkTransformValueSet>(buffers.ikalways_ikAnchorIndices.Length);
                 buffers.ikalways_legTransformValues = tf_to_(p => p.ikalways_legTransforms);
             }
 
             //if (paramlist.SelectMany(p => p.ikleg_ikData.invoke(default)).Any())
             {
-                buffers.ikleg_ikData = count_to_((p, c) => p.ikleg_ikData.invoke(c));
+                buffers.ikleg_ikData = count_to_(p => p.ikleg_ikData);
             }
             //if (paramlist.Any(p => p.noikleg_footTransforms is not null))
             {
-                buffers.noikleg_ikIndices = count_to_((p, c) => p.noikleg_ikIndices.invoke(c));
+                buffers.noikleg_ikIndices = count_to_(p => p.noikleg_ikIndices);
                 buffers.noikleg_footTransforms = tf_to_(p => p.noikleg_footTransforms);
             }
             buffers.legalways_ikAnchors = create_<LegIkAnchorLR>(
@@ -206,11 +195,11 @@ namespace AnimLite.Vmd.experimental
 
             //if (paramlist.Any(p => p.ikfoot_ikData.invoke is not null))
             {
-                buffers.ikfoot_ikData = count_to_((p, c) => p.ikfoot_ikData.invoke(c));
+                buffers.ikfoot_ikData = count_to_(p => p.ikfoot_ikData);
             }
             //if (paramlist.Any(p => p.noikfoot_footTransforms is not null))
             {
-                buffers.noikfoot_ikIndices = count_to_((p, c) => p.noikfoot_ikIndices.invoke(c));
+                buffers.noikfoot_ikIndices = count_to_(p => p.noikfoot_ikIndices);
                 buffers.noikfoot_footTransforms = tf_to_(p => p.noikfoot_footTransforms);
             }
             buffers.footalways_ikAnchors = create_<FootIkAnchorLR>(
@@ -218,7 +207,7 @@ namespace AnimLite.Vmd.experimental
 
             //if (paramlist.Any(p => p.ground_hitData.invoke is not null))
             {
-                buffers.ground_hitData = count_to_((p, c) => p.ground_hitData.invoke(c));
+                buffers.ground_hitData = count_to_(p => p.ground_hitData);
                 buffers.ground_hitCastCommands = create_<LegHitCastCommandLR>(buffers.ground_hitData.Length);
                 buffers.ground_hits = create_<LegHitRaycastHitLR>(buffers.ground_hitData.Length);
                 buffers.ground_hitHeightStorages = to_(p => p.ground_rootHeights);
@@ -226,15 +215,15 @@ namespace AnimLite.Vmd.experimental
             }
 
 
-            buffers.bonefull_rotIndices = count_to_((p, c) => p.bonefull_rotIndices.invoke(c));
+            buffers.bonefull_rotIndices = count_to_(p => p.bonefull_rotIndices);
             buffers.bonefull_rotOffsets = to_(p => p.bonefull_rotOffsets);
             buffers.bonefull_rotResults = create_<BodyBoneLocalRotationResult>(buffers.bonefull_rotIndices.Length);
             buffers.bonefull_transforms = tf_to_(p => p.bonefull_transgorms);
-            buffers.bonefull_transformApplyIndices = count_to_((p, c) => p.bonefull_transformApplyIndices.invoke(c));
+            buffers.bonefull_transformApplyIndices = count_to_(p => p.bonefull_transformApplyIndices);
 
             buffers.boneroothip_posIndices = concat_count_to_(
-                (p, c) => p.boneroot_posIndices.invoke(c),
-                (p, c) => p.bonehip_posIndices.invoke(c));
+                p => p.boneroot_posIndices,
+                p => p.bonehip_posIndices);
             buffers.boneroothip_posScales = concat_to_(
                 p => p.boneroot_posScales,
                 p => p.bonehip_posScales);
@@ -263,14 +252,14 @@ namespace AnimLite.Vmd.experimental
                 Enumerable.Concat(paramlist.ConvertParam(f1), paramlist.ConvertParam(f2))
                     .ToNativeArray(alloc);
 
-            NativeArray<U> count_to_<U>(Func<ModelParams<TPFinder, TRFinder>, ParamCount, IEnumerable<U>> f) where U : unmanaged =>
+            NativeArray<U> count_to_<U>(Func<ModelParams<TPFinder, TRFinder>, EnumerableWithParam<U>> f) where U : unmanaged =>
                 (paramlist, countlist)
                     .ConvertParam(f)
                     .ToNativeArray(alloc);
 
             NativeArray<U> concat_count_to_<U>(
-                Func<ModelParams<TPFinder, TRFinder>, ParamCount, IEnumerable<U>> f1,
-                Func<ModelParams<TPFinder, TRFinder>, ParamCount, IEnumerable<U>> f2) where U : unmanaged
+                Func<ModelParams<TPFinder, TRFinder>, EnumerableWithParam<U>> f1,
+                Func<ModelParams<TPFinder, TRFinder>, EnumerableWithParam<U>> f2) where U : unmanaged
             =>
                 Enumerable.Concat((paramlist, countlist).ConvertParam(f1), (paramlist, countlist).ConvertParam(f2))
                     .ToNativeArray(alloc);
@@ -281,6 +270,24 @@ namespace AnimLite.Vmd.experimental
             TransformAccessArray tf_to_(Func<ModelParams<TPFinder, TRFinder>, IEnumerable<Transform>> f) =>
                 new TransformAccessArray(paramlist.ConvertParam(f).ToArray());
         }
+
+
+        public static IEnumerable<U> ConvertParam<T, U>(
+            this IEnumerable<T> src,
+            Func<T, IEnumerable<U>> invokerSelector)
+        =>
+            from x in src
+            from y in invokerSelector(x) ?? Enumerable.Empty<U>()
+            select y;
+
+        public static IEnumerable<U> ConvertParam<T, U>(
+            this (IEnumerable<T> param, IEnumerable<ParamCount> opt) src,
+            Func<T, EnumerableWithParam<U>> invokerSelector)
+        =>
+            from x in (src.param, src.opt).Zip()
+            from y in invokerSelector(x.Item1).invoke?.Invoke(x.Item2) ?? Enumerable.Empty<U>()
+            select y;
+
 
 
 

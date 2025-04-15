@@ -222,6 +222,7 @@ namespace AnimLite.Vmd.experimental.Job
         [ReadOnly]
         public NativeArray<ModelHipBoneAdjust> model_hipAdjusts;
 
+        // r/w
         public NativeSlice<BodyBoneLocalPositionResult> bodyhip_posResults;
 
 

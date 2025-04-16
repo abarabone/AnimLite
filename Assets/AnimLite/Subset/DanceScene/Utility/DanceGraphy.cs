@@ -129,7 +129,7 @@ namespace AnimLite.DancePlayable
         }
         public class MotionOrderOld : MotionOrder
         {
-            public TransformHandleMappings bone;
+            public new TransformHandleMappings bone;
 
             public override async ValueTask DisposeAsync()
             {

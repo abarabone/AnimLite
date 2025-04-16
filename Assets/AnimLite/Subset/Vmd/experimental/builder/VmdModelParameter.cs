@@ -22,7 +22,6 @@ namespace AnimLite.Vmd.experimental
     using AnimLite.Utility.Linq;
 
 
-
     public class ModelParams<TPFinder, TRFinder>
         where TPFinder : unmanaged, IKeyFinderWithoutProcedure<float4>
         where TRFinder : unmanaged, IKeyFinderWithoutProcedure<quaternion>
@@ -70,11 +69,11 @@ namespace AnimLite.Vmd.experimental
         public EnumerableWithParam<BoneIndexData> bonehip_posIndices;
         public IEnumerable<BodyBoneScale> bonehip_posScales;
 
+    }
 
-        public struct EnumerableWithParam<T>
-        {
-            public Func<ParamCount, IEnumerable<T>> invoke;
-        }
+    public struct EnumerableWithParam<T>
+    {
+        public Func<ParamCount, IEnumerable<T>> invoke;
     }
 
 
@@ -200,9 +199,7 @@ namespace AnimLite.Vmd.experimental
                     }
                     .WrapEnumerable();
             }
-            result.ikalways_baseTransforms ??= Enumerable.Empty<Transform>();
-            result.ikalways_legTransforms ??= Enumerable.Empty<Transform>();
-            result.ikalways_ikAnchorIndices.invoke ??= p => Enumerable.Empty<SolveIkAnchorIndex>();
+
 
             if (footop.useGroundHit)
             {
@@ -210,8 +207,9 @@ namespace AnimLite.Vmd.experimental
                     new LegHitData
                     {
                         model_index = p.model_offset,
-                        legalways_index = p.legalways_offset,
                         ikalways_index = p.ikalways_offset,
+                        legalways_index = p.legalways_offset,
+                        footalways_index = p.footalways_offset,
                         hitMask = footop.groundHitMask,
                         ankleHightL = footop.footIkOffsetL.y,
                         ankleHightR = footop.footIkOffsetR.y,
@@ -238,9 +236,7 @@ namespace AnimLite.Vmd.experimental
                 }
                 .WrapEnumerable();
             }
-            result.ground_hitData.invoke ??= p => Enumerable.Empty<LegHitData>();
-            result.ground_rootTransforms ??= Enumerable.Empty<Transform>();
-            result.ground_rootHeights ??= Enumerable.Empty<LegHitRootHeightStorage>();
+
 
             if (footop.useLegPositionIk)
             {
@@ -258,7 +254,7 @@ namespace AnimLite.Vmd.experimental
                     }
                     .WrapEnumerable();
             }
-            result.ikleg_ikData.invoke ??= p => Enumerable.Empty<LegIkData>();
+
 
             if (footop.useFootRotationIk)
             {
@@ -271,7 +267,7 @@ namespace AnimLite.Vmd.experimental
                     }
                     .WrapEnumerable();
             }
-            result.ikfoot_ikData.invoke ??= p => Enumerable.Empty<FootIkData>();
+
 
 
             if (!footop.useLegPositionIk & footop.useGroundHit)
@@ -285,11 +281,10 @@ namespace AnimLite.Vmd.experimental
                 result.noikleg_ikIndices.invoke = p => Enumerable.Range(0, 2)
                     .Select(i => new LegIkAnchorIndex
                     {
-                        legalways_ikAnchorIndex = p.legalways_offset * 2 + i
+                        legalways_ikAnchorIndex = p.legalways_offset * 2 + i,
                     });
             }
-            result.noikleg_footTransforms ??= Enumerable.Empty<Transform>();
-            result.noikleg_ikIndices.invoke ??= p => Enumerable.Empty<LegIkAnchorIndex>();
+
 
             if (!footop.useFootRotationIk & footop.useGroundHit)
             {
@@ -302,11 +297,10 @@ namespace AnimLite.Vmd.experimental
                 result.noikfoot_ikIndices.invoke = p => Enumerable.Range(0, 2)
                     .Select(i => new FootIkAnchorIndex
                     {
-                        footalways_ikAnchorIndex = p.footalways_offset * 2 + i
+                        footalways_ikAnchorIndex = p.footalways_offset * 2 + i,
                     });
             }
-            result.noikfoot_footTransforms ??= Enumerable.Empty<Transform>();
-            result.noikfoot_ikIndices.invoke ??= p => Enumerable.Empty<FootIkAnchorIndex>();
+
 
 
             // root, hip, other

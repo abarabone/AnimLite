@@ -62,7 +62,7 @@ namespace AnimLite.Samples
 
 
 
-        async Awaitable OnEnable()
+        void OnEnable()
         {
             try
             {

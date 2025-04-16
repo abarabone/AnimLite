@@ -111,7 +111,7 @@ namespace AnimLite.DancePlayable
 
             return new InformationDefine
             {
-                Caption = clip.name != "" ? clip.name : Path.GetFileNameWithoutExtension(ad.AudioFilePath),
+                Caption = clip!.name != "" ? clip.name : Path.GetFileNameWithoutExtension(ad.AudioFilePath),
                 Author = "作者不明",
                 Description = "",
                 Url = "",

@@ -36,14 +36,15 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<LegIkAnchorIndex> noikleg_anchorIndices;
 
         [WriteOnly]
-        public NativeArray<LegIkAnchor> legalwaysLR_ikAnchors;
+        [NativeDisableParallelForRestriction]
+        public NativeArray<LegIkAnchor> legalways_ikAnchors;
 
 
         public void Execute(int index_noikleg, TransformAccess tf)
         {
             var i = this.noikleg_anchorIndices[index_noikleg];
 
-            this.legalwaysLR_ikAnchors[i.legalways_ikAnchorIndex] = new LegIkAnchor
+            this.legalways_ikAnchors[i.legalways_ikAnchorIndex] = new LegIkAnchor
             {
                 legWorldPosition = tf.position.As_float4(1.0f)
             };
@@ -57,14 +58,15 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<FootIkAnchorIndex> noikfoot_anchorIndices;
 
         [WriteOnly]
-        public NativeArray<FootIkAnchor> footalwaysLR_ikAnchors;
+        [NativeDisableParallelForRestriction]
+        public NativeArray<FootIkAnchor> footalways_ikAnchors;
 
 
         public void Execute(int index_noikfoot, TransformAccess tf)
         {
             var i = this.noikfoot_anchorIndices[index_noikfoot];
 
-            this.footalwaysLR_ikAnchors[i.footalways_ikAnchorIndex] = new FootIkAnchor
+            this.footalways_ikAnchors[i.footalways_ikAnchorIndex] = new FootIkAnchor
             {
                 footWorldRotation = tf.rotation
             };
@@ -219,21 +221,27 @@ namespace AnimLite.Vmd.experimental.Job
             };
 
 
-            var ikfoot = this.footalways_ikAnchors[data.legalways_index];
-            this.footalways_ikAnchors[data.legalways_index] = new FootIkAnchorLR
+            var ikfoot = this.footalways_ikAnchors[data.footalways_index];
+            this.footalways_ikAnchors[data.footalways_index] = new FootIkAnchorLR
             {
                 footWorldRotationL = math.select(
-                    falseValue: ikfoot.footWorldRotationL.value,
+                    falseValue: new float4(float.NaN, float.NaN, float.NaN, float.NaN),//ikfoot.footWorldRotationL.value,
                     trueValue: calc_new_foot_(ikfoot.footWorldRotationL, hit.hitL.normal).value,
                     test: chk.isGrounding.x & !chk.isFloating.x),
 
                 footWorldRotationR = math.select(
-                    falseValue: ikfoot.footWorldRotationR.value,
+                    falseValue: new float4(float.NaN, float.NaN, float.NaN, float.NaN),//ikfoot.footWorldRotationR.value,
                     trueValue: calc_new_foot_(ikfoot.footWorldRotationR, hit.hitR.normal).value,
                     test: chk.isGrounding.y & !chk.isFloating.y),
             };
-            quaternion calc_new_foot_(quaternion foot_wrot, float3 hit_normal) =>
-                quaternion.LookRotation(math.rotate(foot_wrot, Vector3.forward), hit_normal);
+            //static quaternion calc_new_foot_(quaternion foot_wrot, float3 hit_normal) =>
+            //    quaternion.LookRotation(math.rotate(foot_wrot, Vector3.forward), hit_normal);
+            static quaternion calc_new_foot_(quaternion wrot, float3 hit_normal)
+            {
+                var up = math.rotate(wrot, Vector3.up);
+                var rotTo = IkExtension.fromToRotation(up, hit_normal);
+                return math.mul(rotTo, wrot);
+            }
 
 
             var t = this.model_timer[data.model_index];

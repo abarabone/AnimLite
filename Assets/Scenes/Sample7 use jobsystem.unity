@@ -848,11 +848,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2741d2aa2eef3dd45b54516560553156, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VmdFilePath:
-    Value: ds/step1.vmd
-  anims:
-  - {fileID: 1881545246}
-  ikmode: 8
+  targets:
+  - VmdFilePath:
+      Value: ds/step1.vmd
+    FootIkMode: 8
+    Animator: {fileID: 1881545246}
   Cache: {fileID: 295167269}
 --- !u!4 &1721916665
 Transform:

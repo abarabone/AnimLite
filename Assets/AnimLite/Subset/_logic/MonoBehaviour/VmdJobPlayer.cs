@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -5,36 +6,39 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Animations;
 using Unity.Jobs;
+using Unity.Mathematics;
 
-using AnimLite.Vmd.experimental;
 using AnimLite.Loader;
 using AnimLite.Utility;
 using AnimLite.Vmd;
 using AnimLite.Vrm;
 using AnimLite;
 using AnimLite.Utility.Linq;
-
-using System.Security.Claims;
-using Unity.Mathematics;
-using System;
+using AnimLite.Vmd.experimental;
 
 public class VmdJobPlayer : MonoBehaviour
 {
 
-    [FilePath]
-    public PathUnit VmdFilePath;
+    [System.Serializable]
+    public class TargetUnit
+    {
+        [FilePath]
+        public PathUnit VmdFilePath;
 
-    public Animator[] anims;
+        public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
 
-    // このスクリプトでは、フェイシャルは対象外とした
-    //public SkinnedMeshRenderer faceRenderer;
+        public Animator Animator;
 
-    public VmdFootIkMode ikmode;
+        // このスクリプトでは、フェイシャルは対象外とした
+        //public SkinnedMeshRenderer faceRenderer;
+    }
+
+    public TargetUnit[] targets;
+
+
 
     public PrototypeCacheManager Cache;
 
-
-    PlayableGraph graph;
 
 
     async Awaitable Start()
@@ -45,11 +49,11 @@ public class VmdJobPlayer : MonoBehaviour
             await using var vmdbag = new AsyncDisposableBag { };
 
             // モデル１体ずつ並行してロードする
-            var q = await Task.WhenAll(this.anims.Select(async anim =>
+            var q = await Task.WhenAll(this.targets.Select(async t =>
             {
                 // ＶＭＤデータをファイルからパースし、ストリームデータをビルドする
-                var vmdpath = this.VmdFilePath;
-                var vmd = await this.Cache.Holder.VmdCache.GetOrLoadVmdAsync(vmdpath, "", null, this.destroyCancellationToken);
+                var vmd = await this.Cache?.Holder.VmdCache
+                    .GetOrLoadVmdAsync(t.VmdFilePath, "", null, this.destroyCancellationToken);
                 vmdbag.Add(vmd);
 
                 // キー検索オブジェクトを構築する
@@ -63,11 +67,11 @@ public class VmdJobPlayer : MonoBehaviour
 
                 // ＶＭＤを再生するための情報を構築する
                 var bodyAdjust = await BodyAdjustLoader.DefaultBodyAdjustAsync;
-                var bones = anim.BuildVmdTransformMappings(bodyAdjust);
+                var bones = t.Animator.BuildVmdTransformMappings(bodyAdjust);
 
                 // モデルごとのジョブパラメータを構築する。今回は足ＩＫの設定だけ指定し、体の設定は自動生成に任せる
-                var footop = anim.ToVmdFootIkTransformOperator(bones).WithIkUsage(vmd, this.ikmode);
-                var param = anim.BuildJobParams(bones, posKeyFinder, rotKeyFinder, footop);
+                var footop = t.Animator.ToVmdFootIkTransformOperator(bones).WithIkUsage(vmd, t.FootIkMode);
+                var param = t.Animator.BuildJobParams(bones, posKeyFinder, rotKeyFinder, footop);
                 return param;
             }));
 
@@ -75,11 +79,6 @@ public class VmdJobPlayer : MonoBehaviour
             // ジョブ用のバッファを構築する。アニメーションのためのジョブは、複数モデルをまとめて処理する
             var countlist = q.CountParams();
             using var buf = q.BuildJobBuffers(countlist);
-
-
-            this.graph = PlayableGraph.Create();
-
-            this.graph.Play();
 
 
             for (; ; )
@@ -107,8 +106,4 @@ public class VmdJobPlayer : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        graph.Destroy();
-    }
 }

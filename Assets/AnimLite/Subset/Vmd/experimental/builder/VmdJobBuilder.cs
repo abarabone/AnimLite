@@ -47,9 +47,12 @@ namespace AnimLite.Vmd.experimental
 
             var depikleg = GetLegIkAnchorJob_((depiktfbase, depadjust).Combine());
             var depikfoot = GetFootIkAnchorJob_((depiktfbase, depsel).Combine());
-            var depfkikleg = CopyLegFkToIkAnchorJob_(depapplybody);
-            var depfkikfoot = CopyFootFkToIkAnchorJob_(depapplybody);
-
+            //var depfkikleg = CopyLegFkToIkAnchorJob_(depapplybody);
+            //var depfkikfoot = CopyFootFkToIkAnchorJob_(depapplybody);
+            var depfkikleg = CopyLegFkToIkAnchorJob_((depapplybody, depikleg).Combine());
+            var depfkikfoot = CopyFootFkToIkAnchorJob_((depapplybody, depikfoot).Combine());
+            //var depfkikleg = (depapplybody, depikleg).Combine();
+            //var depfkikfoot = (depapplybody, depikfoot).Combine();
 
             var depikhit = IkAnchorToCastCommandJob_((depfkikleg, depikleg, depiktfbase).Combine());
 
@@ -144,7 +147,7 @@ namespace AnimLite.Vmd.experimental
 
                 return new CopyLegFkToIkAnchorJob
                 {
-                    legalwaysLR_ikAnchors = buf.legalways_ikAnchors.Reinterpret<LegIkAnchor>(sizeof(LegIkAnchorLR)),
+                    legalways_ikAnchors = buf.legalways_ikAnchors.Reinterpret<LegIkAnchor>(sizeof(LegIkAnchorLR)),
                     noikleg_anchorIndices = buf.noikleg_ikIndices,
                 }
                 .ScheduleReadOnly(buf.noikleg_footTransforms, 32, dep);
@@ -156,7 +159,7 @@ namespace AnimLite.Vmd.experimental
 
                 return new CopyFootFkToIkAnchorJob
                 {
-                    footalwaysLR_ikAnchors = buf.footalways_ikAnchors.Reinterpret<FootIkAnchor>(sizeof(FootIkAnchorLR)),
+                    footalways_ikAnchors = buf.footalways_ikAnchors.Reinterpret<FootIkAnchor>(sizeof(FootIkAnchorLR)),
                     noikfoot_anchorIndices = buf.noikfoot_ikIndices,
                 }
                 .ScheduleReadOnly(buf.noikfoot_footTransforms, 32, dep);

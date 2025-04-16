@@ -334,12 +334,12 @@ namespace AnimLite.IK
                 rottop1, rotmid1, postop1, posmid1, poslow1, posEffector1,
                 rottop2, rotmid2, postop2, posmid2, poslow2, posEffector2);
 
-            // footpos == effector のとき、nan になることへの対策。
-            // 計算前に抜けてもいいが、片足単位で分岐させるより平均的な速度で速い方がいいんじゃないかなと
-            tfrotTop1.SetRotation(stream, math.select(rot.top1.value, rottop1.value, math.isnan(rot.top1.value.x)));
-            tfrotMid1.SetRotation(stream, math.select(rot.mid1.value, rotmid1.value, math.isnan(rot.mid1.value.x)));
-            tfrotTop2.SetRotation(stream, math.select(rot.top2.value, rottop2.value, math.isnan(rot.top2.value.x)));
-            tfrotMid2.SetRotation(stream, math.select(rot.mid2.value, rotmid2.value, math.isnan(rot.mid2.value.x)));
+            //// footpos == effector のとき、nan になることへの対策。
+            //// 計算前に抜けてもいいが、片足単位で分岐させるより平均的な速度で速い方がいいんじゃないかなと
+            //tfrotTop1.SetRotation(stream, math.select(rot.top1.value, rottop1.value, math.isnan(rot.top1.value.x)));
+            //tfrotMid1.SetRotation(stream, math.select(rot.mid1.value, rotmid1.value, math.isnan(rot.mid1.value.x)));
+            //tfrotTop2.SetRotation(stream, math.select(rot.top2.value, rottop2.value, math.isnan(rot.top2.value.x)));
+            //tfrotMid2.SetRotation(stream, math.select(rot.mid2.value, rotmid2.value, math.isnan(rot.mid2.value.x)));
 
             //var rot = SolveTwoBonePairIk_(
             //    tfrotTop1.GetRotation(stream), tfrotMid1.GetRotation(stream),
@@ -358,10 +358,10 @@ namespace AnimLite.IK
             //    tfrotTop2.SetRotation(stream, rot.rotTop2);
             //    tfrotMid2.SetRotation(stream, rot.rotMid2);
             //}
-            //tfrotTop1.SetRotation(stream, rot.rotTop1);
-            //tfrotMid1.SetRotation(stream, rot.rotMid1);
-            //tfrotTop2.SetRotation(stream, rot.rotTop2);
-            //tfrotMid2.SetRotation(stream, rot.rotMid2);
+            tfrotTop1.SetRotation(stream, rot.top1);
+            tfrotMid1.SetRotation(stream, rot.mid1);
+            tfrotTop2.SetRotation(stream, rot.top2);
+            tfrotMid2.SetRotation(stream, rot.mid2);
         }
 
         public static (quaternion top1, quaternion mid1, quaternion top2, quaternion mid2) SolveTwoBonePairIk_(

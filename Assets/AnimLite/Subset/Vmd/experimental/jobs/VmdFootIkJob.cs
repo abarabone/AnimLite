@@ -77,6 +77,7 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<LegIkData> ikleg_ikData;
 
         [WriteOnly]
+        [NativeDisableParallelForRestriction]
         public NativeArray<LegIkAnchorLR> legalways_ikAnchors;
 
 
@@ -173,6 +174,7 @@ namespace AnimLite.Vmd.experimental.Job
         [ReadOnly]
         public NativeArray<FootIkData> ikfoot_ikData;
         [WriteOnly]
+        [NativeDisableParallelForRestriction]
         public NativeArray<FootIkAnchorLR> footalways_ikAnchors;
 
 

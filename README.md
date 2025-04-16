@@ -9,6 +9,11 @@
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
 # 新機能・修正
+2025.4.15
+- foot ik mode を混在させたとき、job の依存関係エラーが出ていたので解消した（と思う）
+  - ik anchor への書き込みで、ik と fk+ground は依存関係なしで行けると思うんだけど、属性使っても回避できない
+  - まだ変な挙動あるので直したい（ foot only の時とか）
+
 2025.4.10
 - 足ＩＫを接地に対応させた
   - animation job だと job 中で raycast が使えないので、job system で raycast command を使うモードを experimental として実装した
@@ -19,6 +24,7 @@
     - animation job のようにモデル１体ごとに単一の job のほうがパフォーマンスでてるか？
       - モデル１体の時でも並列度は高くなってるが、トータル負荷は増えてる気がする（モデル増えたら逆転するか？）
       - 一連の job は、.json 単位で作ってる
+  - 接地とみなされた時とそうでない時でいったりきたりして、足（foot）の角度がチラチラするので調整必要か…
 - DanceSetPlayerFromJson でアニメーション終了を通知するようにした
   - OnPlayEnd を await すれば待機できる（ DanceSetSimpleCaption で使ってる） 
   

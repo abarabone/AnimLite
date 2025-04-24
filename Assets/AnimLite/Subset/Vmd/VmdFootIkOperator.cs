@@ -16,12 +16,12 @@ namespace AnimLite.Vmd
     {
 
         [ReadOnly]
-        public float moveScale;
+        public float3 moveScale;
         [ReadOnly]
-        public float footScale;
+        public float3 footScale;
 
         [ReadOnly]
-        public float _footPerMoveScale;
+        public float3 _footPerMoveScale;
 
 
         [ReadOnly]
@@ -154,7 +154,9 @@ namespace AnimLite.Vmd
         {
             var ikusage = (pos, rot).CheckUseFootIk(ikmode);
             var useGroundHit = (ikmode & VmdFootIkMode.off_with_ground) != 0;
+            
             Debug.Log($"legik:{ikusage.leg} footik:{ikusage.foot} groundhit:{useGroundHit}");
+
             return footop
                 .WithFootIkUsage(ikusage.leg, ikusage.foot)
                 .WithGroundIkUsage(useGroundHit, groundHitDistance, groundhitOriginOffset, hitTarget);
@@ -195,21 +197,22 @@ namespace AnimLite.Vmd
             footop.WithIkUsage(pkf.Streams, rkf.Streams, ikmode, groundHitDistance, groundhitOriginOffset, hitTarget);
 
 
-        public static VmdFootIkOperator<TTf> WithScales<TTf>(
-            this VmdFootIkOperator<TTf> footop, float moveScale, float footScale)
-                where TTf : ITransformProxy, new()
-        {
-            if (moveScale != 0.0f) footop.moveScale = moveScale;
-            if (footScale != 0.0f) footop.footScale = footScale;
+        //public static VmdFootIkOperator<TTf> WithScales<TTf>(
+        //    this VmdFootIkOperator<TTf> footop, float3 moveScale, float3 footScale)
+        //        where TTf : ITransformProxy, new()
+        //{
+        //    if (moveScale != 0.0f) footop.moveScale = moveScale;
+        //    if (footScale != 0.0f) footop.footScale = footScale;
 
-            return footop;
-        }
+        //    return footop;
+        //}
         public static VmdFootIkOperator<TTf> WithScales<TTf>(
-            this VmdFootIkOperator<TTf> footop, Animator anim, float moveScale, float footScale)
+            this VmdFootIkOperator<TTf> footop, Animator anim, float3 moveScale, float3 footScale)
                 where TTf : ITransformProxy, new()
         {
             footop.moveScale = anim.calcVmdBoneScale(moveScale);
             footop.footScale = anim.calcVmdBoneScale(footScale);
+            footop._footPerMoveScale = footop.footScale / footop.moveScale;
 
             return footop;
         }

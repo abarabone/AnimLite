@@ -16,9 +16,9 @@ namespace AnimLite.Vmd
 
 
         [ReadOnly]
-        public float moveScale;
+        public float3 moveScale;
         [ReadOnly]
-        public float bodyScale;
+        public float3 bodyScale;
 
         [ReadOnly]
         public float3 spineToHipLocal;
@@ -46,10 +46,14 @@ namespace AnimLite.Vmd
         /// 158cm のミクの股位置がそのくらいと思われる
         /// humanoid の humanscale 1m は、hip の位置らしいとのこと
         /// </summary>
-        public static float calcVmdBoneScale(this Animator anim, float scale) =>
-            scale == 0.0f
-                ? anim.humanScale * VmdBodyScale
-                : scale * VmdBodyScale;
+        public static float3 calcVmdBoneScale(this Animator anim, float3 scale) =>
+            math.select(
+                falseValue:
+                    scale * VmdBodyScale,
+                trueValue:
+                    anim.humanScale * VmdBodyScale,
+                test:
+                    scale == 0.0f);
 
 
         // ＭＭＤの移動データは、ボーンのオフセットは除いた値が格納されているように思う。
@@ -86,7 +90,7 @@ namespace AnimLite.Vmd
 
         public static VmdBodyMotionOperator<TBone, TTf> WithScales<TBone, TTf>(
             this VmdBodyMotionOperator<TBone, TTf> bodyop, Animator anim,
-            float moveScale, float bodyScale)
+            float3 moveScale, float3 bodyScale)
                 where TBone : ITransformMappings<TTf>
                 where TTf : ITransformProxy
         {
@@ -95,17 +99,17 @@ namespace AnimLite.Vmd
 
             return bodyop;
         }
-        public static VmdBodyMotionOperator<TBone, TTf> WithScales<TBone, TTf>(
-            this VmdBodyMotionOperator<TBone, TTf> bodyop,
-            float moveScale, float bodyScale)
-                where TBone : ITransformMappings<TTf>
-                where TTf : ITransformProxy
-        {
-            if (moveScale != 0.0f) bodyop.moveScale = moveScale;
-            if (bodyScale != 0.0f) bodyop.bodyScale = bodyScale;
+        //public static VmdBodyMotionOperator<TBone, TTf> WithScales<TBone, TTf>(
+        //    this VmdBodyMotionOperator<TBone, TTf> bodyop,
+        //    float3 moveScale, float3 bodyScale)
+        //        where TBone : ITransformMappings<TTf>
+        //        where TTf : ITransformProxy
+        //{
+        //    if (moveScale != 0.0f) bodyop.moveScale = moveScale;
+        //    if (bodyScale != 0.0f) bodyop.bodyScale = bodyScale;
 
-            return bodyop;
-        }
+        //    return bodyop;
+        //}
     }
 
 }

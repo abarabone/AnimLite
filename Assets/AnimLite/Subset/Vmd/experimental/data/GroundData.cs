@@ -59,10 +59,29 @@ namespace AnimLite.Vmd.experimental.Data
 
 
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct LegHitRootHeightStorage
+    //[StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Explicit)]
+    public struct LegHitInterpolationStorage
     {
-        public float rootHeight;
+        [FieldOffset(0)]
+        public float footLocalHeightL;
+        [FieldOffset(4)]
+        public float footLocalHeightR;
+        [FieldOffset(0)]
+        public float2 footLocalHeightLR;
+
+        [FieldOffset(8)]
+        public float rootLocalHeight;
+
+        [FieldOffset(16)]
+        public quaternion footRotationL;
+        [FieldOffset(16 + 16)]
+        public quaternion footRotationR;
+
+        [FieldOffset(48)]
+        public float3 easeSpeed;
+        [FieldOffset(48 + 16)]
+        int pad0;
     }
 
     [StructLayout(LayoutKind.Sequential)]

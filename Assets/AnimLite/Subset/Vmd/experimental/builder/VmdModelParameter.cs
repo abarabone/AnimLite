@@ -56,7 +56,7 @@ namespace AnimLite.Vmd.experimental
 
         public EnumerableWithParam<LegHitData> ground_hitData;
         public IEnumerable<Transform> ground_rootTransforms;
-        public IEnumerable<LegHitRootHeightStorage> ground_rootHeights;
+        public IEnumerable<LegHitInterpolationStorage> ground_rootHeights;
 
         public EnumerableWithParam<BoneIndexData> bonefull_rotIndices;
         public IEnumerable<BoneRotationOffsetPose> bonefull_rotOffsets;
@@ -230,9 +230,9 @@ namespace AnimLite.Vmd.experimental
                 var origin_offset = footop.groundHitOriginOffset * tfbase.up;
                 var isGround = Physics.Raycast(rootwpos + origin_offset, -tfbase.up, out var hit, footop.groundHitDistance + footop.groundHitOriginOffset, footop.groundHitMask);
                 var height = math.select(0.0f, math.dot(hit.point - rootwpos, tfbase.up), isGround);
-                result.ground_rootHeights = new LegHitRootHeightStorage
+                result.ground_rootHeights = new LegHitInterpolationStorage
                 {
-                    rootHeight = height,
+                    rootLocalHeight = height,
                 }
                 .WrapEnumerable();
             }
@@ -248,8 +248,8 @@ namespace AnimLite.Vmd.experimental
                         ikalways_index = p.ikalways_offset,
                         footPosOffsetL = footop.footIkOffsetL.As4(1.0f),
                         footPosOffsetR = footop.footIkOffsetR.As4(1.0f),
-                        footPerMoveScale = footop._footPerMoveScale,
-                        footScale = footop.footScale,
+                        footPerMoveScale = footop._footPerMoveScale.As4(1.0f),
+                        footScale = footop.footScale.As4(1.0f),
                         //rootLocalPositionIndex = p.model_offset,
                     }
                     .WrapEnumerable();
@@ -361,14 +361,14 @@ namespace AnimLite.Vmd.experimental
             result.boneroot_posScales =
                 new BodyBoneScale
                 {
-                    scale = bodyop.moveScale,
+                    scale = bodyop.moveScale.As4(1.0f),
                 }
                 .WrapEnumerable();
             // hip
             result.bonehip_posScales =
                 new BodyBoneScale
                 {
-                    scale = bodyop.bodyScale,
+                    scale = bodyop.bodyScale.As4(1.0f),
                 }
                 .WrapEnumerable();
 

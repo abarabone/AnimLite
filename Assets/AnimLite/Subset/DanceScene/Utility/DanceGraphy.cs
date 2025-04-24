@@ -340,9 +340,9 @@ namespace AnimLite.DancePlayable
 
                     var anim = order.Model.Value.GetComponent<Animator>();
                     var bodyop = anim.ToVmdBodyTransformMotionOperator(order.bone)
-                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
                     var footop = anim.ToVmdFootIkTransformOperator(order.bone)
-                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
+                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
                         .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
                     var param = anim.BuildJobParams(order.bone, pkf, rkf, bodyop, footop, order.DelayTime);
                     return param;
@@ -363,9 +363,9 @@ namespace AnimLite.DancePlayable
 
                     var anim = order.Model.Value.GetComponent<Animator>();
                     var bodyop = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(order.bone)
-                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
                     var footop = anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(order.bone)
-                        .WithScales(order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
+                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
                         .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
                     var job = anim.create(order.bone, pkf, rkf, timer, bodyop, footop);
                     graph.CreateVmdAnimationJobWithSyncScript(anim, job, timer, order.DelayTime);

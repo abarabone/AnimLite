@@ -358,6 +358,8 @@ namespace AnimLite.IK
             //    tfrotTop2.SetRotation(stream, rot.rotTop2);
             //    tfrotMid2.SetRotation(stream, rot.rotMid2);
             //}
+
+            // nan はそのまま送り出し、あとで処理する
             tfrotTop1.SetRotation(stream, rot.top1);
             tfrotMid1.SetRotation(stream, rot.mid1);
             tfrotTop2.SetRotation(stream, rot.top2);

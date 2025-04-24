@@ -41,7 +41,7 @@ namespace AnimLite.Vmd.experimental.Data
     [StructLayout(LayoutKind.Sequential)]
     public struct BodyBoneScale
     {
-        public float scale;
+        public float4 scale;
     }
 
 

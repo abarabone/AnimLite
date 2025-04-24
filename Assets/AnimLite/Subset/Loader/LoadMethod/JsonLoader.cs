@@ -116,40 +116,11 @@ namespace AnimLite.Loader
             using var r = new StreamReader(s);
             var json = await r.ReadToEndAsync();
 
-            JsonConvert.PopulateObject(json, jsondata, JsonLoader.JsonOptions);
+            JsonConvert.PopulateObject(json, jsondata, JsonSupplemetUtility.DeserializeOptions);
             return jsondata;
         }
 
 
-        // System.Text.Json が一般的になったら変更しよう、コメントとかデフォルト値とか
-        //static JsonSerializerOptions jsonOptions;
-        //JsonLoader()
-        //{
-        //    jsonOptions = new
-        //    {
-        //        ReadCommentHandling = JsonCommentHandling.Skip,
-        //    };
-        //}
-
-
-        static JsonLoader()
-        {
-            JsonOptions = new JsonSerializerSettings();
-
-            JsonOptions.Converters.Add(new StringEnumConverter());
-            JsonOptions.Converters.Add(new PathUnitConverter());
-            JsonOptions.Converters.Add(new PathListConverter());
-            JsonOptions.Converters.Add(new DictionaryPopulativeConverter<ModelDefineJson>());
-            JsonOptions.Converters.Add(new DictionaryPopulativeConverter<DanceMotionDefineJson>());
-            //JsonOptions.Converters.Add(new DynamicOptionConverter());
-            //JsonOptions.Converters.Add(new DynamicJsonConverter());
-
-            JsonOptions.Formatting = Formatting.Indented;
-
-            // Vector3 などの normalize など循環を起こして実行時エラーとなるのを防止
-            JsonOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-        }
-        public static JsonSerializerSettings JsonOptions;
     }
 
 

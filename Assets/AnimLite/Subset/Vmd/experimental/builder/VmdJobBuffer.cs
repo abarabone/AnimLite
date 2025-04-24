@@ -73,7 +73,7 @@ namespace AnimLite.Vmd.experimental
         public NativeArray<LegHitCastCommandLR> ground_hitCastCommands;
         public NativeArray<LegHitRaycastHitLR> ground_hits;
         public NativeArray<LegHitData> ground_hitData;
-        public NativeArray<LegHitRootHeightStorage> ground_hitHeightStorages;
+        public NativeArray<LegHitInterpolationStorage> ground_hitHeightStorages;
         public TransformAccessArray ground_rootTransforms;
 
 

@@ -83,7 +83,7 @@ namespace AnimLite.Vmd.experimental.Job
         [ReadOnly]
         public NativeArray<LegHitData> ground_hitData;
         [ReadOnly]
-        public NativeArray<LegHitRootHeightStorage> ground_rootHeigts;
+        public NativeArray<LegHitInterpolationStorage> ground_rootHeigts;
 
 
         [ReadOnly]
@@ -107,9 +107,9 @@ namespace AnimLite.Vmd.experimental.Job
         public void Execute(int index_ground)
         {
             var data = this.ground_hitData[index_ground];
-            var rootheight = this.ground_rootHeigts[index_ground].rootHeight;
+            var rootheight = this.ground_rootHeigts[index_ground].rootLocalHeight;
             
-            var up = this.ikalways_baseTransformValues[data.ikalways_index].worldUp.As3();
+            var up = this.ikalways_baseTransformValues[data.ikalways_index].worldUp.xyz;
             var foots = this.legalways_legIkAnchors[data.legalways_index];
 
             var offset = (data.rayOriginOffset + rootheight) * up;
@@ -117,8 +117,8 @@ namespace AnimLite.Vmd.experimental.Job
             var hitmask = data.hitMask;
             this.ground_hitCastCommands[index_ground] = new LegHitCastCommandLR
             {
-                commandL = makeCommand_(foots.legWorldPositionL.As3()),
-                commandR = makeCommand_(foots.legWorldPositionR.As3()),
+                commandL = makeCommand_(foots.legWorldPositionL.xyz),
+                commandR = makeCommand_(foots.legWorldPositionR.xyz),
             };
 
             return;
@@ -155,21 +155,22 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<LegHitData> ground_hitData;
 
         // r/w
-        public NativeArray<LegHitRootHeightStorage> ground_hitHeightStorages;
+        public NativeArray<LegHitInterpolationStorage> ground_hitHeightStorages;
 
 
-        //[WriteOnly]
-        //public NativeArray<LegIkResult> legIkPositions;
+        // r/w
         [NativeDisableParallelForRestriction]
         public NativeArray<LegIkAnchorLR> legalways_ikAnchors;
 
+        // r/w
         [NativeDisableParallelForRestriction]
         public NativeArray<FootIkAnchorLR> footalways_ikAnchors;
 
 
+        // r/w
         [NativeDisableParallelForRestriction]
-        //public NativeSlice<BodyBoneLocalPositionResult> hipPositions;
         public NativeArray<BodyBoneLocalPositionResult> boneroothip_posResults;
+        //public NativeSlice<BodyBoneLocalPositionResult> hipPositions;
 
         [ReadOnly]
         public NativeArray<IkBaseTransformValue> ikalways_baseTransformValues;
@@ -185,17 +186,20 @@ namespace AnimLite.Vmd.experimental.Job
             var data = this.ground_hitData[index_ground];
 
             var tfBase = this.ikalways_baseTransformValues[data.ikalways_index];
-            var wup = tfBase.worldUp.As3();
-            var base_wpos = tfBase.position.As3();
+            var wup = tfBase.worldUp.xyz;
+            var base_wpos = tfBase.position.xyz;
+
+            var t = this.model_timer[data.model_index];
+            var dt = t.timer.CurrentTime - t.previousTime;
 
 
             // ‚¢‚Á‚½‚ñ base local ‚É‚µ‚Ä‚‚³‚ÅŒvŽZ‚µ‚Ä‚¢‚­
 
-            var rootlpos = this.boneroothip_posResults[data.model_index].localPosition.As3();
-            var local_height_root_ofs = rootStorage.rootHeight - rootlpos.y;
+            var rootlpos = this.boneroothip_posResults[data.model_index].localPosition.xyz;
+            var local_height_root_ofs = rootStorage.rootLocalHeight - rootlpos.y;
 
             var ikpos = this.legalways_ikAnchors[data.legalways_index];
-            var ik_local_height = wpos_to_local_height_(ikpos.legWorldPositionL.As3(), ikpos.legWorldPositionR.As3());
+            var ik_local_height = wpos_to_local_height_(ikpos.legWorldPositionL.xyz, ikpos.legWorldPositionR.xyz);
 
             var hit = this.ground_hits[index_ground];
             var hit_local_height = wpos_to_local_height_(hit.hitL.point.As_float3(), hit.hitR.point.As_float3());
@@ -204,59 +208,109 @@ namespace AnimLite.Vmd.experimental.Job
             var hitid = new int2(hit.hitL.colliderInstanceID, hit.hitR.colliderInstanceID);
             var ankle_height = new float2(data.ankleHightL, data.ankleHightR);
             var ik_height_ankle = ik_local_height + local_height_root_ofs;
-            var root_height = new float2(rootStorage.rootHeight, rootStorage.rootHeight);
+            var root_height = new float2(rootStorage.rootLocalHeight, rootStorage.rootLocalHeight);
             var hit_height = hit_local_height;
 
             var chk = check_();
             var new_local_height = calc_();
 
-            var new_leg_wpos = height_to_world_pos_(
-                ikpos.legWorldPositionL.As3(),
-                ikpos.legWorldPositionR.As3(),
-                new_local_height.leg - ik_local_height);
-            this.legalways_ikAnchors[data.legalways_index] = new LegIkAnchorLR
-            {
-                legWorldPositionL = new_leg_wpos.l.As4(1.0f),
-                legWorldPositionR = new_leg_wpos.r.As4(1.0f),
-            };
+
+            var easeSpeedTarget = math.select(new float4(12.0f, 12.0f, 10.0f, 10.0f), 100.0f, new bool4(!chk.isGrounding/* | chk.isFloating*/, false, false));
+            var easeSpeed = easeSpeedTarget;// rootStorage.easeSpeed + (easeSpeedTarget - rootStorage.easeSpeed) * math.saturate(10.0f * dt);
+            var easerate = math.saturate(easeSpeed * dt);
+            //rootStorage.easeSpeed = easeSpeed;
 
 
-            var ikfoot = this.footalways_ikAnchors[data.footalways_index];
-            this.footalways_ikAnchors[data.footalways_index] = new FootIkAnchorLR
+            // leg
             {
-                footWorldRotationL = math.select(
-                    falseValue: new float4(float.NaN, float.NaN, float.NaN, float.NaN),//ikfoot.footWorldRotationL.value,
-                    trueValue: calc_new_foot_(ikfoot.footWorldRotationL, hit.hitL.normal).value,
-                    test: chk.isGrounding.x & !chk.isFloating.x),
+                var new_local_height_leg_eased = rootStorage.footLocalHeightLR +
+                    (new_local_height.leg - rootStorage.footLocalHeightLR) * easerate.xy;
 
-                footWorldRotationR = math.select(
-                    falseValue: new float4(float.NaN, float.NaN, float.NaN, float.NaN),//ikfoot.footWorldRotationR.value,
-                    trueValue: calc_new_foot_(ikfoot.footWorldRotationR, hit.hitR.normal).value,
-                    test: chk.isGrounding.y & !chk.isFloating.y),
-            };
-            //static quaternion calc_new_foot_(quaternion foot_wrot, float3 hit_normal) =>
-            //    quaternion.LookRotation(math.rotate(foot_wrot, Vector3.forward), hit_normal);
-            static quaternion calc_new_foot_(quaternion wrot, float3 hit_normal)
-            {
-                var up = math.rotate(wrot, Vector3.up);
-                var rotTo = IkExtension.fromToRotation(up, hit_normal);
-                return math.mul(rotTo, wrot);
+                var local_height_leg_move = new_local_height_leg_eased - ik_local_height;
+                var new_leg_wpos = height_to_world_pos_(
+                    ikpos.legWorldPositionL.xyz,
+                    ikpos.legWorldPositionR.xyz,
+                    local_height_leg_move);
+
+                this.legalways_ikAnchors[data.legalways_index] = new LegIkAnchorLR
+                {
+                    legWorldPositionL = new_leg_wpos.l.As4(1.0f),
+                    legWorldPositionR = new_leg_wpos.r.As4(1.0f),
+                };
+
+                rootStorage.footLocalHeightLR = new_local_height_leg_eased;
             }
 
 
-            var t = this.model_timer[data.model_index];
-            var easerate = math.saturate(10.0f * (t.timer.CurrentTime - t.previousTime));
-            var new_local_height_root_lower_LorR = math.min(new_local_height.root.x, new_local_height.root.y);
-            var new_local_height_root = rootStorage.rootHeight + (new_local_height_root_lower_LorR - rootStorage.rootHeight) * easerate;
-            this.boneroothip_posResults[data.model_index] = new BodyBoneLocalPositionResult
+            // foot
             {
-                localPosition = new float4(rootlpos.x, new_local_height_root, rootlpos.z, 1.0f),
-            };
+                var ikfoot = this.footalways_ikAnchors[data.footalways_index];
+                var result = new FootIkAnchorLR
+                {
+                    footWorldRotationL = calc_new_foot_(
+                        ikfoot.footWorldRotationL, hit.hitL.normal, chk.isGrounding.x & !chk.isFloating.x, rootStorage.footRotationL, easerate.w),
 
-            this.ground_hitHeightStorages[index_ground] = new LegHitRootHeightStorage
+                    footWorldRotationR = calc_new_foot_(
+                        ikfoot.footWorldRotationR, hit.hitR.normal, chk.isGrounding.y & !chk.isFloating.y, rootStorage.footRotationR, easerate.w),
+                };
+                this.footalways_ikAnchors[data.footalways_index] = result;
+
+                //static quaternion calc_new_foot_(quaternion foot_wrot, float3 hit_normal) =>
+                //    quaternion.LookRotation(math.rotate(foot_wrot, Vector3.forward), hit_normal);
+                static quaternion calc_new_foot_(quaternion wrot, float3 hit_normal, bool isHit, quaternion wrotprev, float t)
+                {
+                    return math.select(
+                        falseValue:
+                            new float4(float.NaN, float.NaN, float.NaN, float.NaN),
+                        trueValue:
+                            calc_().value,
+                        //trueValue:
+                        //    math.select(
+                        //        math.slerp(wrotprev, calc_(), t).value,
+                        //        wrot.value,//calc_().value,
+                        //        float.IsNaN(wrotprev.value.x)),
+                        test:
+                            isHit);
+
+                    quaternion calc_()
+                    {
+                        var up = math.rotate(wrot, Vector3.up);
+                        var rotTo = IkExtension.fromToRotation(up, hit_normal);
+                        return math.mul(rotTo, wrot);
+                    }
+                }
+
+                ////rootStorage.footRotationL = result.footWorldRotationL;
+                ////rootStorage.footRotationR = result.footWorldRotationR;
+                //rootStorage.footRotationL =
+                //    math.select(
+                //        result.footWorldRotationL.value,
+                //        ikfoot.footWorldRotationL.value,
+                //        float.IsNaN(result.footWorldRotationL.value.x));
+                //rootStorage.footRotationR =
+                //    math.select(
+                //        result.footWorldRotationR.value,
+                //        ikfoot.footWorldRotationR.value,
+                //        float.IsNaN(result.footWorldRotationR.value.x));
+            }
+
+
+            // root
             {
-                rootHeight = new_local_height_root,
-            };
+                var new_local_height_root_lower_LorR = math.min(new_local_height.root.x, new_local_height.root.y);
+                var new_local_height_root = rootStorage.rootLocalHeight +
+                    (new_local_height_root_lower_LorR - rootStorage.rootLocalHeight) * easerate.z;
+
+                this.boneroothip_posResults[data.model_index] = new BodyBoneLocalPositionResult
+                {
+                    localPosition = new float4(rootlpos.x, new_local_height_root, rootlpos.z, 1.0f),
+                };
+
+                rootStorage.rootLocalHeight = new_local_height_root;
+            }
+
+
+            this.ground_hitHeightStorages[index_ground] = rootStorage;
 
             return;
 
@@ -278,7 +332,9 @@ namespace AnimLite.Vmd.experimental.Job
 
             (bool2 isGrounding, bool2 isFloating) check_()
             {
-                var isFloating = ik_height_ankle > root_height + ankle_height;
+                //var isFloating = ik_height_ankle > root_height + ankle_height;
+                //var isFloating = ik_height_ankle > root_height + ankle_height * 0.95f;
+                var isFloating = ik_height_ankle > hit_height + ankle_height * 0.95f;
                 var isGrounding = hitid != 0;
 
                 return (isGrounding, isFloating);
@@ -311,13 +367,13 @@ namespace AnimLite.Vmd.experimental.Job
     public struct LegIkApplyRootHeightJob : IJobParallelForTransform
     {
         [ReadOnly]
-        public NativeArray<LegHitRootHeightStorage> ground_hitHeightStorages;
+        public NativeArray<LegHitInterpolationStorage> ground_hitHeightStorages;
 
         public void Execute(int index, TransformAccess tf)
         {
             var lpos = tf.localPosition;
             
-            lpos.y = this.ground_hitHeightStorages[index].rootHeight;
+            lpos.y = this.ground_hitHeightStorages[index].rootLocalHeight;
 
             tf.localPosition = lpos;
         }

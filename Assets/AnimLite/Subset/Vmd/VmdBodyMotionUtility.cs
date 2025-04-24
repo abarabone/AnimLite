@@ -58,7 +58,7 @@ namespace AnimLite.Vmd
         }
 
         public static void SetLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
-            this TBone bone, int i, TPFinder pkf, TRFinder rkf, TStream stream, float scale)
+            this TBone bone, int i, TPFinder pkf, TRFinder rkf, TStream stream, float3 scale)
                 where TPFinder : IKeyFinder<float4>
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>
@@ -81,7 +81,7 @@ namespace AnimLite.Vmd
 
         public static void SetHipLocal<TPFinder, TRFinder, TBone, TTf, TStream>(
             this TBone bone, int i, TPFinder pkf, TRFinder rkf, TStream stream,
-            float bodyScale, float3 rootToHipLocal, float3 spineToHipLocal)
+            float3 bodyScale, float3 rootToHipLocal, float3 spineToHipLocal)
                 where TPFinder : IKeyFinder<float4>
                 where TRFinder : IKeyFinder<quaternion>
                 where TBone : ITransformMappings<TTf>

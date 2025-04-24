@@ -110,11 +110,11 @@ namespace AnimLite.Vmd.experimental.Job
 
             //var rootlpos_move = this.localPositions[ikdata.rootLocalPositionIndex].localPosition.As3();
             var rootlpos_move = this.boneroothip_posResults[ikdata.model_index].localPosition.As3();
-            var rootpos_foot = rootlpos_move * ikdata.footPerMoveScale;
+            var rootpos_foot = rootlpos_move * ikdata.footPerMoveScale.xyz;
             var (lposL, lposR) = get_(timer);
 
-            var iklposL = lposL * ikdata.footScale * 0.1f - rootpos_foot;
-            var iklposR = lposR * ikdata.footScale * 0.1f - rootpos_foot;
+            var iklposL = lposL * ikdata.footScale.xyz * 0.1f - rootpos_foot;
+            var iklposR = lposR * ikdata.footScale.xyz * 0.1f - rootpos_foot;
 
             var ikPosL = iklposL + ikdata.footPosOffsetL.As3() + rootlpos_move;
             var ikPosR = iklposR + ikdata.footPosOffsetR.As3() + rootlpos_move;

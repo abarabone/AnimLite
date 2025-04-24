@@ -120,9 +120,9 @@ namespace AnimLite.Utility
     [System.Serializable]
     public class MotionOptionsJson
     {
-        public float BodyScaleFromHuman = 0.0f;
-        public float FootScaleFromHuman = 0.0f;
-        public float MoveScaleFromHuman = 0.0f;
+        public numeric3 BodyScaleFromHuman = new numeric3(0.0f);
+        public numeric3 FootScaleFromHuman = new numeric3(0.0f);
+        public numeric3 MoveScaleFromHuman = new numeric3(0.0f);
 
         public VmdFootIkMode FootIkMode = VmdFootIkMode.auto;
 
@@ -130,6 +130,36 @@ namespace AnimLite.Utility
         public float GroundHitOriginOffset = 2.0f;
 
         public bool UseStreamHandleAnimationJob = true;
+    }
+
+    public struct numeric3
+    {
+        public float x, y, z;
+
+        public numeric3(double[] src)
+        {
+            this.x = (float)src[0];
+            this.y = (float)src[1];
+            this.z = (float)src[2];
+        }
+        public numeric3(Vector3 src)
+        {
+            this.x = src.x;
+            this.y = src.y;
+            this.z = src.z;
+        }
+        public numeric3(double src)
+        {
+            this.x = (float)src;
+            this.y = (float)src;
+            this.z = (float)src;
+        }
+
+        public Unity.Mathematics.float3 to_float3() => new Unity.Mathematics.float3(this.x, this.y, this.z);
+        public Vector3 ToVector3() => new Vector3(this.x, this.y, this.z);
+
+        public static implicit operator Unity.Mathematics.float3(numeric3 src) => src.to_float3();
+        //public static implicit operator float(numeric3 src) => src.x;// 暫定
     }
 
 }

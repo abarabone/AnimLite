@@ -44,12 +44,16 @@ namespace AnimLite.Vmd.experimental.Data
         public float4 footPosOffsetL;
         public float4 footPosOffsetR;
 
-        public float footScale;
-        public float footPerMoveScale;
+        public float4 footScale;
+        public float4 footPerMoveScale;
 
         public int model_index;
         public int ikalways_index;
         public int legalways_index;
+
+        int pad0;
+        int pad1;
+        int pad2;
     }
 
     public struct LegIkAnchorIndex

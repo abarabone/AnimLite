@@ -8,7 +8,22 @@
 - .vmd, model, web loading のキャッシュ機能
 - 補助機能として、.json で音楽、モデル、アニメーション、配置、を設定 ＆ file/web からロードする機能
 
+# そういえば書き忘れてたけど
+- clone したら、Assets/AnimLite/Resources_moved にある下記 .txt ファイルを、Addressable に登録して simply addressable names にしてください
+  - default_body_adjust.txt
+  - default_facemap.txt
+- facemap と body adjust に何も指定しないときにデフォルトで参照するために必要です
+- 使い方のドキュメント的なものが一切ないので、clone しても意味不明でしょうけど…
+
 # 新機能・修正
+2025.4.24
+- .json の Animation . Options 以下にある BodyScaleFromHuman/MoveScaleFromHuman/FootScaleFromHuman を、ベクトル値で指定できるようにした。
+  - ベクトルは { "x":0.0, "y":0.0, "z":0.0 } または [0.0, 0.0, 0.0] という形式で指定できる
+  - 今まで通り、スカラー値で指定も可能
+- foot ik の接地で、段差でカクカクするのを補間で緩和した
+  - そのおかげで足の高さ移動が 0.1 秒くらい遅れるので若干フワフワする場合があるかも（キャラクタの下に地面があるときのみ）
+  - 足首の角度補間は leg only with ground の時対応が難しいことが分かったので、根本的に job 構成を変える必要があって未実装
+
 2025.4.17
 - foot ik の修正いろいろ
   - 段差とかでかくかくするの以外はだいたい解消できた気がするけどまだわからぬ
@@ -130,6 +145,7 @@
   - 任意のタイミングでクリアできるが、必ずプログラム開始時にクリアされる
 
 # やりたい・検討中
+- .json でベクトル値を [0.0, 0.0, 0.0] でも記述できるようにしようと思う（現状は Animation.Options の scale のみ対応してる）
 - 現状、.vmd のキャッシュはオンメモリだけど、一時ファイルにした方がよくない？メモリ占有し続けるのってどうなの
 - move/body/ik の補正スケールは水平と垂直で別にしたほうがいいかも？（ベクトルで指定するなど）
 - 各種動作フラグとかは、現状の static 変数じゃなくて、関数に引数で渡す方式にしたほうがいいかな…
@@ -235,9 +251,9 @@
                 "BodyAdjustFilePath": "",         // アニメーションのポーズ補正表へのパス。"" ならデフォルトの補正表（T -> A ポーズ変換用）が使用される
                 "DelayTime": 0.0,
                 "Options": {                      // Vmd では下記を記載可能だが、任意のデータを記述できる
-                    "BodyScaleFromHuman": 0.0,    // 身体サイズの補正比率。0.0 なら自動的に計算される
-                    "FootScaleFromHuman": 0.0,    // 足ＩＫ位置の補正比率。0.0 なら自動的に計算される
-                    "MoveScaleFromHuman": 0.0,    // キャラクター移動の補正比率。0.0 なら自動的に計算される
+                    "BodyScaleFromHuman": 0.0,    // 身体サイズの補正比率。0.0 なら自動的に計算される（ベクトルで軸ごとの指定も可能）
+                    "FootScaleFromHuman": 0.0,    // 足ＩＫ位置の補正比率。0.0 なら自動的に計算される（ベクトルで軸ごとの指定も可能）
+                    "MoveScaleFromHuman": 0.0,    // キャラクター移動の補正比率。0.0 なら自動的に計算される（ベクトルで軸ごとの指定も可能）
                     "FootIkMode": "auto",         // .vmd のフットＩＫをどうするか。auto|on|off|leg_only|foot_only から選ぶ。auto は .vmd の足ＩＫにキーがあるかないかで自動判別する
                                                   // _with_ground をつけると接地ＩＫを使う（ auto_with_ground とか leg_only_with_ground とか書く）
                     "UseStreamHandleAnimationJob": true  // 従来の animation job モードを使用する（接地を試すには false ）
@@ -376,6 +392,8 @@
     - Foot を Move と異なる値にすると滑ってみえる
     - 小さいキャラで 1.0 にすると大股になって頑張ってる感じがしてかわいい
   - 今考えると FromHuman って意味わかんないな、FromVmd とかのがいいのでは？ FromHumanoid ならまだしも…
+  - 各 scale 値は、スカラー値指定とベクトル値指定が可能
+    - ベクトル値は {"x":0.0, "y":0.0, "z":0.0} または [0.0, 0.0, 0.0] のいずれかの記述ができる
 
 # ポーズ補正ファイルについて
 - テキストファイルで、HumanoidBodyBones Enum 値に対応した部位ごとに、ローカル回転を記述する

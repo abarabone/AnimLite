@@ -28,9 +28,11 @@ namespace AnimLite.Vmd.experimental
     {
 
 
-        public static JobHandle BuildMotionJobsAndSchedule<TPFinder, TRFinder>(this JobBuffers<TPFinder, TRFinder> buf, float deltaTime, JobHandle dep = default)
-            where TPFinder : unmanaged, IKeyFinderWithoutProcedure<float4>
-            where TRFinder : unmanaged, IKeyFinderWithoutProcedure<quaternion>
+        public static JobHandle BuildMotionJobsAndSchedule<TPFinder, TRFinder>(
+            //this JobBuffers<TPFinder, TRFinder> buf, float deltaTime, JobHandle dep = default)
+            this JobBuffers<TPFinder, TRFinder> buf, float currentTime, float speedHint = 1.0f, JobHandle dep = default)
+                where TPFinder : unmanaged, IKeyFinderWithoutProcedure<float4>
+                where TRFinder : unmanaged, IKeyFinderWithoutProcedure<quaternion>
         {
 
             var depsel = UpdateTimeAndProcedureSelectorJob_(dep);
@@ -50,27 +52,34 @@ namespace AnimLite.Vmd.experimental
             //var depfkikleg = CopyLegFkToIkAnchorJob_(depapplybody);
             //var depfkikfoot = CopyFootFkToIkAnchorJob_(depapplybody);
             var depfkikleg = CopyLegFkToIkAnchorJob_((depapplybody, depikleg).Combine());
-            var depfkikfoot = CopyFootFkToIkAnchorJob_((depapplybody, depikfoot).Combine());
+            //var depfkikfoot = CopyFootFkToIkAnchorJob_((depapplybody, depikfoot).Combine());
             //var depfkikleg = (depapplybody, depikleg).Combine();
             //var depfkikfoot = (depapplybody, depikfoot).Combine();
 
             var depikhit = IkAnchorToCastCommandJob_((depfkikleg, depikleg, depiktfbase).Combine());
 
-            var depikcast = RaycastCommand_(depikhit);
+            var depikcast = GroundcastCommand_(depikhit);
 
-            var dephitapply = HitApplyToIkAnchorJob_((depikcast, depfkikfoot, depikfoot).Combine());
+            var dephitapply = HitApplyToIkAnchorJob_(depikcast);
 
             var dephitroot = LegIkApplyRootHeightJob_(dephitapply);
 
 
             var depsolve_fromtf = SolveCopyFromTransformJob_(depapplybody);
-
-            var depsolve_apply = SolveIkJob_((depsolve_fromtf, dephitroot).Combine());
-
+            
+            var depsolve_apply = SolveIkJob_((depsolve_fromtf, dephitroot, depikfoot).Combine());
+            
             var depsolve_totf = SolveCopyToTransformJob_(depsolve_apply);
+            
+
+            var dephitfoot_cpy = CopyTransformToFootFkValueJob_(depsolve_totf);
+
+            var dephitfoot_inp = GroundFootInterpolateJob_(dephitfoot_cpy);
+
+            var dephitfoot_res = CopyGroundFootToTransformJob_(dephitfoot_inp);
 
 
-            return depsolve_totf;
+            return dephitfoot_res;
             
 
 
@@ -81,7 +90,9 @@ namespace AnimLite.Vmd.experimental
                 {
                     model_timer = buf.model_timer,
                     model_procedureSelectors = buf.model_procedureSelectors,
-                    deltaTime = deltaTime,
+                    //deltaTime = deltaTime,
+                    currentTime = currentTime,
+                    speedHint = speedHint,
                 }
                 .Schedule(buf.model_procedureSelectors.Length, 32, dep);
             }
@@ -143,7 +154,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle CopyLegFkToIkAnchorJob_(JobHandle dep)
             {
-                if (buf.noikleg_ikIndices.Length == 0) return dep;
+                if (buf.noikleg_ikIndices.Length() == 0) return dep;
 
                 return new CopyLegFkToIkAnchorJob
                 {
@@ -153,22 +164,22 @@ namespace AnimLite.Vmd.experimental
                 .ScheduleReadOnly(buf.noikleg_footTransforms, 32, dep);
             }
 
-            JobHandle CopyFootFkToIkAnchorJob_(JobHandle dep)
-            {
-                if (buf.noikfoot_ikIndices.Length == 0) return dep;
+            //JobHandle CopyFootFkToIkAnchorJob_(JobHandle dep)
+            //{
+            //    if (buf.noikfoot_ikIndices.Length == 0) return dep;
 
-                return new CopyFootFkToIkAnchorJob
-                {
-                    footalways_ikAnchors = buf.footalways_ikAnchors.Reinterpret<FootIkAnchor>(sizeof(FootIkAnchorLR)),
-                    noikfoot_anchorIndices = buf.noikfoot_ikIndices,
-                }
-                .ScheduleReadOnly(buf.noikfoot_footTransforms, 32, dep);
-            }
+            //    return new CopyFootFkToIkAnchorJob
+            //    {
+            //        footalways_ikAnchors = buf.footalways_ikAnchors.Reinterpret<FootIkAnchor>(sizeof(FootIkAnchorLR)),
+            //        noikfoot_anchorIndices = buf.noikfoot_ikIndices,
+            //    }
+            //    .ScheduleReadOnly(buf.noikfoot_footTransforms, 32, dep);
+            //}
 
 
             JobHandle IkBaseTransformCopyJob_(JobHandle dep)
             {
-                if (buf.ikalways_baseTransforms.length == 0) return dep;
+                if (buf.ikalways_baseTransforms.Length() == 0) return dep;
 
                 return new IkBaseTransformCopyJob
                 {
@@ -179,7 +190,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle GetLegIkAnchorJob_(JobHandle dep)
             {
-                if (buf.ikleg_ikData.Length == 0) return dep;
+                if (buf.ikleg_ikData.Length() == 0) return dep;
 
                 return new GetLegIkAnchorJob<TPFinder, TRFinder>
                 {
@@ -196,7 +207,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle GetFootIkAnchorJob_(JobHandle dep)
             {
-                if (buf.ikfoot_ikData.Length == 0) return dep;
+                if (buf.ikfoot_ikData.Length() == 0) return dep;
 
                 return new GetFootIkAnchorJob<TPFinder, TRFinder>
                 {
@@ -204,7 +215,7 @@ namespace AnimLite.Vmd.experimental
                     model_procedureSelectors = buf.model_procedureSelectors,
                     ikalways_baseTransformValues = buf.ikalways_baseTransformValues,
                     ikfoot_ikData = buf.ikfoot_ikData,
-                    footalways_ikAnchors = buf.footalways_ikAnchors,
+                    footalways_ikAnchors = buf.ikfoot_ikAnchors,
                     model_timer = buf.model_timer,
                 }
                 .Schedule(buf.ikfoot_ikData.Length, 8, dep);
@@ -212,30 +223,28 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle IkAnchorToCastCommandJob_(JobHandle dep)
             {
-                if (buf.ground_hitCastCommands.Length == 0) return dep;
+                if (buf.ground_castCommands.Length() == 0) return dep;
 
                 return new IkAnchorToCastCommandJob
                 {
                     ikalways_baseTransformValues = buf.ikalways_baseTransformValues,
                     legalways_legIkAnchors = buf.legalways_ikAnchors,
-                    ground_hitCastCommands = buf.ground_hitCastCommands,
+                    ground_hitCastCommands = buf.ground_castCommands,
                     ground_hitData = buf.ground_hitData,
                     ground_rootHeigts = buf.ground_hitHeightStorages,
                 }
-                .Schedule(buf.ground_hitCastCommands.Length, 8, dep);
+                .Schedule(buf.ground_castCommands.Length, 8, dep);
             }
 
 
 
-            JobHandle RaycastCommand_(JobHandle dep)
+            JobHandle GroundcastCommand_(JobHandle dep)
             {
-                if (buf.ground_hitCastCommands.Length == 0) return dep;
+                if (buf.ground_castCommands.Length() == 0) return dep;
 
-                //return SpherecastCommand.ScheduleBatch(
-                //    buf.leg_hitCastCommands.Reinterpret<SpherecastCommand>(sizeof(LegHitCastCommand)),
-                return RaycastCommand.ScheduleBatch(
-                    buf.ground_hitCastCommands.Reinterpret<RaycastCommand>(sizeof(LegHitCastCommandLR)),
-                    buf.ground_hits.Reinterpret<RaycastHit>(sizeof(LegHitRaycastHitLR)),
+                return SpherecastCommand.ScheduleBatch(
+                    buf.ground_castCommands.Reinterpret<SpherecastCommand>(sizeof(LegGroundcastCommandLR)),
+                    buf.ground_hits.Reinterpret<RaycastHit>(sizeof(LegRaycastHitLR)),
                     minCommandsPerJob: 2,
                     maxHits: 1,
                     dep);
@@ -243,7 +252,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle HitApplyToIkAnchorJob_(JobHandle dep)
             {
-                if (buf.ground_hitCastCommands.Length == 0) return dep;
+                if (buf.ground_castCommands.Length() == 0) return dep;
 
                 return new HitApplyToIkAnchorJob
                 {
@@ -251,17 +260,17 @@ namespace AnimLite.Vmd.experimental
                     ground_hitData = buf.ground_hitData,
                     boneroothip_posResults = buf.boneroothip_posResults,
                     legalways_ikAnchors = buf.legalways_ikAnchors,
-                    footalways_ikAnchors = buf.footalways_ikAnchors,
+                    //footalways_ikAnchors = buf.footalways_ikAnchors,
                     ground_hitHeightStorages = buf.ground_hitHeightStorages,
                     ikalways_baseTransformValues = buf.ikalways_baseTransformValues,
                     model_timer = buf.model_timer,
                 }
-                .Schedule(buf.ground_hitCastCommands.Length, 8, dep);
+                .Schedule(buf.ground_castCommands.Length, 8, dep);
             }
 
             JobHandle LegIkApplyRootHeightJob_(JobHandle dep)
             {
-                if (buf.ground_rootTransforms.length == 0) return dep;
+                if (buf.ground_rootTransforms.Length() == 0) return dep;
 
                 return new LegIkApplyRootHeightJob
                 {
@@ -273,7 +282,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle SolveCopyFromTransformJob_(JobHandle dep)
             {
-                if (buf.ikalways_legTransformValues.length == 0) return dep;
+                if (buf.ikalways_legTransformValues.Length() == 0) return dep;
 
                 return new SolveCopyFromTransformJob
                 {
@@ -285,12 +294,12 @@ namespace AnimLite.Vmd.experimental
             
             JobHandle SolveIkJob_(JobHandle dep)
             {
-                if (buf.ikalways_legTransformValueSets.Length == 0) return dep;
+                if (buf.ikalways_legTransformValueSets.Length() == 0) return dep;
 
                 return new SolveIkJob
                 {
                     legalways_ikAnchors = buf.legalways_ikAnchors,
-                    footalways_ikAnchors = buf.footalways_ikAnchors,
+                    footalways_ikAnchors = buf.ikfoot_ikAnchors,
                     ikalways_ikAnchorIndices = buf.ikalways_ikAnchorIndices,
                     ikalways_legTransformValueSets = buf.ikalways_legTransformValueSets,
                 }
@@ -299,7 +308,7 @@ namespace AnimLite.Vmd.experimental
 
             JobHandle SolveCopyToTransformJob_(JobHandle dep)
             {
-                if (buf.ikalways_legTransformValues.length == 0) return dep;
+                if (buf.ikalways_legTransformValues.Length() == 0) return dep;
 
                 return new SolveCopyToTransformJob
                 {
@@ -309,6 +318,50 @@ namespace AnimLite.Vmd.experimental
                 .Schedule(buf.ikalways_legTransformValues, dep);
             }
 
+
+
+            JobHandle CopyTransformToFootFkValueJob_(JobHandle dep)
+            {
+                if (buf.ground_footFkTransforms.Length() == 0) return dep;
+
+                return new CopyTransformToFootFkValueJob
+                {
+                    ground_footFkTransformValues = buf.ground_footFkTransformValues
+                        .Reinterpret<GroundFootFkTransformValue>(sizeof(GroundFootFkTransformValueLR)),
+                }
+                .ScheduleReadOnly(buf.ground_footFkTransforms, 8, dep);
+            }
+
+            JobHandle GroundFootInterpolateJob_(JobHandle dep)
+            {
+                if (buf.ground_hits.Length() == 0) return dep;
+
+                return new GroundFootInterpolateJob
+                {
+                    model_timer = buf.model_timer,
+                    ikalways_baseTransformValues = buf.ikalways_baseTransformValues,
+
+                    ground_hits = buf.ground_hits,
+                    ground_hitData = buf.ground_hitData,
+                    ground_footFkTransformValues = buf.ground_footFkTransformValues,
+                    ground_footStorages = buf.ground_footStorages,
+
+                    ground_transformValueResults = buf.ground_footTransformValueResults,
+                }
+                .Schedule(buf.ground_hits.Length, 8, dep);
+            }
+
+            JobHandle CopyGroundFootToTransformJob_(JobHandle dep)
+            {
+                if (buf.ground_footResultTransforms.Length() == 0) return dep;
+
+                return new CopyGroundFootToTransformJob
+                {
+                    ground_transformValues = buf.ground_footTransformValueResults
+                        .Reinterpret<GroundFootResultValue>(sizeof(GroundFootResultValueLR)),
+                }
+                .Schedule(buf.ground_footResultTransforms, dep);
+            }
 
         }
 

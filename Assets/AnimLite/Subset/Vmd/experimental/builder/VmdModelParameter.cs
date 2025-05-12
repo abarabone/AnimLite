@@ -35,6 +35,7 @@ namespace AnimLite.Vmd.experimental
         }
 
 
+        // pre
         public ModelData model_data;
 
         public IEnumerable<ModelFinder<TPFinder, TRFinder>> model_finders_origin;
@@ -42,22 +43,8 @@ namespace AnimLite.Vmd.experimental
         public EnumerableWithParam<ModelHipBoneAdjust> model_hipAdjusts;
         public IEnumerable<ModelTimer> model_timeOptions;
 
-        public EnumerableWithParam<SolveIkAnchorIndex> ikalways_ikAnchorIndices;
-        public IEnumerable<Transform> ikalways_legTransforms;
-        public IEnumerable<Transform> ikalways_baseTransforms;
 
-        public EnumerableWithParam<LegIkData> ikleg_ikData;
-        public EnumerableWithParam<LegIkAnchorIndex> noikleg_ikIndices;
-        public IEnumerable<Transform> noikleg_footTransforms;
-
-        public EnumerableWithParam<FootIkData> ikfoot_ikData;
-        public EnumerableWithParam<FootIkAnchorIndex> noikfoot_ikIndices;
-        public IEnumerable<Transform> noikfoot_footTransforms;
-
-        public EnumerableWithParam<LegHitData> ground_hitData;
-        public IEnumerable<Transform> ground_rootTransforms;
-        public IEnumerable<LegHitInterpolationStorage> ground_rootHeights;
-
+        // body motion
         public EnumerableWithParam<BoneIndexData> bonefull_rotIndices;
         public IEnumerable<BoneRotationOffsetPose> bonefull_rotOffsets;
         public IEnumerable<Transform> bonefull_transgorms;
@@ -68,6 +55,36 @@ namespace AnimLite.Vmd.experimental
 
         public EnumerableWithParam<BoneIndexData> bonehip_posIndices;
         public IEnumerable<BodyBoneScale> bonehip_posScales;
+
+
+        // ik
+        public IEnumerable<Transform> ikalways_baseTransforms;
+
+        public EnumerableWithParam<LegIkData> ikleg_ikData;
+        public EnumerableWithParam<FootIkData> ikfoot_ikData;
+
+        // ik : solving
+        public IEnumerable<Transform> ikalways_legTransforms;
+        public EnumerableWithParam<SolveIkAnchorIndex> ikalways_ikAnchorIndices;
+
+
+        // grounding : 
+        public EnumerableWithParam<LegIkAnchorIndex> noikleg_ikIndices;
+        public IEnumerable<Transform> noikleg_footTransforms;
+        //public EnumerableWithParam<FootIkAnchorIndex> noikfoot_ikIndices;
+        //public IEnumerable<Transform> noikfoot_footTransforms;
+
+        // grounding : 
+        public EnumerableWithParam<LegHitData> ground_hitData;
+        public IEnumerable<Transform> ground_rootTransforms;
+        public IEnumerable<GroundLegInterpolationStorageLR> ground_rootHeights;
+
+        // grounding : foot interpolation
+        public IEnumerable<GroundFootInterpolationStorageLR> ground_footStorages;
+        public IEnumerable<Transform> ground_footFkTransforms;
+        //public IEnumerable<GroundFootFkTransformValueLR> ground_footFkTransformValues;
+        public IEnumerable<Transform> ground_footResultTransforms;
+        //public IEnumerable<GroundFootResultValueLR> ground_transformValueResults;
 
     }
 
@@ -133,7 +150,7 @@ namespace AnimLite.Vmd.experimental
         {
 
             var result = new ModelParams<TPFinder, TRFinder>();
-            var timer = new StreamingTimer(rkf.Streams.GetLastKeyTime(), delayTime);
+            var timer = new StreamingTimer(rkf.Streams.GetLastKeyTime());
 
 
             // model
@@ -162,8 +179,11 @@ namespace AnimLite.Vmd.experimental
                 new ModelTimer
                 {
                     timer = timer,
-                    previousTime = -delayTime,
+                    //previousTime = 0.0f,
+                    //nextTime = 0.0f,
+                    delayTime = delayTime,
                     indexBlockTimeRange = rkf.IndexBlockTimeRange,
+                    speedHint = 1.0f,
                 }
                 .WrapEnumerable();
 
@@ -176,8 +196,10 @@ namespace AnimLite.Vmd.experimental
 
             if (footop.useGroundHit | footop.useLegPositionIk | footop.useFootRotationIk)
             {
+
                 result.ikalways_baseTransforms = anim.transform
                     .WrapEnumerable();
+
 
                 result.ikalways_legTransforms = new[]
                 {
@@ -192,10 +214,14 @@ namespace AnimLite.Vmd.experimental
                 result.ikalways_ikAnchorIndices.invoke = p =>
                     new SolveIkAnchorIndex
                     {
-                        legalways_ikAnchorIndex = footop.useGroundHit | footop.useLegPositionIk ? p.legalways_offset : -1,
-                        footalways_ikAnchorIndex = footop.useGroundHit | footop.useFootRotationIk ? p.footalways_offset : -1,
-                        //legalways_ikAnchorIndex = p.legalways_offset,
-                        //footalways_ikAnchorIndex = p.footalways_offset,
+                        legalways_ikAnchorIndex =
+                            footop.useGroundHit | footop.useLegPositionIk
+                                ? p.legalways_offset
+                                : -1,
+                        ikfoot_ikAnchorIndex =
+                            footop.useFootRotationIk
+                                ? p.footik_offset
+                                : -1,
                     }
                     .WrapEnumerable();
             }
@@ -209,7 +235,7 @@ namespace AnimLite.Vmd.experimental
                         model_index = p.model_offset,
                         ikalways_index = p.ikalways_offset,
                         legalways_index = p.legalways_offset,
-                        footalways_index = p.footalways_offset,
+                        //footalways_index = p.footalways_offset,
                         hitMask = footop.groundHitMask,
                         ankleHightL = footop.footIkOffsetL.y,
                         ankleHightR = footop.footIkOffsetR.y,
@@ -218,8 +244,9 @@ namespace AnimLite.Vmd.experimental
                     }
                     .WrapEnumerable();
 
-                result.ground_rootTransforms = bones[0].human.TransformHandle.tf
-                    //anim.GetBoneTransform(HumanBodyBones.Hips).parent
+                result.ground_rootTransforms =
+                    bones[0].human.TransformHandle.tf
+                    //anim.GetBoneTransform(HumanBodyBones.Hips)
                     .WrapEnumerable();
 
                 var pkf_ = pkf.With<float4, TPFinder, Forward>(new StreamingTimer());
@@ -230,11 +257,27 @@ namespace AnimLite.Vmd.experimental
                 var origin_offset = footop.groundHitOriginOffset * tfbase.up;
                 var isGround = Physics.Raycast(rootwpos + origin_offset, -tfbase.up, out var hit, footop.groundHitDistance + footop.groundHitOriginOffset, footop.groundHitMask);
                 var height = math.select(0.0f, math.dot(hit.point - rootwpos, tfbase.up), isGround);
-                result.ground_rootHeights = new LegHitInterpolationStorage
+                result.ground_rootHeights = new GroundLegInterpolationStorageLR
                 {
                     rootLocalHeight = height,
                 }
                 .WrapEnumerable();
+
+
+                result.ground_footStorages = new GroundFootInterpolationStorageLR { }
+                    .WrapEnumerable();
+                result.ground_footFkTransforms = new[]
+                {
+                    anim.GetBoneTransform(HumanBodyBones.LeftLowerLeg),
+                    anim.GetBoneTransform(HumanBodyBones.RightLowerLeg),
+                    anim.GetBoneTransform(HumanBodyBones.LeftFoot),
+                    anim.GetBoneTransform(HumanBodyBones.RightFoot),
+                };
+                result.ground_footResultTransforms = new[]
+                {
+                    anim.GetBoneTransform(HumanBodyBones.LeftFoot),
+                    anim.GetBoneTransform(HumanBodyBones.RightFoot),
+                };
             }
 
 
@@ -263,7 +306,7 @@ namespace AnimLite.Vmd.experimental
                     {
                         model_index = p.model_offset,
                         ikalways_index = p.ikalways_offset,
-                        footalways_index = p.footalways_offset,
+                        ikfoot_index = p.footik_offset,//p.footalways_offset,
                     }
                     .WrapEnumerable();
             }
@@ -286,20 +329,20 @@ namespace AnimLite.Vmd.experimental
             }
 
 
-            if (!footop.useFootRotationIk & footop.useGroundHit)
-            {
-                result.noikfoot_footTransforms = new[]
-                {
-                    anim.GetBoneTransform(HumanBodyBones.LeftFoot),
-                    anim.GetBoneTransform(HumanBodyBones.RightFoot),
-                };
+            //if (!footop.useFootRotationIk & footop.useGroundHit)
+            //{
+            //    result.noikfoot_footTransforms = new[]
+            //    {
+            //        anim.GetBoneTransform(HumanBodyBones.LeftFoot),
+            //        anim.GetBoneTransform(HumanBodyBones.RightFoot),
+            //    };
 
-                result.noikfoot_ikIndices.invoke = p => Enumerable.Range(0, 2)
-                    .Select(i => new FootIkAnchorIndex
-                    {
-                        footalways_ikAnchorIndex = p.footalways_offset * 2 + i,
-                    });
-            }
+            //    result.noikfoot_ikIndices.invoke = p => Enumerable.Range(0, 2)
+            //        .Select(i => new FootIkAnchorIndex
+            //        {
+            //            footalways_ikAnchorIndex = p.footalways_offset * 2 + i,
+            //        });
+            //}
 
 
 

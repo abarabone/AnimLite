@@ -467,12 +467,12 @@ namespace AnimLite.experimental.a
             }
             //float getfromvmd_(MmdBodyBones i)
             //{
-            //    return math.length(streams.GetKeyDirect((int)i, 0.0f).value.As3());
+            //    return math.length(streams.GetKeyDirect((int)i, 0.0f).value.xyz);
             //}
             float getfromvmd_(VmdBoneName name)
             {
                 Debug.Log($"vmd : {name.name} {vmddata[name].First().time} {vmddata[name].First().pos} {vmddata[name].First().rot}");
-                return math.length(vmddata[name].First().pos.As3());
+                return math.length(vmddata[name].First().pos.xyz);
             }
         }
 

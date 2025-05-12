@@ -71,7 +71,7 @@ namespace AnimLite
             {
 
                 HumanBodyBones.Hips =>
-                    pkf.getpos(HumanBodyBones.Hips).As3(),
+                    pkf.getpos(HumanBodyBones.Hips).xyz,
 
                 _ => default,
             };

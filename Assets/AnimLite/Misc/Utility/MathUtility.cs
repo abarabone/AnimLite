@@ -41,10 +41,16 @@ namespace AnimLite.Utility
 
 
         //public static float3 As3(this float4 v) => (float3)v;
-        public static float3 As3(this float4 v) => new float3(v.x, v.y, v.z);
+        //public static float3 As3(this float4 v) => new float3(v.x, v.y, v.z);
         public static float4 As4(this float3 v, float w = 0.0f) => new float4(v, w);
 
-        public static float3 AsXZ(this float3 v) => new float3(v.x, 0, v.z);
+        public static float3 AsXoZ(this float3 v) => new float3(v.x, 0, v.z);
+
+        public static float2 As2(this float src) => new float2(src);
+        public static float3 As3(this float src) => new float3(src);
+        public static float4 As4(this float src) => new float4(src);
+
+
 
         //public static float3 As_float3(this float4 v) => new float3(v.x, v.y, v.z);
 

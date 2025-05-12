@@ -75,8 +75,8 @@ namespace AnimLite.Utility
         public PathUnit ModelFilePath = "";
 
         //public bool UsePositionAndDirection = true;
-        public Vector3 Position = Vector3.zero;
-        public Vector3 EulerAngles = Vector3.zero;
+        public numeric3 Position = new numeric3(0.0f);
+        public numeric3 EulerAngles = new numeric3(0.0f);
         public float Scale = 1.0f;
     }
     [System.Serializable]
@@ -159,7 +159,8 @@ namespace AnimLite.Utility
         public Vector3 ToVector3() => new Vector3(this.x, this.y, this.z);
 
         public static implicit operator Unity.Mathematics.float3(numeric3 src) => src.to_float3();
-        //public static implicit operator float(numeric3 src) => src.x;// 暫定
+        public static implicit operator Vector3(numeric3 src) => src.ToVector3();
+
     }
 
 }

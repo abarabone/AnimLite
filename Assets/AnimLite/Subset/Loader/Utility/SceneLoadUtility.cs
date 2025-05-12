@@ -66,11 +66,11 @@ namespace AnimLite.Loader
                 .WhenAll();
 
 
-            var audioOrder = orders.First() as AudioOrder;
-            var bgOrders = orders.Skip(1).Take(ds.BackGrounds.Count).Cast<ModelOrder>().ToArray();
-            var motionOrders = orders.Skip(1).Skip(ds.BackGrounds.Count).Cast<MotionOrderBase>().ToArray();
+            var audioOrder = (AudioOrder)orders.First();
+            var bgOrders = orders.Skip(1).OfType<BgModelOrder>().ToArray();
+            var motionOrders = orders.Skip(1).OfType<MotionOrderBase>().ToArray();
 
-            var order = await toOrderAsync(audioOrder!, bgOrders, motionOrders, ct);
+            var order = await toOrderAsync(audioOrder, bgOrders, motionOrders, ct);
             await ds.OrverrideInformationIfBlankAsync(order);
             return order;
         }
@@ -153,7 +153,7 @@ namespace AnimLite.Loader
             var audiopath = define.AudioFilePath;
 
             var prototype = await archive.LoadAudioClipPrototypeAsync(audiopath, ct);
-            var clip = await prototype.NullableAsync(x => x.InstantiateAsync());
+            var clip = await prototype.DoIfNotNullAsync(x => x.InstantiateAsync());
 
             await prototype.DisposeNullableAsync();
 
@@ -166,7 +166,7 @@ namespace AnimLite.Loader
         /// <summary>
         /// 
         /// </summary>
-        static async ValueTask<ModelOrder> buildBackGroundModelOrderAsync(
+        static async ValueTask<BgModelOrder> buildBackGroundModelOrderAsync(
             this ModelDefineJson define, PrototypeCacheHolder cache, IArchive? archive, CancellationToken ct)
         {
             var bgpath = define.ModelFilePath;
@@ -321,7 +321,7 @@ namespace AnimLite.Loader
             };
 
 
-        static ModelOrder toBackGroundOrder(
+        static BgModelOrder toBackGroundOrder(
             this ModelDefineJson define, Instance<GameObject>? model)
         =>
             new()
@@ -337,7 +337,7 @@ namespace AnimLite.Loader
         {
             var options = define.Animation.OptionsAs<MotionOptionsJson>();
 
-            return (vmddata.Value is not null) switch
+            return (vmddata?.Value is not null) switch
             {
                 true when options.UseStreamHandleAnimationJob =>
                     define.toMotionOrderOld(options, vmddata, facemap, model, adjust),
@@ -423,7 +423,7 @@ namespace AnimLite.Loader
                         .First()
                         .ToResourceName()
                         .LoadAnimationClipPrototypeAsync(ct))
-                    .NullableAsync(async x =>
+                    .DoIfNotNullAsync(async x =>
                     {
                         var i = await x.InstantiateAsync();
                         await x.DisposeAsync();
@@ -444,7 +444,7 @@ namespace AnimLite.Loader
         /// モデルストックによって非アクティブになっている場合は、Destroy() されない。
         /// ただし、Destroy() が反映されるタイミングには注意すること。（おそらく Destory() の次のフレームから）
         /// </summary>
-        static Func<ValueTask> buildDisposeAction(this (AudioOrder audio, ModelOrder[] bgs, MotionOrderBase[] motions) order) =>
+        static Func<ValueTask> buildDisposeAction(this (AudioOrder audio, BgModelOrder[] bgs, MotionOrderBase[] motions) order) =>
             async () =>
             {
                 await order.audio.AudioClip.DisposeNullableAsync();
@@ -462,7 +462,7 @@ namespace AnimLite.Loader
             };
 
 
-        static async ValueTask<Order> toOrderAsync(AudioOrder audioOrder, ModelOrder[] bgOrders, MotionOrderBase[] motionOrders, CancellationToken ct)
+        static async ValueTask<Order> toOrderAsync(AudioOrder audioOrder, BgModelOrder[] bgOrders, MotionOrderBase[] motionOrders, CancellationToken ct)
         {
             var disposeAction = (audioOrder, bgOrders, motionOrders).buildDisposeAction();
             await ct.ThrowIfCancellationRequested(disposeAction);

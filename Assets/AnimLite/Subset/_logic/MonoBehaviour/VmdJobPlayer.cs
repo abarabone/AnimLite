@@ -80,11 +80,12 @@ public class VmdJobPlayer : MonoBehaviour
             var countlist = q.CountParams();
             using var buf = q.BuildJobBuffers(countlist);
 
+            var timer = new StreamingTimer();
 
             for (; ; )
             {
                 // ジョブのスケジュールは、Update() の度に必要
-                using var dep = buf.BuildMotionJobsAndSchedule(Time.deltaTime)
+                using var dep = buf.BuildMotionJobsAndSchedule(timer.CurrentTime)
                     .AsDisposable(dep => dep.Complete());
 
                 // animator をジョブに依存させる
@@ -94,6 +95,8 @@ public class VmdJobPlayer : MonoBehaviour
                 });
 
                 await Awaitable.NextFrameAsync(this.destroyCancellationToken);
+
+                timer.ProceedTime(Time.deltaTime);
             }
         }
         catch (OperationCanceledException e)

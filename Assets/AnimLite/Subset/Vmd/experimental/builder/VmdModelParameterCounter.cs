@@ -29,8 +29,9 @@ namespace AnimLite.Vmd.experimental
 
         public int model_offset;
         public int legalways_offset;
-        public int footalways_offset;
-        public int ground_index;
+        //public int footalways_offset;
+        public int footik_offset;
+        public int ground_offset;
 
         public int ikalways_offset;
 
@@ -55,13 +56,25 @@ namespace AnimLite.Vmd.experimental
                 {
                     var md = p.model_data;
 
+
                     count.model_offset += 1;
                     count.rot_offset += md.bodyop.bones.BoneLength;
 
-                    count.legalways_offset += md.footop.useLegPositionIk | md.footop.useGroundHit ? 1 : 0;
-                    count.footalways_offset += md.footop.useFootRotationIk | md.footop.useGroundHit ? 1 : 0;
-                    count.ground_index += md.footop.useGroundHit ? 1 : 0;
-                    count.ikalways_offset += md.footop.useGroundHit | md.footop.useLegPositionIk | md.footop.useLegPositionIk ? 1 : 0;
+
+                    count.ikalways_offset +=
+                        md.footop.useGroundHit | md.footop.useLegPositionIk | md.footop.useLegPositionIk ? 1 : 0;
+
+                    count.ground_offset +=
+                        md.footop.useGroundHit ? 1 : 0;
+
+                    count.legalways_offset +=
+                        md.footop.useLegPositionIk | md.footop.useGroundHit ? 1 : 0;
+                    
+                    //count.footalways_offset +=
+                    //    md.footop.useFootRotationIk | md.footop.useGroundHit ? 1 : 0;
+                    count.footik_offset +=
+                        md.footop.useFootRotationIk ? 1 : 0;
+                    
 
                     return count;
                 })

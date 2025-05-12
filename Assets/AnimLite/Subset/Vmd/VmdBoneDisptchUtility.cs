@@ -7,7 +7,6 @@ namespace AnimLite.Vmd
     using AnimLite;
     using AnimLite.Utility;
     using System.Numerics;
-    using static UnityEditor.PlayerSettings;
 
 
     /// <summary>
@@ -134,7 +133,7 @@ namespace AnimLite.Vmd
         public static float3 getpos<TFinder>(this TFinder kf, MmdBodyBones ibone)
             where TFinder : IKeyFinder<float4>
         =>
-            kf.get((int)ibone).As3();
+            kf.get((int)ibone).xyz;
 
         public static quaternion getrotIfOptout<TFinder>(
             this TFinder rkf, OptionalBoneChecker opt, HumanBodyBones humanbone, bool optionBoneIsNotExists)
@@ -166,11 +165,11 @@ namespace AnimLite.Vmd
                     //    get_(MmdBodyBones.全ての親),
                     //    get_(MmdBodyBones.センター),
                     //    get_(MmdBodyBones.グルーブ)) * 0.1f,
-                    //pkf.getpos(MmdBodyBones.全ての親).As3() * 0.1f,
+                    //pkf.getpos(MmdBodyBones.全ての親).xyz * 0.1f,
                     get_root_pos_() * 0.1f,
 
                 HumanBodyBones.Hips =>
-                    //pkf.getpos(MmdBodyBones.下半身).As3() * 0.1f,
+                    //pkf.getpos(MmdBodyBones.下半身).xyz * 0.1f,
                     //transform(
                     //    get_(MmdBodyBones.センター),
                     //    get_(MmdBodyBones.グルーブ),
@@ -245,12 +244,12 @@ namespace AnimLite.Vmd
         ////}
         //static float3 transform(NativeSlice<(quaternion rot, float4 pos)> streams)
         //{
-        //    var pos = streams[0].pos.As3();
+        //    var pos = streams[0].pos.xyz;
 
         //    for (var i = 1; i < streams.Length; i++)
         //    {
         //        var lrot = streams[i - 1].rot;
-        //        var lpos = streams[i - 0].pos.As3();
+        //        var lpos = streams[i - 0].pos.xyz;
 
         //        pos += math.rotate(lrot, lpos);
         //    }

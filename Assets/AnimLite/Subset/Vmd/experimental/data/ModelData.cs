@@ -33,8 +33,18 @@ namespace AnimLite.Vmd.experimental.Data
         public StreamingTimer timer;
         public float previousTime;
         public float indexBlockTimeRange;
-        //public float timeOffset;
+        public float delayTime;
+        public float speedHint;
     }
+    //[StructLayout(LayoutKind.Sequential)]
+    //public struct ModelTimer
+    //{
+    //    public StreamingTimer timer;
+    //    public float nextTime;
+    //    public float previousTime;//
+    //    public float indexBlockTimeRange;
+    //    public float delayTime;
+    //}
 
     [StructLayout(LayoutKind.Sequential)]
     public struct ModelProcedureSelector

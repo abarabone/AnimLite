@@ -48,15 +48,18 @@ namespace AnimLite.Vmd.experimental.Job
         public NativeArray<ModelProcedureSelector> model_procedureSelectors;
 
 
-        public float deltaTime;
+        //public float deltaTime;
+        public float currentTime;
+        public float speedHint;
 
 
         public void Execute(int index)
         {
             var t = this.model_timer[index];
-            
-            t.previousTime = t.timer._curret_time_inner;
-            t.timer.ProceedTime(this.deltaTime);
+
+            t.previousTime = t.timer.CurrentTime;
+            t.timer.UpdateTime(this.currentTime - t.delayTime);
+            t.speedHint = this.speedHint;
 
             var currentTime = t.timer.CurrentTime;
             var previousTime = t.previousTime;
@@ -69,6 +72,40 @@ namespace AnimLite.Vmd.experimental.Job
             this.model_timer[index] = t;
         }
     }
+    //[BurstCompile(FloatPrecision.Medium, FloatMode.Fast)]
+    //public struct UpdateTimeAndProcedureSelectorJob : IJobParallelFor
+    //{
+
+    //    // r/w
+    //    public NativeArray<ModelTimer> model_timer;
+
+    //    [WriteOnly]
+    //    public NativeArray<ModelProcedureSelector> model_procedureSelectors;
+
+
+    //    //public float deltaTime;
+    //    public float currentTime;
+
+
+    //    public void Execute(int index)
+    //    {
+    //        var t = this.model_timer[index];
+
+    //        var currentTime = this.currentTime;
+    //        var previousTime = t.timer.CurrentTime;
+    //        var blockRange = t.indexBlockTimeRange;
+    //        this.model_procedureSelectors[index] = new ModelProcedureSelector
+    //        {
+    //            isForward = (previousTime <= currentTime) & (currentTime <= previousTime + blockRange),
+    //        };
+
+    //        t.timer.UpdateTime(t.nextTime - t.delayTime);
+    //        t.nextTime = this.currentTime;
+    //        t.previousTime = previousTime;//
+
+    //        this.model_timer[index] = t;
+    //    }
+    //}
 
 
 
@@ -236,7 +273,7 @@ namespace AnimLite.Vmd.experimental.Job
 
             var lrot = this.bonefull_rotResults[adjust.hiprot_index].localRotation;
             var hipHeight = adjust.rootToHipLocal.As4();
-            var hipAdjust = math.rotate(lrot, adjust.spineToHipLocal).AsXZ().As4();
+            var hipAdjust = math.rotate(lrot, adjust.spineToHipLocal).AsXoZ().As4();
 
             var hiplpos_prev = this.bodyhip_posResults[index].localPosition;
 
@@ -273,7 +310,7 @@ namespace AnimLite.Vmd.experimental.Job
 
             if (Hint.Unlikely(i.pos_index >= 0))
             {
-                var pos = this.boneroothip_posResults[i.pos_index].localPosition.As3();
+                var pos = this.boneroothip_posResults[i.pos_index].localPosition.xyz;
                 
                 tf.SetLocalPositionAndRotation(pos, rot);
 

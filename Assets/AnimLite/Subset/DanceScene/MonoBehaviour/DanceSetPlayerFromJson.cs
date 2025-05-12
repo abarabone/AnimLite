@@ -48,6 +48,15 @@ namespace AnimLite.DancePlayable
         public struct OnLoaded { public DanceSceneJson ds; }
         public struct OnPlayEnd { }
 
+        public void Play()
+        {
+            this.graphy.graph.Play();
+        }
+        public void Stop()
+        {
+            this.graphy.graph.Stop();
+        }
+
         private async Awaitable OnEnable()
         {
             try

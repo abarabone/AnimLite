@@ -108,19 +108,19 @@ namespace AnimLite.Vmd.experimental.Job
             var tfBase = this.ikalways_baseTransformValues[ikdata.ikalways_index];
 
 
-            //var rootlpos_move = this.localPositions[ikdata.rootLocalPositionIndex].localPosition.As3();
-            var rootlpos_move = this.boneroothip_posResults[ikdata.model_index].localPosition.As3();
+            //var rootlpos_move = this.localPositions[ikdata.rootLocalPositionIndex].localPosition.xyz;
+            var rootlpos_move = this.boneroothip_posResults[ikdata.model_index].localPosition.xyz;
             var rootpos_foot = rootlpos_move * ikdata.footPerMoveScale.xyz;
             var (lposL, lposR) = get_(timer);
 
             var iklposL = lposL * ikdata.footScale.xyz * 0.1f - rootpos_foot;
             var iklposR = lposR * ikdata.footScale.xyz * 0.1f - rootpos_foot;
 
-            var ikPosL = iklposL + ikdata.footPosOffsetL.As3() + rootlpos_move;
-            var ikPosR = iklposR + ikdata.footPosOffsetR.As3() + rootlpos_move;
+            var ikPosL = iklposL + ikdata.footPosOffsetL.xyz + rootlpos_move;
+            var ikPosR = iklposR + ikdata.footPosOffsetR.xyz + rootlpos_move;
 
 
-            var basewpos = tfBase.position.As3();
+            var basewpos = tfBase.position.xyz;
             var basewrot = tfBase.rotation;
             var footposL = math.rotate(basewrot, ikPosL) + basewpos;
             var footposR = math.rotate(basewrot, ikPosR) + basewpos;
@@ -205,7 +205,7 @@ namespace AnimLite.Vmd.experimental.Job
 
             var basewrot = tfBase.rotation;
 
-            this.footalways_ikAnchors[ikdata.footalways_index] = new FootIkAnchorLR
+            this.footalways_ikAnchors[ikdata.ikfoot_index] = new FootIkAnchorLR
             {
                 footWorldRotationL = math.mul(basewrot, lrotL),
                 footWorldRotationR = math.mul(basewrot, lrotR),
@@ -222,7 +222,7 @@ namespace AnimLite.Vmd.experimental.Job
                 }
                 else
                 {
-                    var rkf = finder.rotWith<Forward>(timer);
+                    var rkf = finder.rotWith<Absolute>(timer);
                     return (rkf.getrot(MmdBodyBones.ç∂ë´ÇhÇj), rkf.getrot(MmdBodyBones.âEë´ÇhÇj));
                 }
             }

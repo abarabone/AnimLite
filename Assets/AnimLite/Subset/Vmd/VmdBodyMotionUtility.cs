@@ -98,7 +98,7 @@ namespace AnimLite.Vmd
 
             var lrot = unit.initpose.RotateBone(_lrot);
             var hipHeight = rootToHipLocal;
-            var hipAdjust = math.rotate(lrot, spineToHipLocal).AsXZ();
+            var hipAdjust = math.rotate(lrot, spineToHipLocal).AsXoZ();
             var lpos = _lpos * bodyScale + hipHeight + hipAdjust;
             map.TransformHandle.SetLocalRotation(stream, lrot);
             map.TransformHandle.SetLocalPosition(stream, lpos);

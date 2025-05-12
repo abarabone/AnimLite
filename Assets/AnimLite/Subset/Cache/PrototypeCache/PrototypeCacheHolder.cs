@@ -43,10 +43,10 @@ namespace AnimLite
 
         public async ValueTask DisposeAsync()
         {
-            await this.ModelCache.NullableAsync(x => x.ClearCacheAsync());
+            await this.ModelCache.DoIfNotNullAsync(x => x.ClearCacheAsync());
 
-            await this.VmdCache.stream.NullableAsync(x => x.ClearCacheAsync());
-            await this.VmdCache.facemap.NullableAsync(x => x.ClearCacheAsync());
+            await this.VmdCache.stream.DoIfNotNullAsync(x => x.ClearCacheAsync());
+            await this.VmdCache.facemap.DoIfNotNullAsync(x => x.ClearCacheAsync());
         }
     }
 

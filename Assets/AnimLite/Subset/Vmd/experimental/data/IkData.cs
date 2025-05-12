@@ -83,7 +83,7 @@ namespace AnimLite.Vmd.experimental.Data
     {
         public int model_index;
         public int ikalways_index;
-        public int footalways_index;
+        public int ikfoot_index;
     }
 
     public struct FootIkAnchorIndex
@@ -150,6 +150,10 @@ namespace AnimLite.Vmd.experimental.Data
 
 
 
+
+
+
+
     [StructLayout(LayoutKind.Sequential)]
     public struct SolveIkAppliedTransformValue
     {
@@ -162,7 +166,7 @@ namespace AnimLite.Vmd.experimental.Data
     public struct SolveIkAnchorIndex
     {
         public int legalways_ikAnchorIndex;
-        public int footalways_ikAnchorIndex;
+        public int ikfoot_ikAnchorIndex;
     }
 
 

@@ -34,7 +34,7 @@ namespace AnimLite.DancePlayable
             var output = ScriptPlayableOutput.Create(graph, name);
             var playable_sync = SyncJobTimerPlayable.Create(graph, (currentTime, prevdep) =>
             {
-                var dep = buf.BuildMotionJobsAndSchedule(Time.deltaTime, prevdep);
+                var dep = buf.BuildMotionJobsAndSchedule(currentTime, 1.0f, prevdep);
 
                 foreach (var anim in anims)
                 {

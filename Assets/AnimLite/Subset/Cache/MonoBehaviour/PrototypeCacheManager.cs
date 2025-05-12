@@ -28,7 +28,7 @@ namespace AnimLite
 
         async ValueTask OnDisable()
         {
-            await this.Holder.NullableAsync(x => x.DisposeAsync());
+            await this.Holder.DoIfNotNullAsync(x => x.DisposeAsync());
         }
     }
 

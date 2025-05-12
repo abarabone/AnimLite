@@ -61,19 +61,19 @@ namespace AnimLite.Vmd.experimental.Job
                 stream.SolveTwoBonePairIk(
                     ref legvalue.ULegRotL, ref legvalue.LLegRotL,
                     legvalue.ULegPosL, legvalue.LLegPosL, legvalue.FootPosL,
-                    ikleg.legWorldPositionL.As3(),
+                    ikleg.legWorldPositionL.xyz,
                     ref legvalue.ULegRotR, ref legvalue.LLegRotR,
                     legvalue.ULegPosR, legvalue.LLegPosR, legvalue.FootPosR,
-                    ikleg.legWorldPositionR.As3());
+                    ikleg.legWorldPositionR.xyz);
             }
             else
             {
                 legvalue = legvalue.SetNanToLeg();
             }
 
-            if (Hint.Likely(i.footalways_ikAnchorIndex != -1))
+            if (Hint.Likely(i.ikfoot_ikAnchorIndex != -1))
             {
-                var ikfoot = this.footalways_ikAnchors[i.footalways_ikAnchorIndex];
+                var ikfoot = this.footalways_ikAnchors[i.ikfoot_ikAnchorIndex];
 
                 legvalue.FootRotL.rot = ikfoot.footWorldRotationL;
                 legvalue.FootRotR.rot = ikfoot.footWorldRotationR;

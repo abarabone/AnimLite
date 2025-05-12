@@ -11,7 +11,7 @@ namespace AnimLite
     public struct StreamingTimer
     {
 
-        public float _curret_time_inner;
+        //public float _curret_time_inner;
         public float CurrentTime;
 
         public float TotalTime;
@@ -23,24 +23,24 @@ namespace AnimLite
 
         public StreamingTimer(float totalTime)
         {
-            this._curret_time_inner = 0.0f;
+            //this._curret_time_inner = 0.0f;
             this.CurrentTime = 0.0f;
             
             this.TotalTime = totalTime;
             //this.TotalTimeR = 1f / totalTime;
             this.OffsetTime = 0.0f;
         }
-        public StreamingTimer(float totalTime, float delayTime)
-        {
-            this._curret_time_inner = -delayTime;
+        //public StreamingTimer(float totalTime, float delayTime)
+        //{
+        //    this._curret_time_inner = -delayTime;
 
-            var t = math.floor(this._curret_time_inner / totalTime);
-            this.OffsetTime = totalTime * t;
-            this.CurrentTime = math.max(this._curret_time_inner - t, 0);
+        //    var t = math.floor(this._curret_time_inner / totalTime);
+        //    this.OffsetTime = totalTime * t;
+        //    this.CurrentTime = math.max(this._curret_time_inner - t, 0);
 
-            this.TotalTime = totalTime;
-            //this.TotalTimeR = 1f / totalTime;
-        }
+        //    this.TotalTime = totalTime;
+        //    //this.TotalTimeR = 1f / totalTime;
+        //}
 
 
         /// <summary>
@@ -52,7 +52,8 @@ namespace AnimLite
             //this.CurrentTime =
             //    new TClip().ClipCurrentTime(this.CurrentTime + deltaTime, this.TotalTime, this.TotalTimeR);
 
-            this.UpdateTime(this._curret_time_inner + deltaTime);
+            //this.UpdateTime(this._curret_time_inner + deltaTime);
+            this.UpdateTime(this.CurrentTime + deltaTime);
         }
 
         /// <summary>
@@ -64,8 +65,9 @@ namespace AnimLite
             //this.CurrentTime =
             //    new TClip().ClipCurrentTime(currentTime, this.TotalTime, this.TotalTimeR);
 
-            this._curret_time_inner = currentTime;
-            this.CurrentTime = math.max(this._curret_time_inner, 0);
+            //this._curret_time_inner = currentTime;
+            //this.CurrentTime = math.max(this._curret_time_inner, 0);
+            this.CurrentTime = math.max(currentTime, 0);
 
             // 尺を超えたとき、尺をオフセットに加算していき、ループ時の計算補助に使う。
             this.OffsetTime += math.select(0, this.TotalTime, currentTime >= this.OffsetTime + this.TotalTime);

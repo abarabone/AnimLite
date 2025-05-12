@@ -49,7 +49,7 @@ namespace AnimLite.DancePlayable
         public struct Order
         {
             public AudioOrder Audio;
-            public ModelOrder[] BackGrouds;
+            public BgModelOrder[] BackGrouds;
             public MotionOrderBase[] Motions;
 
             public Func<ValueTask> DisposeAction;
@@ -61,7 +61,7 @@ namespace AnimLite.DancePlayable
             float TotalTime { get; }
         }
 
-        public class ModelOrder : IAsyncDisposable
+        public class ModelOrderBase : IAsyncDisposable
         {
             public Instance<GameObject> Model;
 
@@ -73,6 +73,10 @@ namespace AnimLite.DancePlayable
             {
                 return this.Model.DisposeNullableAsync();
             }
+        }
+        public class BgModelOrder : ModelOrderBase
+        {
+
         }
 
         public class AudioOrder : IAsyncDisposable, IOrderUnit
@@ -92,7 +96,7 @@ namespace AnimLite.DancePlayable
                 : 0.0f;
         }
 
-        public abstract class MotionOrderBase : ModelOrder
+        public abstract class MotionOrderBase : ModelOrderBase
         {
             public SkinnedMeshRenderer FaceRenderer;
 
@@ -148,7 +152,7 @@ namespace AnimLite.DancePlayable
                 await base.DisposeAsync();
 
                 await Awaitable.MainThreadAsync();// 不要かも
-                await this.AnimationClip.DisposeAsync();
+                await this.AnimationClip.DisposeNullableAsync();
                 await this.Model.DisposeNullableAsync();
             }
             public float TotalTime => this.AnimationClip is not null
@@ -209,7 +213,7 @@ namespace AnimLite.DancePlayable
 
 
 
-            static void showBackGround_(ModelOrder[] orders)
+            static void showBackGround_(BgModelOrder[] orders)
             {
                 //if (orders == null) return;
 
@@ -219,7 +223,7 @@ namespace AnimLite.DancePlayable
                     overwriteScale_(order);
                 }
             }
-            static void createBackGroundCollider_(ModelOrder[] orders, MotionOrderBase[] motions)
+            static void createBackGroundCollider_(BgModelOrder[] orders, MotionOrderBase[] motions)
             {
                 var useCollider = motions
                     .OfType<MotionOrder>()
@@ -316,7 +320,7 @@ namespace AnimLite.DancePlayable
                     var qTotalTime =
                         from p in modelparams
                         from t in p.model_timeOptions
-                        select t.timer.TotalTime + t.previousTime
+                        select t.timer.TotalTime + t.delayTime
                         ;
 
                     var objs = modelparams.Select(x => x.model_data.anim);
@@ -382,7 +386,7 @@ namespace AnimLite.DancePlayable
                 }
             }
 
-            static void overwritePosition_(ModelOrder order)
+            static void overwritePosition_(ModelOrderBase order)
             {
                 if (order.Model.IsUnityNull()) return;
                 //if (!order.OverWritePositionAndRotation) return;
@@ -391,7 +395,7 @@ namespace AnimLite.DancePlayable
                 tf.position = order.Position;
                 tf.rotation = order.Rotation;
             }
-            static void overwriteScale_(ModelOrder order)
+            static void overwriteScale_(ModelOrderBase order)
             {
                 if (order.Model.IsUnityNull()) return;
                 if (order.Scale == 0.0f) return;
@@ -413,6 +417,8 @@ namespace AnimLite.DancePlayable
 
             public DanceTimeKeeper(PlayableGraph graph)
             {
+                if (graph.GetOutputCount() == 0) return;
+
                 this.timerPlayable = Enumerable.Range(0, graph.GetOutputCount())
                     //.Select(i => graph.GetRootPlayable(i))
                     .Select(i => graph.GetOutput(i).GetSourcePlayable())
@@ -424,7 +430,7 @@ namespace AnimLite.DancePlayable
                     .Where(p => !double.IsInfinity(p.GetDuration()))
                     //.Do(x => Debug.Log($"playable {x.GetTime()} {x.GetDuration()} {x.GetPlayableType()}"))
                     .MaxBy(x => x.GetDuration() - x.GetTime())
-                    .First()
+                    .FirstOrDefault()
                     ;
                 this.offset = (float)this.timerPlayable.GetTime();
             }

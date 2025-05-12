@@ -370,8 +370,8 @@ namespace AnimLite.Vmd
             var ikPosL = iklposL + op.footIkOffsetL + rootlpos_move;
             var ikPosR = iklposR + op.footIkOffsetR + rootlpos_move;
 
-            //var ikPosL = pkf.getpos(MmdBodyBones.左足ＩＫ).As3() * 0.1f * op.bodyScale + op.footIkOffsetL;
-            //var ikPosR = pkf.getpos(MmdBodyBones.右足ＩＫ).As3() * 0.1f * op.bodyScale + op.footIkOffsetR;
+            //var ikPosL = pkf.getpos(MmdBodyBones.左足ＩＫ).xyz * 0.1f * op.bodyScale + op.footIkOffsetL;
+            //var ikPosR = pkf.getpos(MmdBodyBones.右足ＩＫ).xyz * 0.1f * op.bodyScale + op.footIkOffsetR;
             
             var posL = math.rotate(basewrot, ikPosL) + basewpos;
             var posR = math.rotate(basewrot, ikPosR) + basewpos;

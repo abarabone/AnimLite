@@ -102,7 +102,7 @@ namespace AnimLite
     public static class TfProxyUtility
     {
         public static TfPosision ToProxy(this float3 src) => new TfPosision { pos = src };
-        public static TfPosision ToProxy(this float4 src) => new TfPosision { pos = src.As3() };
+        public static TfPosision ToProxy(this float4 src) => new TfPosision { pos = src.xyz };
         public static TfRotation ToProxy(this quaternion src) => new TfRotation { rot = src };
     }
 

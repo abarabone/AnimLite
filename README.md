@@ -20,10 +20,10 @@
 2025.6.2
 - .json 読込：Motions のキー名が _ から始まるベースキーが、いつのまにか読み込まれなくなってたので修正
 - .json 読込：Motions のキー名でのワイルドカードで、先頭と終端に概念に対応していなかったので修正
-- .json 読込：x, y, z 値のある値で、populate が利かなかったのを修正
+- .json 読込：x, y, z 値のある値で、populate が利かなかったのを修正  
   [ x, y, z ] は [ null, 0 ] など、null や省略が可能（ null はベースの価が残る）
 - .json 読込：Options で populate が利かなかったのを修正
-- .Json 読込：Motions.Model の Scale およびロードされたモデルの Transform.LocalScale が移動などに正しく反映されないのを修正
+- .Json 読込：Motions.Model の Scale およびロードされたモデルの Transform.LocalScale が移動などに正しく反映されないのを修正  
   プレハブやリソースとしてロードしたモデルの場合は、そのモデルの初期値に乗算される（ position は加算）
 - 今回から修正事項は Issues に書くようにした
 

@@ -108,17 +108,20 @@ namespace AnimLite.Vmd.experimental.Job
         {
             var data = this.ground_hitData[index_ground];
             var localGroundHeight = this.ground_rootHeigts[index_ground].localGroundHeight;
-            
-            var up = this.ikalways_baseTransformValues[data.ikalways_index].worldUp.xyz;
+
+            var tfBase = this.ikalways_baseTransformValues[data.ikalways_index];
             var foots = this.legalways_legIkAnchors[data.legalways_index];
 
-            var offset = (data.rayOriginOffset + localGroundHeight) * up;
+            var up = tfBase.worldUp.xyz;
+            var scale = tfBase.scale.y;
+
+            var offset = (data.rayOriginOffset + localGroundHeight * scale) * up;
 
             var hitmask = data.hitMask;
             this.ground_hitCastCommands[index_ground] = new LegGroundcastCommandLR
             {
-                commandL = makeCommand_(foots.legWorldPositionL.xyz, data.ankleHightL * 0.5f),
-                commandR = makeCommand_(foots.legWorldPositionR.xyz, data.ankleHightR * 0.5f),
+                commandL = makeCommand_(foots.legWorldPositionL.xyz, data.ankleHightL * scale * 0.5f),
+                commandR = makeCommand_(foots.legWorldPositionR.xyz, data.ankleHightR * scale * 0.5f),
             };
 
             return;
@@ -205,6 +208,9 @@ namespace AnimLite.Vmd.experimental.Job
             var wup = tfBase.worldUp.xyz;
             var base_wpos = tfBase.position.xyz;
 
+            var base_scale = tfBase.scale.y;
+            var base_scale_rec = 1.0f / base_scale;
+
             var t = this.model_timer[data.model_index];
             var dt = t.timer.CurrentTime - t.previousTime;
 
@@ -215,18 +221,11 @@ namespace AnimLite.Vmd.experimental.Job
             //var local_height_root_ofs = rootStorage.rootLocalHeight - rootlpos.y;
 
             var ikanchor = this.legalways_ikAnchors[data.legalways_index];
-            var ikleg_local_heightLR =
-                wpos_to_local_height_(
-                    ikanchor.legWorldPositionL.xyz,
-                    ikanchor.legWorldPositionR.xyz);
-            var ikleg_local_height_onGroundLR =
-                ikleg_local_heightLR + lposStorage.localGroundHeight;
+            var ikleg_local_heightLR = wpos_to_local_height_(ikanchor.legWorldPositionL.xyz, ikanchor.legWorldPositionR.xyz);
+            var ikleg_local_height_onGroundLR = ikleg_local_heightLR + lposStorage.localGroundHeight;
 
             var hit = this.ground_hits[index_ground];
-            var hit_local_height_onGroundLR =
-                wpos_to_local_height_(
-                    hit.hitL.point.As_float3(),
-                    hit.hitR.point.As_float3());
+            var hit_local_height_onGroundLR = wpos_to_local_height_(hit.hitL.point, hit.hitR.point);
 
             var hitIdLR = new int2(hit.hitL.colliderInstanceID, hit.hitR.colliderInstanceID);
             var ankle_heightLR = new float2(data.ankleHightL, data.ankleHightR);
@@ -297,15 +296,15 @@ namespace AnimLite.Vmd.experimental.Job
 
             float2 wpos_to_local_height_(float3 wposL, float3 wposR)
             {
-                var l = math.dot(wposL - base_wpos, wup);
-                var r = math.dot(wposR - base_wpos, wup);
+                var l = math.dot(wposL - base_wpos, wup) * base_scale_rec;
+                var r = math.dot(wposR - base_wpos, wup) * base_scale_rec;
 
                 return new float2(l, r);
             }
             (float3 l, float3 r) height_to_world_pos_(float3 wbaseposL, float3 wbaseposR, float2 height)
             {
-                var l = wbaseposL + wup * height.x;
-                var r = wbaseposR + wup * height.y;
+                var l = wbaseposL + wup * height.x * base_scale;
+                var r = wbaseposR + wup * height.y * base_scale;
 
                 return (l, r);
             }
@@ -462,7 +461,7 @@ namespace AnimLite.Vmd.experimental.Job
             var hit = this.ground_hits[index_ground];
             var hitIdLR = new int2(hit.hitL.colliderInstanceID, hit.hitR.colliderInstanceID);
             var hit_local_heightLR = wpos_to_local_heightLR_(hit.hitL.point.As_float3().xyz, hit.hitR.point.As_float3().xyz);
-
+            
 
             var isGrounding = check_GroundingLR_();
 

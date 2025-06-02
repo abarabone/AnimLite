@@ -51,7 +51,7 @@ namespace AnimLite.Utility
             ;
 
         /// <summary>
-        /// ・ｽﾗゑｿｽ・ｽ・ｽ・ｽ_・ｽﾌ抵ｿｽ・ｽﾓ： # ・ｽﾍ撰ｿｽ・ｽ・ｽ・ｽ・ｽ・ｽ・ｽ
+        /// 細かい点の注意： # は数字扱い
         /// </summary>
         public static Wildcard ToWildcard(this string s)
         {
@@ -72,7 +72,7 @@ namespace AnimLite.Utility
                         _ => Regex.Escape(c.ToString()),
                     };
 
-                return string.Join("", q);
+                return $"^{string.Join("", q)}$";
             }
         }
     }

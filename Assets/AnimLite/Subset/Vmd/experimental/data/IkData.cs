@@ -32,6 +32,7 @@ namespace AnimLite.Vmd.experimental.Data
         public quaternion rotation_inv;
 
         public float4 position;
+        public float4 scale;
         public float4 worldUp;
     }
 
@@ -45,7 +46,7 @@ namespace AnimLite.Vmd.experimental.Data
         public float4 footPosOffsetR;
 
         public float4 footScale;
-        public float4 footPerMoveScale;
+        public float4 MoveToUnscale;
 
         public int model_index;
         public int ikalways_index;

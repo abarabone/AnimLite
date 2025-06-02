@@ -47,14 +47,16 @@ namespace AnimLite.Vmd
         /// humanoid の humanscale 1m は、hip の位置らしいとのこと
         /// </summary>
         public static float3 calcVmdBoneScale(this Animator anim, float3 scale) =>
-            math.select(
+             /*anim.transform.lossyScale * */VmdBodyScale * math.select(
                 falseValue:
-                    scale * VmdBodyScale,
+                    scale,
                 trueValue:
-                    anim.humanScale * VmdBodyScale,
+                    anim.humanScale,
                 test:
                     scale == 0.0f);
 
+        public static float3 calcVmdBoneScale(this Animator anim) =>
+            /*anim.transform.lossyScale * */VmdBodyScale * anim.humanScale;
 
         // ＭＭＤの移動データは、ボーンのオフセットは除いた値が格納されているように思う。
         // なので、センター → 下半身 までの高さは、移動データには反映されていないと考える。
@@ -75,17 +77,21 @@ namespace AnimLite.Vmd
         public static VmdBodyMotionOperator<TBone, TTf> ToVmdBodyMotionOperator<TBone, TTf>(this Animator anim, TBone bone)
             where TBone : ITransformMappings<TTf>
             where TTf : ITransformProxy
-        =>
-            new VmdBodyMotionOperator<TBone, TTf>
+        {
+            var scale = (float3)anim.transform.lossyScale;
+            var bonescale = anim.calcVmdBoneScale();
+
+            return new VmdBodyMotionOperator<TBone, TTf>
             {
-                moveScale = anim.humanScale * VmdBodyMotionOperator.VmdBodyScale,
-                bodyScale = anim.humanScale * VmdBodyMotionOperator.VmdBodyScale,
+                moveScale = bonescale,
+                bodyScale = bonescale,
 
                 bones = bone,
 
-                spineToHipLocal = -anim.GetBoneTransform(HumanBodyBones.Spine).localPosition,
-                rootToHipLocal = anim.GetBoneTransform(HumanBodyBones.Hips).localPosition,
+                spineToHipLocal = -anim.GetBoneTransform(HumanBodyBones.Spine).localPosition,// * scale,
+                rootToHipLocal = anim.GetBoneTransform(HumanBodyBones.Hips).localPosition,// * scale,
             };
+        }
 
 
         public static VmdBodyMotionOperator<TBone, TTf> WithScales<TBone, TTf>(

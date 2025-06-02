@@ -57,7 +57,8 @@ namespace AnimLite.Vmd.experimental.Job
                 rotation = rot,
                 rotation_inv = math.inverse(rot),
 
-                position = tf.position.As_float3().As4(1.0f),
+                position = tf.position.As_float4(1.0f),
+                scale = tf.localScale.As_float4(1.0f),
                 worldUp = math.rotate(rot, Vector3.up).As4(1.0f),
             };
         }
@@ -108,22 +109,33 @@ namespace AnimLite.Vmd.experimental.Job
             var tfBase = this.ikalways_baseTransformValues[ikdata.ikalways_index];
 
 
-            //var rootlpos_move = this.localPositions[ikdata.rootLocalPositionIndex].localPosition.xyz;
-            var rootlpos_move = this.boneroothip_posResults[ikdata.model_index].localPosition.xyz;
-            var rootpos_foot = rootlpos_move * ikdata.footPerMoveScale.xyz;
+            var rootlpos_movescaled = this.boneroothip_posResults[ikdata.model_index].localPosition.xyz;
+            var rootpos_unscaled = rootlpos_movescaled * ikdata.MoveToUnscale.xyz;
+
             var (lposL, lposR) = get_(timer);
+            var ikposL_unscaled = lposL * 0.1f - rootpos_unscaled;
+            var ikposR_unscaled = lposR * 0.1f - rootpos_unscaled;
 
-            var iklposL = lposL * ikdata.footScale.xyz * 0.1f - rootpos_foot;
-            var iklposR = lposR * ikdata.footScale.xyz * 0.1f - rootpos_foot;
-
-            var ikPosL = iklposL + ikdata.footPosOffsetL.xyz + rootlpos_move;
-            var ikPosR = iklposR + ikdata.footPosOffsetR.xyz + rootlpos_move;
-
+            var iklposL_scaled = ikposL_unscaled * ikdata.footScale.xyz + ikdata.footPosOffsetL.xyz + rootlpos_movescaled;
+            var iklposR_scaled = ikposR_unscaled * ikdata.footScale.xyz + ikdata.footPosOffsetR.xyz + rootlpos_movescaled;
 
             var basewpos = tfBase.position.xyz;
             var basewrot = tfBase.rotation;
-            var footposL = math.rotate(basewrot, ikPosL) + basewpos;
-            var footposR = math.rotate(basewrot, ikPosR) + basewpos;
+            var baselscl = tfBase.scale.xyz;
+            var footposL = math.rotate(basewrot, iklposL_scaled) * baselscl + basewpos;
+            var footposR = math.rotate(basewrot, iklposR_scaled) * baselscl + basewpos;
+
+            //// foot scale ÇæÇØ tf scale ÇèúäOÇµÇΩÇ¢èÍçáÅiñ¢äÆê¨Ç©Ç‡Åj
+            //var iklposL = lposL * 0.1f - rootpos_unscaled;
+            //var iklposR = lposR * 0.1f - rootpos_unscaled;
+
+            //var ikPosL = (iklposL + ikdata.footPosOffsetL.xyz) * ikdata.footScale.xyz + rootlpos_movescaled * tfBase.scale.xyz;
+            //var ikPosR = (iklposR + ikdata.footPosOffsetR.xyz) * ikdata.footScale.xyz + rootlpos_movescaled * tfBase.scale.xyz;
+
+            //var basewpos = tfBase.position.xyz;
+            //var basewrot = tfBase.rotation;
+            //var footposL = math.rotate(basewrot, ikPosL) + basewpos;
+            //var footposR = math.rotate(basewrot, ikPosR) + basewpos;
 
             this.legalways_ikAnchors[ikdata.legalways_index] = new LegIkAnchorLR
             {

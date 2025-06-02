@@ -20,7 +20,7 @@ namespace AnimLite
     {
 
     }
-    public interface ITransformLocalProxy<TSrc> : ITransformLocalPositionProxy<TSrc>, ITransformeLocalRotationProxy<TSrc>
+    public interface ITransformLocalProxy<TSrc> : ITransformLocalPositionProxy<TSrc>, ITransformeLocalRotationProxy<TSrc>, ITransformLocalScaleProxy<TSrc>
         where TSrc : ITransformStreamSource
     {
 
@@ -57,6 +57,13 @@ namespace AnimLite
         void SetLocalRotation(TSrc stream, quaternion r);
     }
 
+    public interface ITransformLocalScaleProxy<TSrc> : ITransformProxy
+        where TSrc : ITransformStreamSource
+    {
+        float3 GetLocalScale(TSrc stream);
+
+        void SetLocalScale(TSrc stream, float3 s);
+    }
 
 
 

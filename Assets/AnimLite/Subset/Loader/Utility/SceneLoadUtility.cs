@@ -361,7 +361,7 @@ namespace AnimLite.Loader
                 //vmddata = vmddata,
                 vmd = vmddata,
                 bone = model.AsUnityNull()?.GetComponent<Animator>()
-                    .BuildVmdTransformMappings(adjust)
+                    .BuildVmdTransformMappings(adjust, options.GroundHitOriginOffset)
                     ??
                     default,
                 face = facemap.Value.BuildStreamingFace(),

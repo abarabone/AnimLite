@@ -291,7 +291,7 @@ namespace AnimLite.Vmd.experimental
                         ikalways_index = p.ikalways_offset,
                         footPosOffsetL = footop.footIkOffsetL.As4(1.0f),
                         footPosOffsetR = footop.footIkOffsetR.As4(1.0f),
-                        footPerMoveScale = footop._footPerMoveScale.As4(1.0f),
+                        MoveToUnscale = footop._MoveToUnscale.As4(1.0f),
                         footScale = footop.footScale.As4(1.0f),
                         //rootLocalPositionIndex = p.model_offset,
                     }

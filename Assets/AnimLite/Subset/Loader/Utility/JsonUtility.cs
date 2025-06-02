@@ -23,7 +23,7 @@ namespace AnimLite.Utility
 
             var json = JsonConvert.SerializeObject(value, SerializeOptions);
 
-            return JsonConvert.DeserializeObject<T>(json, DeserializeOptions);
+            return JsonConvert.DeserializeObject<T>(json, SerializeOptions);
         }
 
         public static T PopulateViaJson<T>(this T overridevalue, T basevalue)
@@ -32,76 +32,81 @@ namespace AnimLite.Utility
 
             var json = JsonConvert.SerializeObject(overridevalue, SerializeOptions);
 
-            JsonConvert.PopulateObject(json, basevalue, DeserializeOptions);
+            JsonConvert.PopulateObject(json, basevalue, SerializeOptions);
 
             return basevalue;
         }
 
-        public static T PopulateDefaultViaJson<T>(this T overridevalue) where T : new() =>
-            PopulateViaJson(overridevalue, new T { });
+        //public static T PopulateDefaultViaJson<T>(this T overridevalue) where T : new() =>
+        //    PopulateViaJson(overridevalue, new T { });
 
 
 
 
-#if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
+//#if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
 
-        public static T CloneViaJson<T>(object value)
-        {
-            if (value is null) return default;
+//        //public static T CloneViaJson<T>(object value)
+//        //{
+//        //    if (value is null) return default;
 
-            var json = JsonConvert.SerializeObject(value as object, SerializeOptions);
+//        //    var json = JsonConvert.SerializeObject(value as object, SerializeOptions);
 
-            return JsonConvert.DeserializeObject<T>(json, DeserializeOptions);
-        }
+//        //    return JsonConvert.DeserializeObject<T>(json, SerializeOptions);
+//        //}
 
-        public static T PopulateViaJson<T>(object overridevalue, T basevalue)
-        {
-            if (overridevalue is null) return basevalue;
+//        //public static T PopulateViaJson<T>(object overridevalue, T basevalue)
+//        //{
+//        //    if (overridevalue is null) return basevalue;
 
-            //var json = JsonConvert.SerializeObject(overridevalue as object, setting);
-            var json = JsonConvert.SerializeObject(overridevalue as object, SerializeOptions);
+//        //    //var json = JsonConvert.SerializeObject(overridevalue as object, setting);
+//        //    var json = JsonConvert.SerializeObject(overridevalue as object, SerializeOptions);
 
-            JsonConvert.PopulateObject(json, basevalue, DeserializeOptions);
+//        //    JsonConvert.PopulateObject(json, basevalue, SerializeOptions);
 
-            return basevalue;
-        }
+//        //    return basevalue;
+//        //}
 
-        public static T PopulateDefaultViaJson<T>(object overridevalue) where T : new() =>
-            PopulateViaJson(overridevalue, new T { });
+//        //public static T PopulateDefaultViaJson<T>(object overridevalue) where T : new() =>
+//        //    PopulateViaJson(overridevalue, new T { });
 
-#else
-        public static T CloneViaJson<T>(dynamic value)
-        {
-            if (value is null) return default;
+//        public static T PopulateDefaultViaJson<T>(JObject overridevalue) where T : new() =>
+//            overridevalue.ToObject<T>();
 
-            var json = JsonConvert.SerializeObject(value as object, SerializeOptions);
+//#else
+//        public static T CloneViaJson<T>(dynamic value)
+//        {
+//            if (value is null) return default;
 
-            return JsonConvert.DeserializeObject<T>(json, DeserializeOptions);
-        }
+//            var json = JsonConvert.SerializeObject(value as object, SerializeOptions);
 
-        public static T PopulateViaJson<T>(dynamic overridevalue, T basevalue)
-        {
-            if (overridevalue is null) return basevalue;
+//            return JsonConvert.DeserializeObject<T>(json, SerializeOptions);
+//        }
 
-            var json = JsonConvert.SerializeObject(overridevalue as object, SerializeOptions);
+//        public static T PopulateViaJson<T>(dynamic overridevalue, T basevalue)
+//        {
+//            if (overridevalue is null) return basevalue;
 
-            JsonConvert.PopulateObject(json, basevalue, DeserializeOptions);
+//            var json = JsonConvert.SerializeObject(overridevalue as object), SerializeOptions);
 
-            return basevalue;
-        }
+//            JsonConvert.PopulateObject(json, basevalue, SerializeOptions);
 
-        public static T PopulateDefaultViaJson<T>(dynamic overridevalue) where T : new() =>
-            PopulateViaJson(overridevalue, new T { });
+//            return basevalue;
+//        }
 
-#endif
+//        public static T PopulateDefaultViaJson<T>(dynamic overridevalue) where T : new() =>
+//            PopulateViaJson(overridevalue, new T { });
+
+//#endif
 
 
 
         public static T PopulateTo<T>(this JsonSerializer serializer, JsonReader reader, T value)
         {
-            serializer.Populate(reader, value);
+            var obj = value as object;
+            
+            serializer.Populate(reader, obj);
 
-            return value;
+            return (T)obj;
         }
 
 
@@ -140,6 +145,8 @@ namespace AnimLite.Utility
 
             // Vector3 などの normalize など循環を起こして実行時エラーとなるのを防止
             SerializeOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+            SerializeOptions.DefaultValueHandling = DefaultValueHandling.Populate;
         }
 
         static void setDeserializeOption()
@@ -149,9 +156,10 @@ namespace AnimLite.Utility
             DeserializeOptions.Converters.Add(new StringEnumConverter());
             DeserializeOptions.Converters.Add(new PathUnitConverter());
             DeserializeOptions.Converters.Add(new PathListConverter());
-            DeserializeOptions.Converters.Add(new EasyFloat3Converter());
+            DeserializeOptions.Converters.Add(new Numeric3Converter());
             DeserializeOptions.Converters.Add(new DictionaryPopulativeConverter<ModelDefineJson>());
             DeserializeOptions.Converters.Add(new DictionaryPopulativeConverter<DanceMotionDefineJson>());
+            DeserializeOptions.Converters.Add(new JObjectMergeConverter());
             //JsonOptions.Converters.Add(new DynamicOptionConverter());
             //JsonOptions.Converters.Add(new DynamicJsonConverter());
 
@@ -159,6 +167,9 @@ namespace AnimLite.Utility
 
             // Vector3 などの normalize など循環を起こして実行時エラーとなるのを防止
             DeserializeOptions.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+            SerializeOptions.DefaultValueHandling = DefaultValueHandling.Populate;
+            //SerializeOptions.NullValueHandling = NullValueHandling.Ignore;
         }
 
     }
@@ -431,7 +442,7 @@ namespace AnimLite.Utility
         //}
 
 
-        public override bool CanWrite => false;
+        //public override bool CanWrite => false;
 
         public override void WriteJson(JsonWriter writer, Dictionary<string, TValue> value, JsonSerializer serializer)
         {
@@ -493,24 +504,45 @@ namespace AnimLite.Utility
         }
     }
 
-    public class EasyFloat3Converter : JsonConverter<numeric3>
+    public class Numeric3Converter : JsonConverter<numeric3>
     {
         public override numeric3 ReadJson(
             JsonReader reader, Type objectType, numeric3 existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return reader.TokenType switch
+            return hasExistingValue
+                ? reader.TokenType switch
+                {
+                    JsonToken.Float => new numeric3(serializer.Deserialize<double>(reader)),
+
+                    JsonToken.StartArray => populate_(serializer.Deserialize<double?[]>(reader), existingValue),
+
+                    JsonToken.StartObject => serializer.PopulateTo<numeric3>(reader, existingValue),
+
+                    _ => existingValue,
+                }
+                : reader.TokenType switch
+                {
+                    JsonToken.Float => new numeric3(serializer.Deserialize<double>(reader)),
+
+                    JsonToken.StartArray => get_(serializer.Deserialize<double?[]>(reader)),
+                
+                    JsonToken.StartObject => new numeric3(serializer.Deserialize<Vector3>(reader)),
+
+                    _ => default,
+                };
+
+            static numeric3 populate_(double?[] v, numeric3 exist)
             {
-                JsonToken.Float => new numeric3(serializer.Deserialize<double>(reader)),
-
-                JsonToken.StartArray => new numeric3(serializer.Deserialize<double[]>(reader) ?? new double[] { }),
-
-                JsonToken.StartObject => new numeric3(serializer.Deserialize<Vector3>(reader)),
-
-                _ =>
-                    hasExistingValue
-                        ? existingValue
-                        : new numeric3 { },
-            };
+                if (v is null) return exist;
+                if (v.Length > 0 && v[0].HasValue) exist.x = (float)v[0].Value;
+                if (v.Length > 1 && v[1].HasValue) exist.y = (float)v[1].Value;
+                if (v.Length > 2 && v[2].HasValue) exist.z = (float)v[2].Value;
+                return exist;
+            }
+            static numeric3 get_(double?[] v) => new numeric3(
+                v.Select(x => x ?? 0.0).ToArray()
+                ??
+                new double[] { });
         }
 
         public override void WriteJson(
@@ -586,5 +618,31 @@ namespace AnimLite.Utility
     //}
 
 
+
+    public class JObjectMergeConverter : JsonConverter<JObject>
+    {
+        //public override bool CanConvert(Type objectType)
+        //{
+        //    return objectType == typeof(JObject);
+        //}
+        public override JObject ReadJson(
+            JsonReader reader, Type objectType, JObject existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            JObject newData = JObject.Load(reader);
+
+            if (existingValue is JObject existingData)
+            {
+                existingData.Merge(newData);
+                return existingData;
+            }
+
+            return newData;
+        }
+
+        public override void WriteJson(JsonWriter writer, JObject value, JsonSerializer serializer)
+        {
+            serializer.Serialize(writer, value);
+        }
+    }
 
 }

@@ -21,8 +21,7 @@ namespace AnimLite.Vmd
         public float3 footScale;
 
         [ReadOnly]
-        public float3 _footPerMoveScale;
-
+        public float3 _MoveToUnscale;
 
         [ReadOnly]
         public float3 footIkOffsetL;
@@ -85,21 +84,24 @@ namespace AnimLite.Vmd
             where TTf : ITransformProxy, new()
         {
             var tfanim = anim.transform;
+            var scale = (float3)tfanim.lossyScale;
 
             // 足ＩＫローカル位置。
-            var footLpos = anim.GetBoneTransform(HumanBodyBones.LeftFoot).position - tfanim.position;   // ルートからの足位置
-            var footRpos = anim.GetBoneTransform(HumanBodyBones.RightFoot).position - tfanim.position;
-            var footIkOffsetL = tfanim.InverseTransformVector(footLpos);                                // ローカル位置になおす（向き回転を可能にするため）
-            var footIkOffsetR = tfanim.InverseTransformVector(footRpos);
+            var footLpos = anim.GetBoneTransform(HumanBodyBones.LeftFoot).position;     // ルートからの足位置
+            var footRpos = anim.GetBoneTransform(HumanBodyBones.RightFoot).position;
+            var footIkOffsetL = tfanim.InverseTransformPoint(footLpos);// * scale;      // ローカル位置になおす（向き回転を可能にするため）
+            var footIkOffsetR = tfanim.InverseTransformPoint(footRpos);// * scale;
 
             //var footScale_ = anim.calcVmdBoneScale(footScale);
             //var moveScale_ = anim.calcVmdBoneScale(moveScale);
 
+            var bonescale = anim.calcVmdBoneScale();
+
             return new VmdFootIkOperator<TTf>
             {
-                footScale = anim.humanScale * VmdBodyMotionOperator.VmdBodyScale,
-                moveScale = anim.humanScale * VmdBodyMotionOperator.VmdBodyScale,
-                _footPerMoveScale = 1.0f,
+                footScale = bonescale,
+                moveScale = bonescale,
+                _MoveToUnscale = 1.0f,
 
                 footIkOffsetL = footIkOffsetL,
                 footIkOffsetR = footIkOffsetR,
@@ -212,7 +214,8 @@ namespace AnimLite.Vmd
         {
             footop.moveScale = anim.calcVmdBoneScale(moveScale);
             footop.footScale = anim.calcVmdBoneScale(footScale);
-            footop._footPerMoveScale = footop.footScale / footop.moveScale;
+            //footop._MoveToFootScale = footop.footScale / footop.moveScale;
+            footop._MoveToUnscale = 1.0f / footop.moveScale;
 
             return footop;
         }
@@ -361,20 +364,19 @@ namespace AnimLite.Vmd
 
             var basewpos = op.tf.baseAnimator.GetPosition(stream);
             var basewrot = op.tf.baseAnimator.GetRotation(stream);
-            var rootlpos_move = op.tf.root.GetLocalPosition(stream);
+            var baselscl = op.tf.baseAnimator.GetLocalScale(stream);
 
-            var rootpos_foot = rootlpos_move * op._footPerMoveScale;
-            var iklposL = pkf.getpos(MmdBodyBones.左足ＩＫ) * op.footScale * 0.1f - rootpos_foot;
-            var iklposR = pkf.getpos(MmdBodyBones.右足ＩＫ) * op.footScale * 0.1f - rootpos_foot;
+            var rootlpos_movescled = op.tf.root.GetLocalPosition(stream);
+            var rootlpos_unscaled = rootlpos_movescled * op._MoveToUnscale;
 
-            var ikPosL = iklposL + op.footIkOffsetL + rootlpos_move;
-            var ikPosR = iklposR + op.footIkOffsetR + rootlpos_move;
+            var ikposL_unscaled = pkf.getpos(MmdBodyBones.左足ＩＫ) * 0.1f - rootlpos_unscaled;
+            var ikposR_unscaled = pkf.getpos(MmdBodyBones.右足ＩＫ) * 0.1f - rootlpos_unscaled;
 
-            //var ikPosL = pkf.getpos(MmdBodyBones.左足ＩＫ).xyz * 0.1f * op.bodyScale + op.footIkOffsetL;
-            //var ikPosR = pkf.getpos(MmdBodyBones.右足ＩＫ).xyz * 0.1f * op.bodyScale + op.footIkOffsetR;
-            
-            var posL = math.rotate(basewrot, ikPosL) + basewpos;
-            var posR = math.rotate(basewrot, ikPosR) + basewpos;
+            var iklposL_scaled = ikposL_unscaled * op.footScale + op.footIkOffsetL + rootlpos_movescled;
+            var iklposR_scaled = ikposR_unscaled * op.footScale + op.footIkOffsetR + rootlpos_movescled;
+
+            var wposL = math.rotate(basewrot, iklposL_scaled) * baselscl + basewpos;
+            var wposR = math.rotate(basewrot, iklposR_scaled) * baselscl + basewpos;
 
             //stream.SolveTwoBoneIk(op.tf.uLegL, op.tf.lLegL, op.tf.footL, posL);
             //stream.SolveTwoBoneIk(op.tf.uLegR, op.tf.lLegR, op.tf.footR, posR);
@@ -386,10 +388,10 @@ namespace AnimLite.Vmd
             stream.SolveTwoBonePairIk(
                 ref op.tf.uLegL, ref op.tf.lLegL,
                 op.tf.uLegL, op.tf.lLegL, op.tf.footL,
-                posL,
+                wposL,
                 ref op.tf.uLegR, ref op.tf.lLegR,
                 op.tf.uLegR, op.tf.lLegR, op.tf.footR,
-                posR);
+                wposR);
         }
 
 

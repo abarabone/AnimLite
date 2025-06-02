@@ -100,21 +100,10 @@ namespace AnimLite.Utility
 
     public class OptionBase
     {
-        JObject? _options;
-
-    #if UNITY_IL2CPP || UNITY_WEBGL || UNITY_IOS || !USE_DYNAMIC
-        public object Options
-    #else
-        public dynamic Options
-    #endif
-        {
-            //get => this._options ?? = new ExpandoObject { };
-            get => this._options ??= new JObject { };
-            set => this._options = value as JObject;
-        }
+        public JObject Options = new();
 
         public T OptionsAs<T>() where T : new() =>
-            JsonSupplemetUtility.PopulateDefaultViaJson<T>(this._options);
+            this.Options.ToObject<T>(JsonSerializer.Create(JsonSupplemetUtility.DeserializeOptions))!;
     }
 
     [System.Serializable]
@@ -135,7 +124,7 @@ namespace AnimLite.Utility
     public struct numeric3
     {
         public float x, y, z;
-
+        
         public numeric3(double[] src)
         {
             this.x = (float)src[0];

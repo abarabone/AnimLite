@@ -271,6 +271,9 @@ namespace AnimLite.DancePlayable
 
                 foreach (var order in orders)
                 {
+                    overwritePosition_(order);
+                    overwriteScale_(order);
+
                     if (order is MotionOrderOld mo_old)
                     {
                         createFaceMotionPlayable_(mo_old);
@@ -280,14 +283,12 @@ namespace AnimLite.DancePlayable
                     {
                         createFaceMotionPlayable_(mo);
                         buildModelParameters_(mo).AddTo(modelParams);
+                        mo.Model.Value.GetComponent<Animator>().AdjustBbox();
                     }
                     else if (order is MotionOrderWithAnimationClip moac)
                     {
                         createBodyMotionPlayable_AnimationClip_(moac);
                     }
-
-                    overwritePosition_(order);
-                    overwriteScale_(order);
                 }
 
                 return createBodyMotionPlayable_(modelParams);
@@ -392,8 +393,8 @@ namespace AnimLite.DancePlayable
                 //if (!order.OverWritePositionAndRotation) return;
 
                 var tf = order.Model.Value.transform;
-                tf.position = order.Position;
-                tf.rotation = order.Rotation;
+                tf.position += order.Position;
+                tf.rotation *= order.Rotation;
             }
             static void overwriteScale_(ModelOrderBase order)
             {
@@ -401,7 +402,7 @@ namespace AnimLite.DancePlayable
                 if (order.Scale == 0.0f) return;
 
                 var tf = order.Model.Value.transform;
-                tf.localScale = new Vector3(order.Scale, order.Scale, order.Scale);
+                tf.localScale = (float3)tf.localScale * order.Scale;
             }
 
         }

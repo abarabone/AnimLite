@@ -19,6 +19,21 @@ namespace AnimLite.Vrm
             face.localBounds = bbox;
         }
 
+        public static void AdjustBbox(this Animator anim)
+        {
+            var tfRoot = anim.GetBoneTransform(HumanBodyBones.Hips).parent;
+            var tfHead = anim.GetBoneTransform(HumanBodyBones.Head);
+
+            var smrs = anim.GetComponentsInChildren<SkinnedMeshRenderer>();
+            smrs.ForEach(smr =>
+                {
+                    smr.rootBone = smr.sharedMesh.blendShapeCount > 0
+                        ? tfHead
+                        : tfRoot
+                        ;
+                });
+        }
+
         public static void AdjustLootAt(this Vrm10Instance vrm, Transform tfTarget)
         {
             vrm.LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.SpecifiedTransform;

@@ -31,6 +31,9 @@ namespace AnimLite
         public quaternion GetLocalRotation(StreamSource src) => this.handle.GetLocalRotation(src.stream);
         public void SetLocalRotation(StreamSource src, quaternion r) => this.handle.SetLocalRotation(src.stream, r);
 
+        public float3 GetLocalScale(StreamSource src) => this.handle.GetLocalScale(src.stream);
+        public void SetLocalScale(StreamSource src, float3 s) => this.handle.SetLocalScale(src.stream, s);
+
 
         public struct StreamSource : ITransformStreamSource
         {
@@ -57,6 +60,9 @@ namespace AnimLite
 
         public quaternion GetLocalRotation(StreamSource src) => this.tf.localRotation;
         public void SetLocalRotation(StreamSource src, quaternion r) => this.tf.localRotation = r;
+
+        public float3 GetLocalScale(StreamSource src) => this.tf.localScale;
+        public void SetLocalScale(StreamSource src, float3 s) => this.tf.localScale = s;
 
 
         public struct StreamSource : ITransformStreamSource

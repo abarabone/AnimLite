@@ -48,6 +48,10 @@ namespace AnimLite.Utility
 
         GameObject prototype = null;
 
+        Vector3 initPosition;
+        Quaternion initRotation;
+        Vector3 initScale;
+
 
         public async ValueTask<Instance<GameObject>> InstantiateAsync()
         {
@@ -57,11 +61,21 @@ namespace AnimLite.Utility
 
             var prevProtoUsed = Interlocked.CompareExchange(ref this.prototypeUsed, 1, 0);
             var go = prevProtoUsed == 0
-                ? this.prototype
+                //? this.prototype
+                ? await getPrototypeAsync_()
                 : await instantateAsync_();
 
             return new Instance<GameObject>(go, this);
 
+            async ValueTask<GameObject> getPrototypeAsync_()
+            {
+                await Awaitable.MainThreadAsync();
+                // ほんとはコンストラクタで保存したいけど await 使えないからな…
+                var tf = this.prototype.transform;
+                tf.GetLocalPositionAndRotation(out this.initPosition, out this.initRotation);
+                this.initScale = tf.localScale;
+                return this.prototype;
+            }
             async ValueTask<GameObject> instantateAsync_()
             {
                 await Awaitable.MainThreadAsync();
@@ -104,6 +118,9 @@ namespace AnimLite.Utility
                     var anim = go.GetComponent<Animator>().AsUnityNull();
                     anim?.UnbindAllStreamHandles();
                     anim?.ResetPose();
+                    var tf = go.transform;
+                    tf.SetLocalPositionAndRotation(this.initPosition, this.initRotation);
+                    tf.localScale = this.initScale;
                 }
                 async ValueTask destroyAsync_()
                 {

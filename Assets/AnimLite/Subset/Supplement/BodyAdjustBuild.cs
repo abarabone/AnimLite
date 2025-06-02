@@ -100,7 +100,9 @@ namespace AnimLite
                         _ => quaternion.identity,
                     };
                 var qLocalRotation =
-                    from _label in Parse.String("local rotation").Or(Parse.String("LocalRotation")).Or(Parse.String("lrot")).Token()
+                    from _label in Parse.String("local rotation")
+                        .Or(Parse.String("LocalRotation"))
+                        .Or(Parse.String("lrot")).Token()
                     from rots in qRotUnit.Token().DelimitedBy(Parse.Char('*').Token())
                     select rots.Aggregate((pre, cur) => math.mul(pre, cur));
                     ;

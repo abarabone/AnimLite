@@ -36,11 +36,14 @@ namespace AnimLite.Vmd
             };
         }
 
-        public static TransformMappings BuildVmdTransformMappings(this Animator anim, BodyAdjustData adjust = null)
+        public static TransformMappings BuildVmdTransformMappings(this Animator anim, BodyAdjustData adjust = null, float v=1.0f)
         {
             if (anim.IsUnityNull()) return default;
 
             var x = anim.buildVmdTfMappings<Tf>(adjust);
+            var xc = x.c;
+            xc.omake = v;
+            x.c = xc;
 
             return new TransformMappings
             {

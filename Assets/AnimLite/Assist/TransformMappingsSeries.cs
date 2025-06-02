@@ -113,6 +113,7 @@ namespace AnimLite
         public bool HasChest;
         public bool HasLeftSholder;
         public bool HasRightSholder;
+        public float omake;//
     }
 
     /// <summary>
@@ -159,6 +160,15 @@ namespace AnimLite
 
         static quaternion mul(quaternion r1, quaternion r2) => math.mul(r1, r2);
         static quaternion mul(quaternion r1, quaternion r2, quaternion r3) => math.mul(math.mul(r1, r2), r3);
+    }
+
+
+
+    public struct BoneRotationInitialPose2
+    {
+        public quaternion RotGlobalize;  // 左からかける
+        public quaternion RotLocalize; // 右からかける
+        
     }
 
 }

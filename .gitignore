@@ -18,7 +18,8 @@
 /Assets/VRMShaders.meta
 
 /Assets/AnimLite/**/*.meta
-!**/MonoBehaviour/*.meta
+!**/[Mm]ono[Bb]ehaviour/*.meta
+!**/[Pp]refab/*.meta
 !**/[Rr]esources/*.meta
 !**/[Rr]esources_moved/*.meta
 

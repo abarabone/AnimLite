@@ -21,10 +21,12 @@ namespace AnimLite.Loader
     using AnimLite.Utility;
     using AnimLite.Utility.Linq;
     using AnimLite.DancePlayable;
+    using AnimLite.Geometry;
 
     using AnimLite.Vrm;
     using AnimLite.Vmd;
     using static AnimLite.DancePlayable.DanceGraphy;
+    using static UnityEditor.Progress;
 
     public static class SceneLoadUtilitiy
     {
@@ -174,6 +176,7 @@ namespace AnimLite.Loader
             var model = await cache.loadModelAsync(bgpath, archive, ct);
             //var model = await bgpath.LoadModelExAsync(archive, ct);
 
+            await Awaitable.MainThreadAsync();
             return define.toBackGroundOrder(model);
         }
 
@@ -323,8 +326,11 @@ namespace AnimLite.Loader
 
         static BgModelOrder toBackGroundOrder(
             this ModelDefineJson define, Instance<GameObject>? model)
-        =>
-            new()
+        {
+            var options = define.OptionsAs<ModelOptionsJson>();
+            model.combineMeshes(options);
+
+            return new()
             {
                 Model = model,
                 Position = define.Position,
@@ -332,19 +338,44 @@ namespace AnimLite.Loader
                 Scale = define.Scale,
             };
 
+        }
+
         static async ValueTask<MotionOrderBase> toMotionOrderAwait(
             this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust, CancellationToken ct)
         {
-            var options = define.Animation.OptionsAs<MotionOptionsJson>();
+            var model_options = define.Model.OptionsAs<ModelOptionsJson>();
+            if (model is not null)
+            {
+                model.combineMeshes(model_options);
+                model.Value.transform.ApplyBlendShapeToVrmExpression("new skin blend");
+            }
 
+            var anim_options = define.Animation.OptionsAs<MotionOptionsJson>();
             return (vmddata?.Value is not null) switch
             {
-                true when options.UseStreamHandleAnimationJob =>
-                    define.toMotionOrderOld(options, vmddata, facemap, model, adjust),
+                true when anim_options.UseStreamHandleAnimationJob =>
+                    define.toMotionOrderOld(anim_options, vmddata, facemap, model, adjust),
                 true =>
-                    define.toMotionOrder(options, vmddata, facemap, model, adjust),
+                    define.toMotionOrder(anim_options, vmddata, facemap, model, adjust),
                 false =>
-                    await define.toMotionOrderAwait(options, model, ct),
+                    await define.toMotionOrderAwait(anim_options, model, ct),
+            };
+        }
+
+        static GameObject? combineMeshes(this Instance<GameObject>? model, ModelOptionsJson options)
+        {
+            if (model is null) return null;
+
+            return options.MeshCombineMode switch
+            {
+                MeshCombineMode.IntoSingleMesh =>
+                    model.Value.CombineMeshes_IntoSingleMesh(options.MeshMaterialName, options.SkinMaterialName, options.SkinMaterialName),
+                MeshCombineMode.ByMaterial =>
+                    model.Value.CombineMeshes_ByMaterial(),
+                MeshCombineMode.ByMaterialAndAtlasTextures =>
+                    model.Value.CombineMeshes_ByMaterialAndAtlasTextures(),
+                _ =>
+                    model.Value,
             };
         }
 

@@ -321,7 +321,7 @@ namespace AnimLite.DancePlayable
                     var qTotalTime =
                         from p in modelparams
                         from t in p.model_timeOptions
-                        select t.timer.TotalTime + t.delayTime
+                        select t.timer.TotalTime - t.delayTime
                         ;
 
                     var objs = modelparams.Select(x => x.model_data.anim);

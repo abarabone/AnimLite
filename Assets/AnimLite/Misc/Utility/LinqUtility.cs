@@ -29,6 +29,8 @@ namespace AnimLite.Utility.Linq
             public bool MoveNext() { return false; }
             public void Reset() { }
         }
+
+        static public EmptyEnumerableStruct<T> Create() => new EmptyEnumerableStruct<T>();
     }
 
     public static class EmptyEnumerableExtension
@@ -91,6 +93,17 @@ namespace AnimLite.Utility.Linq
     public static class LinqUtilityExtenstion
     {
 
+        public static bool HasSingleElement<T>(this IEnumerable<T> src) =>
+            src.Any() && src.Skip(1).IsEmpty();
+
+
+        static public Dictionary<TKey, TValue> ToDictionary<TKey, TValue>
+            (this (IEnumerable<TKey> keys, IEnumerable<TValue> values) src)
+        =>
+            src.Zip().ToDictionary(x => x.Item1, x => x.Item2);
+
+
+
         public static IEnumerable<T> Do<T>(this IEnumerable<T> e, Action<T, int> f) =>
             e.Select((x, i) => { f(x, i); return x; })
             ;
@@ -109,6 +122,23 @@ namespace AnimLite.Utility.Linq
 
         public static IAsyncEnumerable<(T1, T2)> Zip<T1, T2>(this (IAsyncEnumerable<T1> src1, IAsyncEnumerable<T2> src2) x) =>
             (x.src1, x.src2).Zip((x, y) => (x, y));
+
+
+        //public static IEnumerable<(T1, T2, T3)> Zip<T1, T2, T3>(
+        //    this (IEnumerable<T1> a, IEnumerable<T2> b, IEnumerable<T3> c) x) =>
+        //        ((x.a, x.b).Zip(), x.c).Zip((x, y) => (x.Item1, x.Item2, y));
+
+        public static IEnumerable<(T1, T2, T3)> Zip<T1, T2, T3>(
+            this (IEnumerable<T1> a, IEnumerable<T2> b, IEnumerable<T3> c) x)
+        {
+            var ea = x.a.GetEnumerator();
+            var eb = x.b.GetEnumerator();
+            var ec = x.c.GetEnumerator();
+            while (ea.MoveNext() && eb.MoveNext() && ec.MoveNext())
+            {
+                yield return (ea.Current, eb.Current, ec.Current);
+            }
+        }
 
 
 

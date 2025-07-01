@@ -38,7 +38,7 @@ namespace AnimLite.DancePlayable
 
                 foreach (var anim in anims)
                 {
-                    anim.AddJobDependency(dep);
+                    anim.AddJobDependency(dep);// animation job 使ってなければ関係ないかも
                 }
 
                 return dep;
@@ -48,6 +48,7 @@ namespace AnimLite.DancePlayable
             //playable_sync.SetInputWeight(0, 1);
 
             playable_sync.SetDuration(totalTime);
+            playable_sync.SetTime(0.0);
 
             output.SetSourcePlayable(playable_sync);
         }

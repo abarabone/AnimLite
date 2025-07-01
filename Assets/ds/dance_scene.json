@@ -32,16 +32,20 @@
                     "x": 0.0,
                     "y": 0.0,
                     "z": 0.0
+                },
+                "Options": {
+                    "MeshCombineMode": "IntoSingleMesh",
+                    "MeshMaterialName": "*"
                 }
             },
             "Animation": {
                 "AnimationFilePath": "step1.vmd",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         },
         "right": {
@@ -56,16 +60,19 @@
                     "x": 0.0,
                     "y": 30.0,
                     "z": 0.0
+                },
+                "Options": {
+                    "MeshCombineMode": "ByMaterial"
                 }
             },
             "Animation": {
                 "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-sjis.zip/ds/step1.vmd",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         },
         "left": {
@@ -80,16 +87,19 @@
                     "x": 0.0,
                     "y": -30.0,
                     "z": 0.0
+                },
+                "Options": {
+                    "MeshCombineMode": "ByMaterialAndAtlasTextures"
                 }
             },
             "Animation": {
                 "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/ds-utf8.zip/step1.vmd",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         },
         "right-back": {
@@ -109,11 +119,11 @@
             "Animation": {
                 "AnimationFilePath": "https://github.com/abarabone/AnimLite/raw/master/Assets/Resources_moved/step2.vmd",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         },
         "left-back": {
@@ -133,11 +143,11 @@
             "Animation": {
                 "AnimationFilePath": "Resources_moved/step2.vmd",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         },
         "center-back": {
@@ -157,11 +167,11 @@
             "Animation": {
                 "AnimationFilePath": "step2 as resource",
                 "FaceMappingFilePath": "",
-                "DelayTime": 0.0
-            },
-            "Options": {
-                "BodyScaleFromHuman": 0.0,
-                "FootIkMode": "auto"
+                "DelayTime": 0.0,
+                "Options": {
+                    "BodyScaleFromHuman": 0.0,
+                    "FootIkMode": "auto"
+                }
             }
         }
     }

@@ -34,6 +34,39 @@ namespace AnimLite.Vrm
                 });
         }
 
+
+        //public static Bounds EncapsulateTo(this Bounds self, Bounds other)
+        //{
+        //    self.Encapsulate(other);
+        //    return self;
+        //}
+
+        //public static Bounds CalcLocalBounds(this IEnumerable<Bounds> others) =>
+        //    others.Aggregate(new Bounds(), (pre, next) => pre.EncapsulateTo(next));
+
+        //public static Bounds CalcLocalBounds(this IEnumerable<SkinnedMeshRenderer> others) =>
+        //    //others.Select(x => x.sharedMesh.bounds).CalcLocalBounds();
+        //    others.Select(x => x.localBounds).CalcLocalBounds();
+
+        //public static Bounds CalcLocalBounds(this IEnumerable<SkinnedMeshRenderer> others, Transform tfbase)
+        //{
+        //    var mtInv = tfbase?.worldToLocalMatrix ?? Matrix4x4.identity;
+        //    //others.Select(x => x.sharedMesh.bounds).CalcLocalBounds();
+        //    //others.Select(x => x.localBounds).CalcLocalBounds();
+        //    return others
+        //        .Where(x => x.rootBone is not null)
+        //        .Select(x =>
+        //        {
+        //            var bounds = x.localBounds;
+        //            bounds.center = (x.rootBone.localToWorldMatrix * mtInv).MultiplyPoint(bounds.center);
+        //            return bounds;
+        //        })
+        //        .CalcLocalBounds();
+        //}
+
+
+
+
         public static void AdjustLootAt(this Vrm10Instance vrm, Transform tfTarget)
         {
             vrm.LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.SpecifiedTransform;

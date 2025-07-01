@@ -22,6 +22,7 @@ namespace AnimLite.Utility
     using AnimLite.Vrm;
     using AnimLite.Utility;
     using AnimLite.Utility.Linq;
+    using AnimLite.Geometry;
 
 #nullable enable
 
@@ -104,6 +105,30 @@ namespace AnimLite.Utility
 
         public T OptionsAs<T>() where T : new() =>
             this.Options.ToObject<T>(JsonSerializer.Create(JsonSupplemetUtility.DeserializeOptions))!;
+    }
+
+    //[System.Serializable]
+    //public class BgModelOptionsJson
+    //{
+    //    public MeshCombineMode MeshCombineMode = MeshCombineMode.None;
+    //    public string MeshMaterialName = "";
+    //    public string SkinMaterialName = "";
+    //}
+    //[System.Serializable]
+    //public class ChModelOptionsJson
+    //{
+    //    public MeshCombineMode MeshCombineMode = MeshCombineMode.None;
+    //    public string BodyMaterialName = "";
+    //    public string FaceMaterialName = "";
+    //    public string MeshMaterialName = "";
+    //}
+    [System.Serializable]
+    public class ModelOptionsJson
+    {
+        public MeshCombineMode MeshCombineMode = MeshCombineMode.None;
+        public string MeshMaterialName = "";
+        public string SkinMaterialName = "";
+        public string SkinBlendMaterialName = "";
     }
 
     [System.Serializable]

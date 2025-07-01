@@ -35,7 +35,8 @@ namespace AnimLite.DancePlayable
         DanceGraphy graphy;
 
         public PlayableGraph? Graph => this.graphy?.graph;
-        public float TotalTime => this.graphy?.timekeeper.TotalTime ?? 0.0f;// 暫定
+        //public float TotalTime => this.graphy?.timekeeper.TotalTime ?? 0.0f;// 暫定
+        public DanceTimeKeeper TimeKeeper => this.graphy?.timekeeper;
 
 
 

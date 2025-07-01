@@ -13,10 +13,22 @@
   - default_body_adjust.txt
   - default_facemap.txt
 - facemap と body adjust に何も指定しないときにデフォルトで参照するために必要です
+- Asset/Resources_moved フォルダを reimport しないと、中の vrm がロードできないようです（ univrm の自動変換をオフにしているため）
 - あと足接地は foot IK target というレイヤー名に属するものと判定するようになってます
 - 使い方のドキュメント的なものが未整備なので、clone しても意味不明とは思う…
 
 # 新機能・修正
+2025.7.2
+- .json 読込：メッシュ結合に対応
+  - 詳しくは issue に書いた
+  - 下記３モード
+    - 単一メッシュ単一テクスチャ化
+    - マテリアルごとにサブメッシュ化
+    - サブメッシュ化しつつ単一アトラス化
+  - .json の Model.Options で設定する
+    - 「.json について」を参照のこと
+  - サンプルは Sample6 overrid json のぶいけっとにゃん３体（Asset/ds/dance_scene.json）
+
 2025.6.2
 - .json 読込：Motions のキー名が _ から始まるベースキーが、いつのまにか読み込まれなくなってたので修正
 - .json 読込：Motions のキー名でのワイルドカードで、先頭と終端に概念に対応していなかったので修正
@@ -245,7 +257,13 @@
           "y": 0.0,
           "z": 0.0
         },
-        "Scale": 0.0
+        "Scale": 0.0,
+        "Options": {
+          "MeshCombineMode": "None",              // 選択肢は IntoSingleMesh | ByMaterial | ByMaterialAndAtlasTextures
+          "MeshMaterialName": "",                 // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい。
+          "SkinMaterialName": "",                 // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialName と同じマテリアルが適用される
+          "SkinBlendMaterialName": ""             // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は道場
+        }
       },
       "Options": { ... }                          // 任意のデータ
     },

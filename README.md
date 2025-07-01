@@ -28,6 +28,9 @@
   - .json の Model.Options で設定する
     - 「.json について」を参照のこと
   - サンプルは Sample6 overrid json のぶいけっとにゃん３体（Asset/ds/dance_scene.json）
+  - 修正
+    - job モード（UseStreamHandleAnimationJob : false）の時、playable の初期位置を指定してなかったので、時々ずれたりしてた orz
+      → .SetTime(0) 的なことをやって時間 0 から始まるようにした
 
 2025.6.2
 - .json 読込：Motions のキー名が _ から始まるベースキーが、いつのまにか読み込まれなくなってたので修正

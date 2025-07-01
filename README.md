@@ -262,10 +262,10 @@
         },
         "Scale": 0.0,
         "Options": {
-          "MeshCombineMode": "None",              // 選択肢は IntoSingleMesh | ByMaterial | ByMaterialAndAtlasTextures
-          "MeshMaterialName": "",                 // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい。
+          "MeshCombineMode": "None",              // 選択肢は "IntoSingleMesh" | "ByMaterial" | "ByMaterialAndAtlasTextures"
+          "MeshMaterialName": "",                 // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
           "SkinMaterialName": "",                 // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialName と同じマテリアルが適用される
-          "SkinBlendMaterialName": ""             // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は道場
+          "SkinBlendMaterialName": ""             // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
         }
       },
       "Options": { ... }                          // 任意のデータ
@@ -285,7 +285,12 @@
                     "z": 0.0
                 },
                 "Scale": 0.0,
-                "Options": { ... }                // 任意のデータ
+                "Options": {
+                  "MeshCombineMode": "None",      // 選択肢は "IntoSingleMesh" | "ByMaterial" | "ByMaterialAndAtlasTextures"
+                  "MeshMaterialName": "",         // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
+                  "SkinMaterialName": "",         // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialName と同じマテリアルが適用される
+                  "SkinBlendMaterialName": ""     // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
+                }
             },
             "Animation": {                        // キャラクターのアニメーション
                 "AnimationFilePath": "",          // ["", ..., ""], とすれば複数 .vmd のマージ読込となる

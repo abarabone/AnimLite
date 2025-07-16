@@ -18,6 +18,22 @@
 - 使い方のドキュメント的なものが未整備なので、clone しても意味不明とは思う…
 
 # 新機能・修正
+2025.7.17
+- .json 読込：メッシュ結合の際、結合対象をリストで指定できるようにした
+  - 服やアクセサリーを着脱したり等の用途に使用できると思う
+- .json の Model.Options で設定する
+  - 対象としたいメッシュを含むゲームオブジェクト名を配列形式で指定できる
+  - そこで使用されているマテリアル名も、同上のようにして対象としたいものを指定できる
+  - 何も指定しなければすべて対象となる
+  - ワイルドカードを使用可能
+  - ! で始まる場合は、逆に対象としないようになる
+  - \ でエスケープできる
+- 変更
+  - メッシュ単一化時のマテリアル名指定で、.json オプション名を変更
+    - MeshMaterialName -> MeshMaterialOnSingleMesh など
+- 修正
+  - モデルキャッシュをオフにしてもエラーが出ないようにした
+
 2025.7.2
 - .json 読込：メッシュ結合に対応
   - 詳しくは issue に書いた
@@ -263,9 +279,11 @@
         "Scale": 0.0,
         "Options": {
           "MeshCombineMode": "None",              // 選択肢は "IntoSingleMesh" | "ByMaterial" | "ByMaterialAndAtlasTextures"
-          "MeshMaterialName": "",                 // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
-          "SkinMaterialName": "",                 // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialName と同じマテリアルが適用される
-          "SkinBlendMaterialName": ""             // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
+          "MeshMaterialOnSingleMesh": "",         // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
+          "SkinMaterialOnSingleMesh": "",         // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialOnSingleMesh と同じマテリアルが適用される
+          "BlendShapeMaterialOnSingleMesh": "",   // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
+          "TargetMeshList": [],                   // 結合対象とするメッシュを含むゲームオブジェクト名を配列で指定。ワイルドカードに対応。先頭に ! をつけると逆に対象としない指定。エスケープは \ で。省略するとすべてのメッシュが結合対象となる
+          "TargetMaterialList": []                // 結合対象とするマテリアル名を配列で指定。ワイルドカード、省略時、等は TargetMeshList と同じ。
         }
       },
       "Options": { ... }                          // 任意のデータ

@@ -52,6 +52,7 @@ namespace AnimLite.Utility
 
         /// <summary>
         /// 細かい点の注意： # は数字扱い
+        /// * # ? -> .* @"[\d\#] . 
         /// </summary>
         public static Wildcard ToWildcard(this string s)
         {
@@ -72,7 +73,38 @@ namespace AnimLite.Utility
                         _ => Regex.Escape(c.ToString()),
                     };
 
-                return $"^{string.Join("", q)}$";
+                return $"^{string.Join(null, q)}$";
+            }
+        }
+
+        /// <summary>
+        /// 細かい点の注意： # は数字扱い
+        /// * # ? -> .* @"[\d\#] . 
+        /// \* \# \? \\ -> * # ? \
+        /// 先頭の
+        /// </summary>
+        public static Wildcard ToWildcardEscaped(this string s)
+        {
+            return new Wildcard
+            {
+                value = toPattern_(s)
+            };
+
+            static string toPattern_(string input)
+            {
+                var result = new List<string>();
+                for (var i=0; i<input.Length; i++)
+                {
+                    result.Add(input[i] switch
+                    {
+                        '\\' => Regex.Escape(input[++i].ToString()),
+                        '*' => ".*",
+                        '?' => ".",
+                        '#' => @"[\d\#]",
+                        char c => Regex.Escape(c.ToString()),
+                    });
+                }
+                return $"^{string.Join(null, result)}$";
             }
         }
     }

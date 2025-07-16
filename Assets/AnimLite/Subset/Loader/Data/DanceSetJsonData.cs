@@ -126,13 +126,16 @@ namespace AnimLite.Utility
     public class ModelOptionsJson
     {
         public MeshCombineMode MeshCombineMode = MeshCombineMode.None;
-        public string MeshMaterialName = "";
-        public string SkinMaterialName = "";
-        public string SkinBlendMaterialName = "";
+        public string MeshMaterialOnSingleMesh = "";
+        public string SkinMaterialOnSingleMesh = "";
+        public string BlendShapeMaterialOnSingleMesh = "";
+
+        public string[] TargetMeshList = new string[] { };
+        public string[] TargetMaterialList = new string[] { };
     }
 
     [System.Serializable]
-    public class MotionOptionsJson
+    public class AnimationOptionsJson
     {
         public numeric3 BodyScaleFromHuman = new numeric3(0.0f);
         public numeric3 FootScaleFromHuman = new numeric3(0.0f);

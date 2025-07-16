@@ -342,6 +342,11 @@ namespace AnimLite.Vmd
                 //    MmdBodyBones.首,
 
 
+                //HumanBodyBones.LeftShoulder =>
+                //    math.slerp(quaternion.identity, rkf.getrot(MmdBodyBones.左肩), -1.2f),
+                //HumanBodyBones.RightShoulder =>
+                //    math.slerp(quaternion.identity, rkf.getrot(MmdBodyBones.右肩), -1.2f),
+
                 //HumanBodyBones.LeftShoulder => accumulate(
                 //    //rkf.getrotIfOptout(opt, HumanBodyBones.UpperChest, !opt.HasChest),    // upper chest にあたる mmd ボーンはなさそうなので未設定、バグる
                 //    //rkf.getrot(MmdBodyBones.左肩2),

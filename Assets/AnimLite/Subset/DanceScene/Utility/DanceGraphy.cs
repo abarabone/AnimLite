@@ -27,6 +27,7 @@ namespace AnimLite.DancePlayable
     //using static UnityEditor.Progress;
     using VmdPosFinder = KeyFinderWithoutProcedure<float4, Key4CatmulPos, Clamp, Key4StreamCache<float4>, StreamIndex>;
     using VmdRotFinder = KeyFinderWithoutProcedure<quaternion, Key4CatmulRot, Clamp, Key4StreamCache<quaternion>, StreamIndex>;
+    using AnimLite.Geometry;
 
     public class DanceGraphy : IAsyncDisposable
     {
@@ -68,6 +69,8 @@ namespace AnimLite.DancePlayable
             public Vector3 Position;
             public Quaternion Rotation;
             public float Scale;
+
+            public ModelOptionsJson ModelOptions;
 
             public virtual ValueTask DisposeAsync()
             {
@@ -115,7 +118,7 @@ namespace AnimLite.DancePlayable
             //public float BodyScale;
             //public float FootScale;
             //public float MoveScale;
-            public MotionOptionsJson Options;
+            public AnimationOptionsJson AnimationOptions;
 
             public override bool IsMotionBlank => this.vmd is null;
             public override async ValueTask DisposeAsync()
@@ -184,6 +187,8 @@ namespace AnimLite.DancePlayable
 
             var graph = PlayableGraph.Create();
 
+            combineModelMesh_(order.BackGrouds);
+            combineModelMesh_(order.Motions);
 
             createBackGroundCollider_(order.BackGrouds, order.Motions);
             showBackGround_(order.BackGrouds);
@@ -213,6 +218,12 @@ namespace AnimLite.DancePlayable
 
 
 
+            static void combineModelMesh_(IEnumerable<ModelOrderBase> orders)
+            {
+                orders.ForEach(x => combineMeshes_(x.Model, x.ModelOptions));
+            }
+
+
             static void showBackGround_(BgModelOrder[] orders)
             {
                 //if (orders == null) return;
@@ -227,7 +238,7 @@ namespace AnimLite.DancePlayable
             {
                 var useCollider = motions
                     .OfType<MotionOrder>()
-                    .Any(x => (x.Options.FootIkMode & VmdFootIkMode.off_with_ground) != 0);
+                    .Any(x => (x.AnimationOptions.FootIkMode & VmdFootIkMode.off_with_ground) != 0);
 
                 if (!useCollider) return;
 
@@ -261,6 +272,7 @@ namespace AnimLite.DancePlayable
 
                 graph.CreateAudio(order.AudioSource, order.AudioClip, order.DelayTime);
             }
+
 
 
             static JobBuffers<VmdPosFinder, VmdRotFinder> createMotionPlayables_(PlayableGraph graph, IEnumerable<MotionOrderBase> orders)
@@ -345,10 +357,10 @@ namespace AnimLite.DancePlayable
 
                     var anim = order.Model.Value.GetComponent<Animator>();
                     var bodyop = anim.ToVmdBodyTransformMotionOperator(order.bone)
-                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                        .WithScales(anim, order.AnimationOptions.MoveScaleFromHuman, order.AnimationOptions.BodyScaleFromHuman);
                     var footop = anim.ToVmdFootIkTransformOperator(order.bone)
-                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
-                        .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
+                        .WithScales(anim, order.AnimationOptions.MoveScaleFromHuman, order.AnimationOptions.FootScaleFromHuman)
+                        .WithIkUsage(order.vmd, order.AnimationOptions.FootIkMode, order.AnimationOptions.GroundHitDistance, order.AnimationOptions.GroundHitOriginOffset);
                     var param = anim.BuildJobParams(order.bone, pkf, rkf, bodyop, footop, order.DelayTime);
                     return param;
                 }
@@ -368,10 +380,10 @@ namespace AnimLite.DancePlayable
 
                     var anim = order.Model.Value.GetComponent<Animator>();
                     var bodyop = anim.ToVmdBodyMotionOperator<TransformHandleMappings, TfHandle>(order.bone)
-                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.BodyScaleFromHuman);
+                        .WithScales(anim, order.AnimationOptions.MoveScaleFromHuman, order.AnimationOptions.BodyScaleFromHuman);
                     var footop = anim.ToVmdFootIkOperator<TransformHandleMappings, TfHandle>(order.bone)
-                        .WithScales(anim, order.Options.MoveScaleFromHuman, order.Options.FootScaleFromHuman)
-                        .WithIkUsage(order.vmd, order.Options.FootIkMode, order.Options.GroundHitDistance, order.Options.GroundHitOriginOffset);
+                        .WithScales(anim, order.AnimationOptions.MoveScaleFromHuman, order.AnimationOptions.FootScaleFromHuman)
+                        .WithIkUsage(order.vmd, order.AnimationOptions.FootIkMode, order.AnimationOptions.GroundHitDistance, order.AnimationOptions.GroundHitOriginOffset);
                     var job = anim.create(order.bone, pkf, rkf, timer, bodyop, footop);
                     graph.CreateVmdAnimationJobWithSyncScript(anim, job, timer, order.DelayTime);
                 }
@@ -405,6 +417,31 @@ namespace AnimLite.DancePlayable
                 tf.localScale = (float3)tf.localScale * order.Scale;
             }
 
+            static void combineMeshes_(Instance<GameObject> model, ModelOptionsJson options)
+            {
+                if (model is null) return;
+
+                var targets = new CombineTargetList
+                {
+                    Mesh = options.TargetMeshList,
+                    Material = options.TargetMaterialList,
+                };
+
+                var result = options.MeshCombineMode switch
+                {
+                    MeshCombineMode.IntoSingleMesh =>
+                        model.Value.CombineMeshes_IntoSingleMesh(
+                            options.MeshMaterialOnSingleMesh, options.SkinMaterialOnSingleMesh, options.BlendShapeMaterialOnSingleMesh, targets),
+                    MeshCombineMode.ByMaterial =>
+                        model.Value.CombineMeshes_ByMaterial(targets),
+                    MeshCombineMode.ByMaterialAndAtlasTextures =>
+                        model.Value.CombineMeshes_ByMaterialAndAtlasTextures(targets),
+                    _ =>
+                        model.Value,
+                };
+
+                result.transform.ApplyBlendShapeToVrmExpression("new skin blend");
+            }
         }
 
 

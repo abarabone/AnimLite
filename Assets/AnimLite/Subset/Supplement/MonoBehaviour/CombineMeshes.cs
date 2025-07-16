@@ -7,7 +7,7 @@ using Unity.Mathematics;
 
 using AnimLite.Geometry;
 using AnimLite.Vrm;
-using UniVRM10;
+using AnimLite.Utility;
 
 public class CombineMeshes : MonoBehaviour
 {
@@ -18,19 +18,27 @@ public class CombineMeshes : MonoBehaviour
     public Material skinMaterial;
     public Material blendShapeSkinMaterial;
 
+    public string[] MeshTargetList;
+    public string[] MaterialTargetList;
+
     private void OnEnable()
     {
+        var ctl = new CombineTargetList
+        {
+            Mesh = this.MeshTargetList,
+            Material = this.MaterialTargetList,
+        };
 
         switch (this.mode)
         {
             case MeshCombineMode.IntoSingleMesh:
-                this.gameObject.CombineMeshes_IntoSingleMesh(meshMaterial, skinMaterial, blendShapeSkinMaterial);
+                this.gameObject.CombineMeshes_IntoSingleMesh(meshMaterial, skinMaterial, blendShapeSkinMaterial, ctl);
                 break;
             case MeshCombineMode.ByMaterial:
-                this.gameObject.CombineMeshes_ByMaterial();
+                this.gameObject.CombineMeshes_ByMaterial(ctl);
                 break;
             case MeshCombineMode.ByMaterialAndAtlasTextures:
-                this.gameObject.CombineMeshes_ByMaterialAndAtlasTextures();
+                this.gameObject.CombineMeshes_ByMaterialAndAtlasTextures(ctl);
                 break;
             case MeshCombineMode.None:
                 break;

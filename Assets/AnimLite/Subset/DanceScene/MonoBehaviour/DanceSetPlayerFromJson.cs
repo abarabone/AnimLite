@@ -71,7 +71,8 @@ namespace AnimLite.DancePlayable
                     
 
                     using var x = await this.JsonFiles.LoadDanceSceneAsync(ct);
-                    var order = await x.dancescene.BuildDanceGraphyOrderAsync(this.Cache?.Holder, x.archive, this.AudioSource, ct);
+                    var order = await x.dancescene.BuildDanceGraphyOrderAsync(
+                        this.Cache.AsUnityNull()?.Holder, x.archive, this.AudioSource, ct);
 
                     await Awaitable.MainThreadAsync();
                     this.graphy = DanceGraphy.CreateGraphy(order);

@@ -22,21 +22,70 @@ namespace AnimLite.Geometry
         ByMaterialAndAtlasTextures,
     }
 
+    public struct CombineTargetList
+    {
+        public Wildlist Mesh;
+        public Wildlist Material;
+    }
+    public struct Wildlist
+    {
+        public Wildcard[] targets_wild { get; private set; }
+        public Wildcard[] untargets_wild { get; private set; }
+
+        public IEnumerable<string> targetlist_input
+        {
+            set
+            {
+                this.targets_wild = value
+                    .Where(x => !x.StartsWith('!'))// || x.StartsWith(@"\!"))// \! はエスケープで ! に置き換わるので考えなくてよい
+                    .Select(x => x.ToWildcardEscaped())
+                    .ToArray();
+                this.untargets_wild = value
+                    .Where(x => x.StartsWith('!'))// || x.StartsWith(@"!\!"))// \! はエスケープで ! に置き換わるので考えなくてよい
+                    .Select(x => x[1..].ToWildcardEscaped())
+                    .ToArray();
+            }
+        }
+        public static implicit operator Wildlist(string[] src) => new Wildlist
+        {
+            targetlist_input = src,
+        };
+
+        public bool IsTarget(string name)
+        {
+            if (this.untargets_wild is not null)
+            {
+                var isUntarget = this.untargets_wild.Any(t => name.Like(t));
+                if (isUntarget) return false;
+            }
+
+            if (this.targets_wild is not null)
+            {
+                var isTarget = this.targets_wild.IsEmpty() || this.targets_wild.Any(t => name.Like(t));
+                return isTarget;
+            }
+
+            return true;
+        }
+    }
+
 
     public static class MeshCombiner
     {
 
-        public static GameObject CombineMeshes_IntoSingleMesh(this GameObject go)
+        public static GameObject CombineMeshes_IntoSingleMesh(
+            this GameObject go, CombineTargetList targetList = default)
         {
             var rs = go.GetComponentsInChildren<Renderer>();
-            return go.combineMeshes_IntoSingleMesh(rs);
+            return go.combineMeshes_IntoSingleMesh(null, null, null, default, rs);
         }
 
         public static GameObject CombineMeshes_IntoSingleMesh(
             this GameObject go,
             string meshMaterialName = null,
             string skinMaterialName = null,
-            string blendShapeMaterialName = null)
+            string blendShapeMaterialName = null,
+            CombineTargetList targetList = default)
         {
             var rs = go.GetComponentsInChildren<Renderer>();
             var qmat = rs.SelectMany(x => x.sharedMaterials);
@@ -45,7 +94,8 @@ namespace AnimLite.Geometry
             var sname = skinMaterialName != mname ? skinMaterialName : null;
             var bname = blendShapeMaterialName != mname ? blendShapeMaterialName : null;
 
-            return go.combineMeshes_IntoSingleMesh(rs, getMaterial_(mname), getMaterial_(sname), getMaterial_(bname));
+            return go.combineMeshes_IntoSingleMesh(
+                getMaterial_(mname), getMaterial_(sname), getMaterial_(bname), targetList, rs);
 
 
             Material getMaterial_(string name)
@@ -66,35 +116,42 @@ namespace AnimLite.Geometry
             this GameObject go,
             Material meshMaterial = null,
             Material skinMaterial = null,
-            Material blendShapeMaterial = null)
+            Material blendShapeMaterial = null,
+            CombineTargetList targetList = default)
         {
             var rs = go.GetComponentsInChildren<Renderer>();
-            return go.combineMeshes_IntoSingleMesh(rs, meshMaterial, skinMaterial, blendShapeMaterial);
+            return go.combineMeshes_IntoSingleMesh(
+                meshMaterial, skinMaterial, blendShapeMaterial, targetList, rs);
         }
 
         static GameObject combineMeshes_IntoSingleMesh(
-            this GameObject go, IEnumerable<Renderer> rs,
-            Material meshMaterial = null,
-            Material skinMaterial = null,
-            Material blendShapeMaterial = null)
+            this GameObject go,
+            Material meshMaterial,
+            Material skinMaterial,
+            Material blendShapeMaterial,
+            CombineTargetList targetList,
+            IEnumerable<Renderer> rs)
         {
             //var rs = go.GetComponentsInChildren<Renderer>();
-            var (ctex, ctexToUvRectList) = rs.PackTexture(TextureUtility.GetColorTexture2D);
-            var (ntex, ntexToUvRectList) = rs.PackTexture(TextureUtility.GetNormalTexture2D);
+            var target_rs = rs.filterRenderer(targetList);
+            var target_mats = target_rs.FilterMaterials(targetList).ToArray();
+            var (ctex, ctexToUvRectList) = target_mats.PackTexture(TextureUtility.GetColorTexture2D);
+            var (ntex, ntexToUvRectList) = target_mats.PackTexture(TextureUtility.GetNormalTexture2D);
             var texToUvRectDict = ctexToUvRectList.Concat(ntexToUvRectList).ToDictionary();
 
-            var meshes = rs.OfType<MeshRenderer>();
+            var meshes = target_rs.OfType<MeshRenderer>();
             var stdmat = meshMaterial.AsUnityNull() ?? default_mat_();
             combine_mesh_("new mesh", meshes, stdmat);
 
-            var qbody = rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount == 0);
+            var qbody = target_rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount == 0);
             var bodymat = skinMaterial.AsUnityNull() ?? stdmat;
             combine_skin_("new skin", qbody, bodymat);
 
-            var qface = rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount > 0);
+            var qface = target_rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount > 0);
             var facemat = blendShapeMaterial.AsUnityNull() ?? stdmat;
-            combine_skin_("new skin blend", qface, facemat).AddBlendShapes(qface);
+            combine_skin_("new skin blend", qface, facemat).AddBlendShapes(qface, targetList);
 
+            rs.HideRenderer();
             return go;
 
 
@@ -102,28 +159,33 @@ namespace AnimLite.Geometry
 
             Mesh combine_skin_(string name, IEnumerable<SkinnedMeshRenderer> smrs, Material mat)
             {
+                if (smrs.IsEmpty()) return null;
+
                 var (bones, bindposes) = smrs.buildBonesAndBindposes();
-                var mesh = smrs.CombineMeshesIntoSingleMesh(texToUvRectDict, bones, bindposes, go);
+                var mesh = smrs.CombineMeshesIntoSingleMesh(targetList, texToUvRectDict, bones, bindposes, go);
                 mat.SetColorTexture2D(ctex);
                 mat.SetNormalTexture2D(ntex);
 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mat, bones, smrs);
+                go.CreateSkinRendererObject(mesh, new[] {mat}, bones, smrs);
                 return mesh;
             }
             void combine_mesh_(string name, IEnumerable<MeshRenderer> mrs, Material mat)
             {
-                var mesh = mrs.CombineMeshesIntoSingleMesh(texToUvRectDict, go);
+                if (mrs.IsEmpty()) return;
+
+                var mesh = mrs.CombineMeshesIntoSingleMesh(targetList, texToUvRectDict, go);
                 mat.SetColorTexture2D(ctex);
                 mat.SetNormalTexture2D(ntex);
 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mat, null, mrs);
+                go.CreateRendererObject(mesh, new[] {mat});
             }
         }
 
 
-        public static GameObject CombineMeshes_ByMaterial(this GameObject go)
+        public static GameObject CombineMeshes_ByMaterial(
+            this GameObject go, CombineTargetList targetList = default)
         {
             var rs = go.GetComponentsInChildren<Renderer>();
 
@@ -134,70 +196,92 @@ namespace AnimLite.Geometry
             combine_skin_("new skin", bodies);
 
             var faces = rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount > 0);
-            combine_skin_("new skin blend", faces).AddBlendShapes(faces);
+            combine_skin_("new skin blend", faces).AddBlendShapes(faces, targetList);
 
+            rs.HideRenderer();
             return go;
 
 
             Mesh combine_skin_(string name, IEnumerable<SkinnedMeshRenderer> smrs)
             {
+                if (smrs.IsEmpty()) return null;
+
                 var (bones, bindposes) = smrs.buildBonesAndBindposes();
-                var (mesh, mats) = smrs.CombineMeshesByMaterial(bones, bindposes, go);
+                var (mesh, mats) = smrs.CombineMeshesByMaterial(targetList, bones, bindposes, go);
 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mats, bones, smrs);
+                go.CreateSkinRendererObject(mesh, mats, bones, smrs);
                 return mesh;
             }
             void combine_mesh_(string name, IEnumerable<MeshRenderer> mrs)
             {
-                var (mesh, mats) = mrs.CombineMeshesByMaterial(go);
+                if (mrs.IsEmpty()) return;
+
+                var (mesh, mats) = mrs.CombineMeshesByMaterial(targetList, go);
                 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mats, null, mrs);
+                go.CreateRendererObject(mesh, mats);
             }
         }
 
-        public static GameObject CombineMeshes_ByMaterialAndAtlasTextures(this GameObject go)
+        public static GameObject CombineMeshes_ByMaterialAndAtlasTextures(
+            this GameObject go, CombineTargetList targetList = default)
         {
             var rs = go.GetComponentsInChildren<Renderer>();
-            var (ctex, ctexToUvRectList) = rs.PackTexture(TextureUtility.GetColorTexture2D);
-            var (ntex, ntexToUvRectList) = rs.PackTexture(TextureUtility.GetNormalTexture2D);
+            var target_rs = rs.filterRenderer(targetList);
+            var target_mats = target_rs.FilterMaterials(targetList).ToArray();
+            var (ctex, ctexToUvRectList) = target_mats.PackTexture(TextureUtility.GetColorTexture2D);
+            var (ntex, ntexToUvRectList) = target_mats.PackTexture(TextureUtility.GetNormalTexture2D);
             var texToUvRectDict = ctexToUvRectList.Concat(ntexToUvRectList).ToDictionary();
 
-            var meshes = rs.OfType<MeshRenderer>();
+            var meshes = target_rs.OfType<MeshRenderer>();
             combine_mesh_("new mesh", meshes);
 
-            var bodies = rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount == 0);
+            var bodies = target_rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount == 0);
             combine_skin_("new skin", bodies);
 
-            var faces = rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount > 0);
-            combine_skin_("new skin blend", faces).AddBlendShapes(faces);
+            var faces = target_rs.OfType<SkinnedMeshRenderer>().Where(x => x.sharedMesh.blendShapeCount > 0);
+            combine_skin_("new skin blend", faces).AddBlendShapes(faces, targetList);
 
+            rs.HideRenderer();
             return go;
 
 
             Mesh combine_skin_(string name, IEnumerable<SkinnedMeshRenderer> smrs)
             {
+                if (smrs.IsEmpty()) return null;
+
                 var (bones, bindposes) = smrs.buildBonesAndBindposes();
-                var (mesh, mats) = smrs.CombineMeshesByMaterial(texToUvRectDict, bones, bindposes, go);
+                var (mesh, mats) = smrs.CombineMeshesByMaterial(targetList, texToUvRectDict, bones, bindposes, go);
                 mats.ForEach(mat => mat.SetColorTexture2D(ctex));
                 mats.ForEach(mat => mat.SetNormalTexture2D(ntex));
 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mats, bones, smrs);
+                go.CreateSkinRendererObject(mesh, mats, bones, smrs);
                 return mesh;
             }
             void combine_mesh_(string name, IEnumerable<MeshRenderer> mrs)
             {
-                var (mesh, mats) = mrs.CombineMeshesByMaterial(texToUvRectDict, go);
+                if (mrs.IsEmpty()) return;
+
+                var (mesh, mats) = mrs.CombineMeshesByMaterial(targetList, texToUvRectDict, go);
                 mats.ForEach(mat => mat.SetColorTexture2D(ctex));
                 mats.ForEach(mat => mat.SetNormalTexture2D(ntex));
 
                 mesh.name = name;
-                go.SwitchRenderer(mesh, mats, null, mrs);
+                go.CreateRendererObject(mesh, mats);
             }
         }
 
+    }
+
+
+    struct SrcModelData
+    {
+        public Mesh mesh;
+        public Material[] mats;
+        public Transform[] bones;
+        public Matrix4x4 mt;
     }
 
 
@@ -206,17 +290,23 @@ namespace AnimLite.Geometry
     {
 
         public static Mesh CombineMeshesIntoSingleMesh(
-            this IEnumerable<Renderer> rs,
+            this IEnumerable<Renderer> rs, CombineTargetList targetList,
             Dictionary<Texture2D, Rect> texToUvRectDict,
             GameObject baseobj)
         {
-            var qmmb = rs
-                .Select(r =>
-                    (mesh: r.GetComponent<MeshFilter>().sharedMesh, mats: r.sharedMaterials, bones: null as Transform[]))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from r in rs
+                select new SrcModelData
+                {
+                    mesh = r.GetComponent<MeshFilter>().sharedMesh,
+                    mats = r.sharedMaterials,
+                    bones = null,
+                    mt = mtinvbase * r.localToWorldMatrix,
+                };
 
             return qmmb.combineMeshesIntoSingleMesh(
+                targetList,
                 getcuvs: mat => mat.GetColorTexture2D()?.tex_to_rect(texToUvRectDict),
                 getnuvs: mat => mat.GetNormalTexture2D()?.tex_to_rect(texToUvRectDict),
                 getweights: (bones, wi) => 0,
@@ -224,20 +314,27 @@ namespace AnimLite.Geometry
                 baseobj);
         }
         public static Mesh CombineMeshesIntoSingleMesh(
-            this IEnumerable<SkinnedMeshRenderer> smrs,
+            this IEnumerable<SkinnedMeshRenderer> smrs, CombineTargetList targetList,
             Dictionary<Texture2D, Rect> texToUvRectDict,
             Transform[] bones,
             Matrix4x4[] bindposes,
             GameObject baseobj)
         {
-            var qmmb = smrs
-                .Select(smr => (mesh: smr.sharedMesh, mats: smr.sharedMaterials, bones: smr.bones))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from smr in smrs
+                select new SrcModelData
+                {
+                    mesh = smr.sharedMesh,
+                    mats = smr.sharedMaterials,
+                    bones = smr.bones,
+                    mt = mtinvbase * smr.localToWorldMatrix,
+                };
 
             var boneToIndex = bones.buildBoneToIndexDict();
 
             return qmmb.combineMeshesIntoSingleMesh(
+                targetList,
                 getcuvs: mat => mat.GetColorTexture2D()?.tex_to_rect(texToUvRectDict),
                 getnuvs: mat => mat.GetNormalTexture2D()?.tex_to_rect(texToUvRectDict),
                 getweights: (bones, wi) => boneToIndex[bones[wi]],
@@ -247,13 +344,18 @@ namespace AnimLite.Geometry
 
 
         static Mesh combineMeshesIntoSingleMesh(
-            this IEnumerable<(Mesh mesh, Material[] mats, Transform[] bones)> mmbs,
+            this IEnumerable<SrcModelData> srcmmbs, CombineTargetList targetList,
             Func<Material, Rect?> getcuvs,
             Func<Material, Rect?> getnuvs,
             Func<Transform[], int, int> getweights,
             Matrix4x4[] bindposes,
             GameObject baseobj)
         {
+            var mmbs = srcmmbs
+                .Where(x => targetList.Mesh.IsTarget(x.mesh.name))
+                .Do(x => Debug.Log(x.mesh.name))
+                .ToArray();
+
             var hasWeithts = mmbs.Select(x => x.mesh).HasWeights();
             var hasUv0s = mmbs.Select(x => x.mesh).HasUvs(0);
             var hasUv1s = mmbs.Select(x => x.mesh).HasUvs(1);
@@ -270,9 +372,11 @@ namespace AnimLite.Geometry
                 let mesh = x.Item1.mesh
                 let mats = x.Item1.mats
                 let bones = x.Item1.bones
+                let mt = x.Item1.mt
                 let vtxofs = x.Item2
 
                 let idxs = mesh.triangles
+                let idxs_ = filter_index_(mesh, mats, idxs, vtxofs).ToArray()
 
                 let tangents = hasTangents ? mesh.tangents : null
 
@@ -284,9 +388,13 @@ namespace AnimLite.Geometry
 
                 let cols = hasColors ? mesh.calc_cols(mats, idxs) : null
 
+                let vtxs = mt.isIdentity
+                    ? mesh.vertices
+                    : mesh.vertices.Select(v => mt.MultiplyPoint3x4(v)).ToArray()
+
                 select (
-                    idxs: idxs.Select(x => x + vtxofs),
-                    mesh.vertices,
+                    idxs: idxs_,//.Select(x => x + vtxofs),
+                    vtxs,
                     mesh.normals,
                     tangents,
                     cuvs,
@@ -298,7 +406,7 @@ namespace AnimLite.Geometry
 
             var newmesh = new Mesh();
 
-            newmesh.vertices = qmesh.SelectMany(x => x.vertices).ToArray();
+            newmesh.vertices = qmesh.SelectMany(x => x.vtxs).ToArray();
             newmesh.normals = qmesh.SelectMany(x => x.normals).ToArray();
             if (hasTangents) newmesh.tangents = qmesh.SelectMany(x => x.tangents).ToArray();
             if (hasUv0s) newmesh.uv = qmesh.SelectMany(x => x.cuvs).ToArray();
@@ -314,6 +422,15 @@ namespace AnimLite.Geometry
             newmesh.RecalculateBounds();
             return newmesh;
 
+
+            IEnumerable<int> filter_index_(Mesh mesh, Material[] mats, int[] idxs, int vofs) =>
+                from isub in Enumerable.Range(0, mats.Length)
+                let mat = mats[isub]
+                where targetList.Material.IsTarget(mat.name)
+
+                from idx in mesh.idx_subs(isub, idxs, vofs)
+
+                select idx;
         }
 
     }
@@ -323,16 +440,27 @@ namespace AnimLite.Geometry
     {
 
         public static (Mesh, Material[]) CombineMeshesByMaterial(
-            this IEnumerable<Renderer> rs,
+            this IEnumerable<Renderer> rs, CombineTargetList targetList,
             GameObject baseobj)
         {
-            var qmmb = rs
-                .Select(r =>
-                    (mesh: r.GetComponent<MeshFilter>().sharedMesh, mats: r.sharedMaterials, bones: null as Transform[]))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            //var qmmb = rs
+            //    .Select(r =>
+            //        (mesh: r.GetComponent<MeshFilter>().sharedMesh, mats: r.sharedMaterials, bones: null as Transform[]))
+            //    //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
+            //    ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from r in rs
+                select new SrcModelData
+                {
+                    mesh = r.GetComponent<MeshFilter>().sharedMesh,
+                    mats = r.sharedMaterials,
+                    bones = null,
+                    mt = mtinvbase * r.localToWorldMatrix,
+                };
 
             return qmmb.combineMeshesByMaterial(
+                targetList,
                 getcuvs: mat => default,
                 getnuvs: mat => default,
                 getweights: (bones, wi) => 0,
@@ -340,19 +468,30 @@ namespace AnimLite.Geometry
                 baseobj);
         }
         public static (Mesh, Material[]) CombineMeshesByMaterial(
-            this IEnumerable<SkinnedMeshRenderer> smrs,
+            this IEnumerable<SkinnedMeshRenderer> smrs, CombineTargetList targetList,
             Transform[] bones,
             Matrix4x4[] bindposes,
             GameObject baseobj)
         {
-            var qmmb = smrs
-                .Select(smr => (mesh: smr.sharedMesh, mats: smr.sharedMaterials, bones: smr.bones))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            //var qmmb = smrs
+            //    .Select(smr => (mesh: smr.sharedMesh, mats: smr.sharedMaterials, bones: smr.bones))
+            //    //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
+            //    ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from smr in smrs
+                select new SrcModelData
+                {
+                    mesh = smr.sharedMesh,
+                    mats = smr.sharedMaterials,
+                    bones = smr.bones,
+                    mt = mtinvbase * smr.localToWorldMatrix,
+                };
 
             var boneToIndex = bones.buildBoneToIndexDict();
 
             return qmmb.combineMeshesByMaterial(
+                targetList,
                 getcuvs: mat => default,
                 getnuvs: mat => default,
                 getweights: (bones, wi) => boneToIndex[bones[wi]],
@@ -362,17 +501,28 @@ namespace AnimLite.Geometry
 
 
         public static (Mesh, Material[]) CombineMeshesByMaterial(
-            this IEnumerable<Renderer> rs,
+            this IEnumerable<Renderer> rs, CombineTargetList targetList,
             Dictionary<Texture2D, Rect> texToUvRectDict,
             GameObject baseobj)
         {
-            var qmmb = rs
-                .Select(r =>
-                    (mesh: r.GetComponent<MeshFilter>().sharedMesh, mats: r.sharedMaterials, bones: null as Transform[]))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            //var qmmb = rs
+            //    .Select(r =>
+            //        (mesh: r.GetComponent<MeshFilter>().sharedMesh, mats: r.sharedMaterials, bones: null as Transform[]))
+            //    //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
+            //    ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from r in rs
+                select new SrcModelData
+                {
+                    mesh = r.GetComponent<MeshFilter>().sharedMesh,
+                    mats = r.sharedMaterials,
+                    bones = null,
+                    mt = mtinvbase * r.localToWorldMatrix,
+                };
 
             return qmmb.combineMeshesByMaterial(
+                targetList,
                 getcuvs: mat => mat.GetColorTexture2D()?.tex_to_rect(texToUvRectDict),
                 getnuvs: mat => mat.GetNormalTexture2D()?.tex_to_rect(texToUvRectDict),
                 getweights: (bones, wi) => 0,
@@ -380,20 +530,31 @@ namespace AnimLite.Geometry
                 baseobj);
         }
         public static (Mesh, Material[]) CombineMeshesByMaterial(
-            this IEnumerable<SkinnedMeshRenderer> smrs,
+            this IEnumerable<SkinnedMeshRenderer> smrs, CombineTargetList targetList,
             Dictionary<Texture2D, Rect> texToUvRectDict,
             Transform[] bones,
             Matrix4x4[] bindposes,
             GameObject baseobj)
         {
-            var qmmb = smrs
-                .Select(smr => (mesh: smr.sharedMesh, mats: smr.sharedMaterials, bones: smr.bones))
-                //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
-                ;
+            //var qmmb = smrs
+            //    .Select(smr => (mesh: smr.sharedMesh, mats: smr.sharedMaterials, bones: smr.bones))
+            //    //.Do(x => Debug.Log($"{x.mesh.boneWeights?.Length} {x.mesh.uv2?.Length}"))
+            //    ;
+            var mtinvbase = baseobj.transform.worldToLocalMatrix;
+            var qmmb =
+                from smr in smrs
+                select new SrcModelData
+                {
+                    mesh = smr.sharedMesh,
+                    mats = smr.sharedMaterials,
+                    bones = smr.bones,
+                    mt = mtinvbase * smr.localToWorldMatrix,
+                };
 
             var boneToIndex = bones.buildBoneToIndexDict();
 
             return qmmb.combineMeshesByMaterial(
+                targetList,
                 getcuvs: mat => mat.GetColorTexture2D()?.tex_to_rect(texToUvRectDict),
                 getnuvs: mat => mat.GetNormalTexture2D()?.tex_to_rect(texToUvRectDict),
                 getweights: (bones, wi) => boneToIndex[bones[wi]],
@@ -403,13 +564,18 @@ namespace AnimLite.Geometry
 
 
         static (Mesh, Material[]) combineMeshesByMaterial(
-            this IEnumerable<(Mesh mesh, Material[] mats, Transform[] bones)> mmbs,
+            this IEnumerable<SrcModelData> srcmmbs, CombineTargetList targetList,
             Func<Material, Rect?> getcuvs,
             Func<Material, Rect?> getnuvs,
             Func<Transform[], int, int> getweights,
             Matrix4x4[] bindposes,
             GameObject baseobj)
         {
+            var mmbs = srcmmbs
+                .Where(x => targetList.Mesh.IsTarget(x.mesh.name))
+                .Do(x => Debug.Log(x.mesh.name))
+                .ToArray();
+
             var hasWeithts = mmbs.Select(x => x.mesh).HasWeights();
             var hasUv0s = mmbs.Select(x => x.mesh).HasUvs(0);
             var hasUv1s = mmbs.Select(x => x.mesh).HasUvs(1);
@@ -422,6 +588,7 @@ namespace AnimLite.Geometry
                 let mesh = mmb.mesh
                 let mats = mmb.mats
                 let bones = mmb.bones
+                let mt = mmb.mt
 
                 let idxs = mesh.triangles
 
@@ -435,8 +602,12 @@ namespace AnimLite.Geometry
 
                 let cols = hasColors ? mesh.calc_cols(mats, idxs) : null
 
+                let vtxs = mt.isIdentity
+                    ? mesh.vertices
+                    : mesh.vertices.Select(v => mt.MultiplyPoint3x4(v)).ToArray()
+
                 select (
-                    mesh.vertices,
+                    vtxs,
                     mesh.normals,
                     tangents,
                     cuvs,
@@ -457,16 +628,22 @@ namespace AnimLite.Geometry
                 let vtxofs = x.Item2
 
                 let idxs = mesh.triangles
+                //let idxs_ = filter_index_(mesh, mats, idxs, vtxofs).ToArray()
 
                 from i in Enumerable.Range(0, mesh.subMeshCount)
-                group mesh.idx_subs(i, idxs, vtxofs) by mats[i];
+                let mat = mats[i]
+                where targetList.Material.IsTarget(mat.name)
+                group
+                    mesh.idx_subs(i, idxs, vtxofs)
+                by
+                    mat;// s[i];
 
 
             var newmats = qsubmesh.Select(x => new Material(x.Key)).ToArray();
 
             var newmesh = new Mesh();
 
-            newmesh.vertices = qmeshvtx.SelectMany(x => x.vertices).ToArray();
+            newmesh.vertices = qmeshvtx.SelectMany(x => x.vtxs).ToArray();
             newmesh.normals = qmeshvtx.SelectMany(x => x.normals).ToArray();
             if (hasTangents) newmesh.tangents = qmeshvtx.SelectMany(x => x.tangents).ToArray();
             if (hasUv0s) newmesh.uv = qmeshvtx.SelectMany(x => x.cuvs).ToArray();
@@ -487,6 +664,16 @@ namespace AnimLite.Geometry
 
             newmesh.RecalculateBounds();
             return (newmesh, newmats);
+
+
+            //IEnumerable<int> filter_index_(Mesh mesh, Material[] mats, int[] idxs, int vofs) =>
+            //    from isub in Enumerable.Range(0, mats.Length)
+            //    let mat = mats[isub]
+            //    where targetList.Material.IsTarget(mat.name)
+
+            //    from idx in mesh.idx_subs(isub, idxs, vofs)
+
+            //    select idx;
         }
 
     }
@@ -518,8 +705,11 @@ namespace AnimLite.Geometry
 
 
 
-        public static Mesh AddBlendShapes(this Mesh dstmesh, IEnumerable<SkinnedMeshRenderer> smrs)
-        {
+        public static Mesh AddBlendShapes(
+            this Mesh dstmesh, IEnumerable<SkinnedMeshRenderer> smrs, CombineTargetList targetList)
+        {;
+            if (dstmesh is null) return null;
+
             var names = smrs
                 .Select(smr => smr.sharedMesh)
                 .SelectMany(mesh =>
@@ -678,20 +868,65 @@ namespace AnimLite.Geometry
 
     }
 
-    static class TextureUtility
+
+    static class FilterUtility
     {
 
-        public static (IEnumerable<T>, IEnumerable<U>) Concat<T, U>(this (IEnumerable<T>, IEnumerable<U>) src1, (IEnumerable<T>, IEnumerable<U>) src2) =>
+        public static (IEnumerable<T>, IEnumerable<U>) Concat<T, U>(
+            this (IEnumerable<T>, IEnumerable<U>) src1, (IEnumerable<T>, IEnumerable<U>) src2)
+        =>
             (src1.Item1.Concat(src2.Item1), src1.Item2.Concat(src2.Item2));
+
+
+
+        public static IEnumerable<T> filterRenderer<T>(
+            this IEnumerable<T> src, CombineTargetList targetList)
+                where T : Renderer
+        =>
+            src
+                .Where(x => targetList.Mesh.IsTarget(x.name))
+                .Do(x => Debug.Log(x.name))
+                ;//.ToArray();
+
+
+        //public static IEnumerable<Material> FilterMaterials<T>(
+        //    this IEnumerable<T> src, CombineTargetList targetlist)
+        //        where T : Renderer
+        //=>
+        //    src
+        //        .Where(r => targetlist.Mesh.IsTarget(r.name))
+        //        .FilterMaterials(targetlist);
+
+
+        public static IEnumerable<Material> FilterMaterials(
+            this IEnumerable<Renderer> rs, CombineTargetList targetlist)
+        =>
+            from r in rs
+            from mat in r.sharedMaterials
+            where targetlist.Material.IsTarget(mat.name)
+            select mat
+            ;
+
+    }
+
+
+    static class TextureUtility
+    {
 
 
         //public static (Texture2D tex, Dictionary<Texture2D, Rect> texToUvRectDict) PackTexture(
         public static (Texture2D tex, (Texture2D[], Rect[]) texToUvRectList) PackTexture(
             this IEnumerable<Renderer> rs, Func<Material, Texture2D> gettex)
+        =>
+            rs
+                .SelectMany(r => r.sharedMaterials)
+                .PackTexture(gettex);
+
+        public static (Texture2D tex, (Texture2D[], Rect[]) texToUvRectList) PackTexture(
+            this IEnumerable<Material> mats, Func<Material, Texture2D> gettex)
         {
             var qtex =
-                from r in rs
-                from mat in r.sharedMaterials
+                from mat in mats
                 let tex = gettex(mat)
                 where tex is not null
                 select tex
@@ -774,51 +1009,58 @@ namespace AnimLite.Geometry
     public static class RendererUtility
     {
 
-        public static void SwitchRenderer(
-            this GameObject parent, Mesh mesh, Material mat, Transform[] bones, IEnumerable<Renderer> prevsmrs)
-        =>
-            parent.SwitchRenderer(mesh, new[] { mat }, bones, prevsmrs);
 
-        public static void SwitchRenderer(
-            this GameObject parent, Mesh mesh, Material[] mats, Transform[] bones, IEnumerable<Renderer> prevrs)
+        public static void HideRenderer(this IEnumerable<Renderer> rs)
         {
-            if (prevrs.IsEmpty()) return;
-            //prevsmrs.ForEach(x => x.enabled = false);
-            prevrs.ForEach(x => x.gameObject.SetActive(false));
+            //rs.ForEach(x => x.enabled = false);
+            rs.ForEach(x => x.gameObject.SetActive(false));
+        }
 
-            var go = bones is not null
-                ? createObject_SkinnedMesh_()
-                : createObject_Mesh_()
-                ;
+
+        //public static void CreateRenderer(
+        //    this GameObject parent, Mesh mesh, Material mat, Transform[] bones, IEnumerable<Renderer> prevsmrs)
+        //=>
+        //    parent.CreateRenderer(mesh, new[] { mat }, bones, prevsmrs);
+
+        //public static void CreateRenderer(
+        //    this GameObject parent, Mesh mesh, Material[] mats, Transform[] bones, IEnumerable<Renderer> prevrs)
+        //{
+        //    var go = bones is not null
+        //        ? createObject_SkinnedMesh_()
+        //        : createObject_Mesh_()
+        //        ;
+
+        //    go.transform.SetParent(parent.transform, worldPositionStays: false);
+        //    return;
+
+
+        //}
+        public static void CreateSkinRendererObject(
+            this GameObject parent,
+            Mesh mesh, Material[] mats, Transform[] bones, IEnumerable<SkinnedMeshRenderer> prevrs)
+        {
+            var go = new GameObject(mesh.name);
+
+            var smr = go.AddComponent<SkinnedMeshRenderer>();
+            smr.rootBone = prevrs.First().rootBone?.findRoot(parent.transform);
+            smr.bones = bones;
+            smr.sharedMesh = mesh;
+            smr.sharedMaterials = mats;
+            //smr.localBounds = prevrs.Cast<SkinnedMeshRenderer>().CalcLocalBounds(smr.rootBone);
 
             go.transform.SetParent(parent.transform, worldPositionStays: false);
-            return;
+        }
+        public static void CreateRendererObject(
+            this GameObject parent, Mesh mesh, Material[] mats)
+        {
+            var go = new GameObject(mesh.name);
 
+            var mr = go.AddComponent<MeshRenderer>();
+            var mf = go.AddComponent<MeshFilter>();
+            mf.sharedMesh = mesh;
+            mr.sharedMaterials = mats;
 
-            GameObject createObject_SkinnedMesh_()
-            {
-                var go = new GameObject(mesh.name);
-
-                var smr = go.AddComponent<SkinnedMeshRenderer>();
-                smr.rootBone = prevrs.Cast<SkinnedMeshRenderer>().First().rootBone?.findRoot(parent.transform);
-                smr.bones = bones;
-                smr.sharedMesh = mesh;
-                smr.sharedMaterials = mats;
-                //smr.localBounds = prevrs.Cast<SkinnedMeshRenderer>().CalcLocalBounds(smr.rootBone);
-
-                return go;
-            }
-            GameObject createObject_Mesh_()
-            {
-                var go = new GameObject(mesh.name);
-
-                var mr = go.AddComponent<MeshRenderer>();
-                var mf = go.AddComponent<MeshFilter>();
-                mf.sharedMesh = mesh;
-                mr.sharedMaterials = mats;
-
-                return go;
-            }
+            go.transform.SetParent(parent.transform, worldPositionStays: false);
         }
         static Transform findRoot(this Transform tfthis, Transform baseobj)
         {
@@ -845,5 +1087,7 @@ namespace AnimLite.Geometry
         }
 
     }
+
+
 
 }

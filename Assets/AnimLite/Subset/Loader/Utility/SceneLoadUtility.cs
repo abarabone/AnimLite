@@ -26,7 +26,6 @@ namespace AnimLite.Loader
     using AnimLite.Vrm;
     using AnimLite.Vmd;
     using static AnimLite.DancePlayable.DanceGraphy;
-    using static UnityEditor.Progress;
 
     public static class SceneLoadUtilitiy
     {
@@ -267,7 +266,7 @@ namespace AnimLite.Loader
         static async ValueTask<Instance<GameObject>?> loadModelAsync(
             this PrototypeCacheHolder cache, PathUnit modelpath, IArchive? archive, CancellationToken ct)
         {
-            return cache is not null
+            return cache?.ModelCache is not null
                 ? await cache.ModelCache.GetOrLoadModelAsync(modelpath, archive, ct)
                 : await archive.LoadModelInstanceAsync(modelpath, ct);
         }
@@ -328,7 +327,6 @@ namespace AnimLite.Loader
             this ModelDefineJson define, Instance<GameObject>? model)
         {
             var options = define.OptionsAs<ModelOptionsJson>();
-            model.combineMeshes(options);
 
             return new()
             {
@@ -336,6 +334,7 @@ namespace AnimLite.Loader
                 Position = define.Position,
                 Rotation = Quaternion.Euler(define.EulerAngles),
                 Scale = define.Scale,
+                ModelOptions = options,
             };
 
         }
@@ -344,55 +343,36 @@ namespace AnimLite.Loader
             this DanceMotionDefineJson define, Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust, CancellationToken ct)
         {
             var model_options = define.Model.OptionsAs<ModelOptionsJson>();
-            if (model is not null)
-            {
-                model.combineMeshes(model_options);
-                model.Value.transform.ApplyBlendShapeToVrmExpression("new skin blend");
-            }
+            var anim_options = define.Animation.OptionsAs<AnimationOptionsJson>();
 
-            var anim_options = define.Animation.OptionsAs<MotionOptionsJson>();
             return (vmddata?.Value is not null) switch
             {
                 true when anim_options.UseStreamHandleAnimationJob =>
-                    define.toMotionOrderOld(anim_options, vmddata, facemap, model, adjust),
+                    define.toMotionOrderOld(model_options, anim_options, vmddata, facemap, model, adjust),
                 true =>
-                    define.toMotionOrder(anim_options, vmddata, facemap, model, adjust),
+                    define.toMotionOrder(model_options, anim_options, vmddata, facemap, model, adjust),
                 false =>
-                    await define.toMotionOrderAwait(anim_options, model, ct),
+                    await define.toMotionOrderAwait(model_options, anim_options, model, ct),
             };
         }
 
-        static GameObject? combineMeshes(this Instance<GameObject>? model, ModelOptionsJson options)
-        {
-            if (model is null) return null;
-
-            return options.MeshCombineMode switch
-            {
-                MeshCombineMode.IntoSingleMesh =>
-                    model.Value.CombineMeshes_IntoSingleMesh(options.MeshMaterialName, options.SkinMaterialName, options.SkinMaterialName),
-                MeshCombineMode.ByMaterial =>
-                    model.Value.CombineMeshes_ByMaterial(),
-                MeshCombineMode.ByMaterialAndAtlasTextures =>
-                    model.Value.CombineMeshes_ByMaterialAndAtlasTextures(),
-                _ =>
-                    model.Value,
-            };
-        }
 
 
         static MotionOrder toMotionOrder(
-            this DanceMotionDefineJson define, MotionOptionsJson options,
+            this DanceMotionDefineJson define,
+            ModelOptionsJson model_options, AnimationOptionsJson anim_options,
             Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
         {
             return new()
             {
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
+                ModelOptions = model_options,
 
                 //vmddata = vmddata,
                 vmd = vmddata,
                 bone = model.AsUnityNull()?.GetComponent<Animator>()
-                    .BuildVmdTransformMappings(adjust, options.GroundHitOriginOffset)
+                    .BuildVmdTransformMappings(adjust, anim_options.GroundHitOriginOffset)
                     ??
                     default,
                 face = facemap.Value.BuildStreamingFace(),
@@ -402,7 +382,7 @@ namespace AnimLite.Loader
                 //FootScale = options.FootScaleFromHuman,
                 //MoveScale = options.MoveScaleFromHuman,
                 //FootIkMode = options.FootIkMode,
-                Options = options,
+                AnimationOptions = anim_options,
 
                 Position = define.Model.Position,
                 Rotation = Quaternion.Euler(define.Model.EulerAngles),
@@ -410,13 +390,15 @@ namespace AnimLite.Loader
             };
         }
         static MotionOrderOld toMotionOrderOld(
-            this DanceMotionDefineJson define, MotionOptionsJson options,
+            this DanceMotionDefineJson define,
+            ModelOptionsJson model_options, AnimationOptionsJson anim_options,
             Instance<VmdStreamData> vmddata, Instance<VmdFaceMapping> facemap, Instance<GameObject>? model, BodyAdjustData adjust)
         {
             return new()
             {
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
+                ModelOptions = model_options,
 
                 //vmddata = vmddata,
                 vmd = vmddata,
@@ -431,7 +413,7 @@ namespace AnimLite.Loader
                 //FootScale = options.FootScaleFromHuman,
                 //MoveScale = options.MoveScaleFromHuman,
                 //FootIkMode = options.FootIkMode,
-                Options = options,
+                AnimationOptions = anim_options,
 
                 Position = define.Model.Position,
                 Rotation = Quaternion.Euler(define.Model.EulerAngles),
@@ -440,13 +422,15 @@ namespace AnimLite.Loader
         }
         // animation clip がキャッシュ、face やブレンドを整備するまでの暫定
         static async ValueTask<MotionOrderWithAnimationClip> toMotionOrderAwait(
-            this DanceMotionDefineJson define, MotionOptionsJson options,
+            this DanceMotionDefineJson define,
+            ModelOptionsJson model_options, AnimationOptionsJson anim_options,
             Instance<GameObject>? model, CancellationToken ct)
         =>
             new()
             {
                 Model = model,
                 FaceRenderer = model.AsUnityNull()?.FindFaceRenderer(),
+                ModelOptions = model_options,
 
                 // vmd ロード失敗してたら、animation clip をリソースロードする
                 AnimationClip = await (await define.Animation.AnimationFilePath.Paths

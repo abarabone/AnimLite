@@ -304,10 +304,12 @@
                 },
                 "Scale": 0.0,
                 "Options": {
-                  "MeshCombineMode": "None",      // 選択肢は "IntoSingleMesh" | "ByMaterial" | "ByMaterialAndAtlasTextures"
-                  "MeshMaterialName": "",         // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
-                  "SkinMaterialName": "",         // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialName と同じマテリアルが適用される
-                  "SkinBlendMaterialName": ""     // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
+                  "MeshCombineMode": "None",              // 選択肢は "IntoSingleMesh" | "ByMaterial" | "ByMaterialAndAtlasTextures"
+                  "MeshMaterialOnSingleMesh": "",         // IntoSingleMesh の時に、マテリアル名を指定。ワイルドカードに対応。シェーダー名でもよい
+                  "SkinMaterialOnSingleMesh": "",         // 同上で、スキンメッシュのマテリアルを指定する。省略時は MeshMaterialOnSingleMesh と同じマテリアルが適用される
+                  "BlendShapeMaterialOnSingleMesh": "",   // 同上で、ブレンドシェイプ付スキンメッシュのマテリアルを指定する。省略時は同上
+                  "TargetMeshList": [],                   // 結合対象とするメッシュを含むゲームオブジェクト名を配列で指定。ワイルドカードに対応。先頭に ! をつけると逆に対象としない指定。エスケープは \ で。省略するとすべてのメッシュが結合対象となる
+                  "TargetMaterialList": []                // 結合対象とするマテリアル名を配列で指定。ワイルドカード、省略時、等は TargetMeshList と同じ。
                 }
             },
             "Animation": {                        // キャラクターのアニメーション
